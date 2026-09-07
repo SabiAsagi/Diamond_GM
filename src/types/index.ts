@@ -1,4 +1,11 @@
 export * from './highSchool';
+export * from './calendar';
+export * from './academicCalendar';
+export * from './tournament';
+export * from './dailySchedule';
+export * from './activity';
+
+import type { GameDate, TimeSlot } from './calendar';
 
 export type Position = 'P' | 'C' | '1B' | '2B' | '3B' | 'SS' | 'LF' | 'CF' | 'RF' | 'TwoWay';
 export type PlayerStatus = 'HighSchool' | 'Pro' | 'Minor' | 'Military' | 'Retired';
@@ -58,8 +65,14 @@ export interface Player {
   chosenPathTitle?: string; // 면담에서 선택한 목표
   grade?: number; // 고1, 고2, 고3 (1, 2, 3)
   month?: number; // 3월 ~ 다음해 2월
-  week?: number; // 1주 ~ 4주
+  week?: number; // 1주 ~ 4주 (하위 호환 유지)
+  day?: number; // 1 ~ 31
   fame?: number; // 전국 인지도 / 스카우트 주목도 (0-100)
+
+  // 신규 일일 생활 시뮬레이션 & 캘린더 시계 필드
+  gameDate?: GameDate;
+  currentSlot?: TimeSlot;
+  injuryStatus?: string;
 }
 
 export interface Team {

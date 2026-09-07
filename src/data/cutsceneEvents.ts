@@ -1,0 +1,83 @@
+import type { EventCutscene } from '../types/randomEvent';
+
+export const CUTSCENE_EVENTS_POOL: EventCutscene[] = [
+  {
+    id: 'scout_secret_visit',
+    title: 'KBO 프로 스카우트의 밀착 관찰',
+    subtitle: '백스톱 뒤에서 스피드건을 든 프로 스카우트가 자네를 지켜봅니다.',
+    dialogue: '"저 녀석 메커니즘이 제법인데? 다음 주말리그 경기 때 스카우트 팀장님께도 보고서를 올려야겠어."',
+    speakerName: 'KBO 구단 스카우트',
+    speakerRole: '프로 스카우팅 팀',
+    icon: '📋',
+    baseChance: 0.12, // 12%
+    cooldownDays: 7,
+    conditions: player => (player.fame || 0) >= 15,
+    effect: player => ({
+      statChanges: {
+        fame: (player.fame || 10) + 4,
+        condition: Math.min(100, player.condition + 5),
+      },
+      logMessage: '👀 프로 스카우트가 연습장에 방문하여 자네의 플레이를 스카우팅 리포트에 기록했습니다! (인지도 +4)',
+    }),
+  },
+  {
+    id: 'coach_one_point_lesson',
+    title: '감독님의 방과 후 원포인트 레슨',
+    subtitle: '해가 진 뒤 남아서 1:1로 릴리스 포인트와 타격 궤적을 짚어주십니다.',
+    dialogue: '"자네의 릴리스 각도가 조금 흔들리는군. 하체를 단단히 디디고 팔을 채는 느낌을 기억하게."',
+    speakerName: '담당 감독',
+    speakerRole: 'Head Coach',
+    icon: '👨‍🏫',
+    baseChance: 0.15,
+    cooldownDays: 8,
+    conditions: player => (player.relationshipCoach || 50) >= 45,
+    effect: player => {
+      const isP = player.position === 'P';
+      return {
+        statChanges: {
+          control: isP ? player.control + 2 : player.control,
+          contact: !isP ? player.contact + 2 : player.contact,
+          relationshipCoach: (player.relationshipCoach || 50) + 3,
+        },
+        logMessage: `✨ 감독님이 1:1 밀착 교정으로 밸런스를 바로잡아 주셨습니다. (${isP ? '제구 +2' : '컨택 +2'}, 감독신뢰 +3)`,
+      };
+    },
+  },
+  {
+    id: 'senior_secret_pep_talk',
+    title: '3학년 주전 선배의 격려와 조언',
+    subtitle: '고교 야구 메이저 대회를 앞두고 선배가 실전 노하우를 전수합니다.',
+    dialogue: '"처음엔 다 떨려. 하지만 마운드나 타석에선 그냥 나 자신과 공만 믿는 거야. 넌 충분히 잘하고 있어."',
+    speakerName: '3학년 주장 선배',
+    speakerRole: 'Team Captain',
+    icon: '🤝',
+    baseChance: 0.14,
+    cooldownDays: 7,
+    effect: player => ({
+      statChanges: {
+        condition: Math.min(100, player.condition + 15),
+        relationshipTeam: (player.relationshipTeam || 50) + 5,
+      },
+      logMessage: '💪 주전 선배의 든든한 격려를 받으며 마인드컨트롤과 멘탈이 크게 회복되었습니다. (컨디션 +15)',
+    }),
+  },
+  {
+    id: 'rival_school_provocation',
+    title: '라이벌 고교 에이스와의 조우',
+    subtitle: '경기장 복도에서 마주친 라이벌 학교 주전이 강한 눈빛을 보냅니다.',
+    dialogue: '"이번 주말리그에서 맞붙게 되겠군. 어디 네 공/배트가 얼마나 대단한지 똑똑히 지켜보겠다."',
+    speakerName: '라이벌 고교 유망주',
+    speakerRole: 'Rival Ace',
+    icon: '⚔️',
+    baseChance: 0.10,
+    cooldownDays: 10,
+    effect: player => ({
+      statChanges: {
+        stuff: player.position === 'P' ? player.stuff + 1 : player.stuff,
+        power: player.position !== 'P' ? player.power + 1 : player.power,
+        fame: (player.fame || 10) + 2,
+      },
+      logMessage: '🔥 라이벌과의 팽팽한 신경전으로 가슴속 투지가 불타오릅니다! (승부욕 및 능력치 상승)',
+    }),
+  },
+];

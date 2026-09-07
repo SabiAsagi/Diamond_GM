@@ -1,8 +1,7 @@
-export interface InterviewChoice {
+export interface InterviewChoiceOption {
   id: string;
   title: string;
   dialogue: string;
-  response: string; // 감독의 화답
   coachReply: string;
   statBoosts: {
     stuff?: number;
@@ -14,127 +13,173 @@ export interface InterviewChoice {
     speed?: number;
     defense?: number;
     condition?: number;
+    academics?: number;
+    fame?: number;
+    relationshipCoach?: number;
+    relationshipTeam?: number;
+    relationshipFriends?: number;
+    relationshipFamily?: number;
   };
   gainedTrait: string;
   traitDescription: string;
   icon: string;
 }
 
-export const PITCHER_INTERVIEW_CHOICES: InterviewChoice[] = [
-  {
-    id: 'power_fireballer',
-    title: '강속구 파이어볼러 (구위 & 구속 특화)',
-    dialogue: '"타자를 압도하는 150km/h대 강속구로 마운드를 지배하는 파이어볼러가 되겠습니다!"',
-    response: '호기롭군! 빠른 공은 신이 내린 선물이지. 자네의 강한 어깨를 믿고 타자를 힘으로 윽박지르는 훈련을 집중적으로 시켜주겠네.',
-    coachReply: '구위와 최고구속을 집중 훈련하며 타자의 헛스윙을 이끌어냅니다.',
-    statBoosts: { stuff: 15, control: 4, stamina: 5 },
-    gainedTrait: '파이어볼러',
-    traitDescription: '패스트볼 체감 구속 상승 및 타자의 헛스윙 유도율 대폭 증가',
-    icon: '🔥'
-  },
-  {
-    id: 'control_artist',
-    title: '면도날 제구파 (제구 & 선구안 파괴 특화)',
-    dialogue: '"스트라이크 존 구석구석을 찌르는 칼날 같은 제구력으로 타자의 허를 찌르겠습니다!"',
-    response: '좋은 눈과 영리한 마인드야. 결국 야구는 제구력의 싸움이지. 사사구를 줄이고 볼카운트를 유리하게 이끄는 정밀 피칭을 연마해보세.',
-    coachReply: '사사구 비율을 최소화하고 스트라이크 존 보더라인을 완벽히 공략합니다.',
-    statBoosts: { control: 16, stuff: 4, stamina: 4 },
-    gainedTrait: '컨트롤 아티스트',
-    traitDescription: '볼넷 허용률 최소화 및 2스트라이크 이후 결정구 성공률 증가',
-    icon: '🎯'
-  },
-  {
-    id: 'iron_inning_eater',
-    title: '강철 체력의 이닝 이터 (완투 & 스태미너 특화)',
-    dialogue: '"9회 마지막 아웃카운트까지 마운드를 든든하게 책임지는 에이스 선발투수가 되겠습니다!"',
-    response: '진정한 에이스의 자세로군! 불펜의 부담을 덜어주는 완투형 투수야말로 모든 감독이 꿈꾸는 기둥이지. 강철 체력을 만들어주겠네.',
-    coachReply: '투구수가 많아져도 구위 저하가 적고 이닝 소화력이 비약적으로 상승합니다.',
-    statBoosts: { stamina: 18, control: 5, stuff: 4, condition: 10 },
-    gainedTrait: '강철 어깨',
-    traitDescription: '이닝당 스태미너 소모량 감소 및 연투 피로 회복 속도 대폭 증가',
-    icon: '🛡️'
-  },
-  {
-    id: 'stone_closer',
-    title: '돌부처 수호신 (위기관리 & 클로저 특화)',
-    dialogue: '"만루 위기에서도 흔들리지 않고 팀의 승리를 끝까지 지켜내는 마무리가 되겠습니다!"',
-    response: '배짱이 두둑하군! 마운드 위에서의 강심장은 훈련만으로는 얻기 힘든 법. 자네의 강한 멘탈로 뒷문을 굳게 잠가주게.',
-    coachReply: '주자가 득점권에 있을 때 멘탈이 흔들리지 않고 구위가 한 단계 각성합니다.',
-    statBoosts: { stuff: 10, control: 8, stamina: 4, condition: 15 },
-    gainedTrait: '돌부처 클로저',
-    traitDescription: '득점권 위기 상황 및 9회 세이브 상황에서 피안타율 대폭 감소',
-    icon: '💎'
-  }
-];
+export interface InterviewQuestion {
+  step: number;
+  questionTitle: string;
+  questionDialogue: string;
+  options: InterviewChoiceOption[];
+}
 
-export const BATTER_INTERVIEW_CHOICES: InterviewChoice[] = [
+/**
+ * 3단계 연속 질문 세트 (A: 목표/각오 + B: 야구관/플레이스타일 + C: 팀내 태도/역할)
+ */
+export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
+  // 1단계: 야구를 향한 궁극적인 목표 (세트 A 기반)
   {
-    id: 'slugger_home_run_king',
-    title: '거포 슬러거 (파워 & 장타력 특화)',
-    dialogue: '"담장을 훌쩍 넘기는 호쾌한 한 방으로 경기 흐름을 뒤집는 4번 홈런 타자가 되겠습니다!"',
-    response: '홈런 한 방은 야구의 꽃이지! 자네의 체격과 파워를 살려 전국대회 담장을 넘기는 괴물 타자로 키워보겠네.',
-    coachReply: '타구 속도와 비거리가 극대화되어 장타와 홈런 생산력이 크게 향상됩니다.',
-    statBoosts: { power: 16, contact: 4, eye: 4 },
-    gainedTrait: '거포 본능',
-    traitDescription: '정타 시 장타 및 홈런 확률 증가, 비거리 보너스',
-    icon: '💣'
+    step: 1,
+    questionTitle: '질문 1. 야구를 향한 궁극적인 목표',
+    questionDialogue: '"자네는 어떤 각오와 목표를 품고 우리 고교 야구부 유니폼을 입게 되었나?"',
+    options: [
+      {
+        id: 'q1_pro_bound',
+        title: 'KBO 1라운드 프로 지명',
+        dialogue: '"반드시 KBO 신인 드래프트 1라운드에 지명되어 대한민국 최고의 프로 선수가 되겠습니다!"',
+        coachReply: '호기롭군! 높은 목표의식이야말로 프로를 향한 가장 강력한 연료지. 스카우트들의 눈길을 사로잡도록 집중 육성해보세.',
+        statBoosts: { relationshipCoach: 5, fame: 6, condition: 5 },
+        gainedTrait: '프로지망',
+        traitDescription: '스카우트 주목도 및 전국 인지도 가산 보정',
+        icon: '👑',
+      },
+      {
+        id: 'q1_team_first',
+        title: '메이저 전국대회 우승 헌신',
+        dialogue: '"개인 성적보다 학교의 전국대회 우승기를 휘날리기 위해 모든 것을 바치겠습니다!"',
+        coachReply: '진정한 원팀 플레이어야! 자네 같은 선수가 더그아웃에 있을 때 팀은 챔피언이 되는 법이지. 든든하구먼.',
+        statBoosts: { relationshipCoach: 8, relationshipTeam: 8, condition: 10 },
+        gainedTrait: '팀퍼스트',
+        traitDescription: '팀 신뢰 및 감독 신뢰도 상승치 20% 보너스',
+        icon: '🏆',
+      },
+      {
+        id: 'q1_grit_spirit',
+        title: '포기를 모르는 잡초 근성',
+        dialogue: '"어떤 혹독한 훈련과 시련이 닥쳐도 절대 꺾이지 않고 끝까지 악착같이 버텨내겠습니다!"',
+        coachReply: '그 눈빛이 마음에 드는군. 야구는 9회 투아웃부터라는 말처럼, 끈기 있는 자가 마침내 승리하는 법일세.',
+        statBoosts: { stamina: 5, condition: 15, relationshipCoach: 4 },
+        gainedTrait: '잡초근성',
+        traitDescription: '스태미너 고갈 시 훈련 페널티 감소 및 슬럼프 저항',
+        icon: '🛡️',
+      },
+      {
+        id: 'q1_pure_passion',
+        title: '야구를 향한 순수한 열정',
+        dialogue: '"그냥 야구가 미치도록 좋습니다! 매일 그라운드에서 흙먼지를 마시며 성장하고 싶습니다!"',
+        coachReply: '순수한 즐거움을 아는 자는 그 누구도 이길 수 없지. 자네의 그 맑은 열정을 소중히 지켜주겠네.',
+        statBoosts: { condition: 20, relationshipFriends: 6 },
+        gainedTrait: '야구소년',
+        traitDescription: '휴식 및 취미 활동 시 멘탈/컨디션 회복량 대폭 증가',
+        icon: '⚾',
+      },
+    ],
   },
-  {
-    id: 'contact_machine',
-    title: '3할 타격 머신 (컨택트 & 선구안 특화)',
-    dialogue: '"어떤 코스의 공이든 날카로운 안타로 연결하는 정교한 3할 타자가 되겠습니다!"',
-    response: '훌륭한 각오일세. 기복 없이 꾸준히 살아나가는 타자야말로 팀 타선의 심장이지. 배트 중심에 맞히는 훈련을 집중하겠네.',
-    coachReply: '삼진을 당하지 않고 높은 타율과 출루율을 꾸준히 유지합니다.',
-    statBoosts: { contact: 16, eye: 8, speed: 3 },
-    gainedTrait: '타격 장인',
-    traitDescription: '2스트라이크 이후 컨택트 보정 및 삼진 비율 대폭 감소',
-    icon: '⚔️'
-  },
-  {
-    id: 'speed_demon_leadoff',
-    title: '호타준족 테이블세터 (주력 & 도루 특화)',
-    dialogue: '"빠른 발로 그라운드를 흔들고 상대 배터리의 혼을 빼놓는 1번 도루왕이 되겠습니다!"',
-    response: '발 빠른 주자는 수비진 전체를 공포에 떨게 만들지! 한 베이스를 더 훔치고 득점을 올리는 기동력 야구를 완성해보세.',
-    coachReply: '도루 성공률이 극상승하며, 빗맞은 타구도 내야 안타로 만드는 스피드를 발휘합니다.',
-    statBoosts: { speed: 18, contact: 6, eye: 5 },
-    gainedTrait: '대도(Great Thief)',
-    traitDescription: '도루 성공률 대폭 증가 및 내야 땅볼 시 세이프 확률 증가',
-    icon: '⚡'
-  },
-  {
-    id: 'golden_glove_defense',
-    title: '철벽 수비 사령관 (수비 & 송구력 특화)',
-    dialogue: '"어떤 타구도 빠져나가지 못하게 막아내어 투수를 든든하게 받쳐주는 수비의 핵이 되겠습니다!"',
-    response: '진정한 야구 고수의 마인드야! 수비가 무너지면 이길 수 없는 법. 내야/외야를 완벽히 통솔하는 수비 명수로 만들어주겠네.',
-    coachReply: '넓은 수비 범위와 강한 송구력으로 실책을 방지하고 팀의 실점을 차단합니다.',
-    statBoosts: { defense: 18, speed: 5, contact: 4 },
-    gainedTrait: '골든글러버',
-    traitDescription: '수비 범위 증가, 실책 확률 0%에 수렴, 다이빙 캐치 성공률 상승',
-    icon: '🧤'
-  }
-];
 
-export const TWOWAY_INTERVIEW_CHOICES: InterviewChoice[] = [
+  // 2단계: 야구관 및 플레이 스타일 (세트 B 기반)
   {
-    id: 'two_way_phenom',
-    title: '완전무결 만능 이도류 (투타 겸업 슈퍼스타)',
-    dialogue: '"마운드에서는 150km를 던지고, 타석에서는 홈런을 때려내는 대한민국 최고의 이도류가 되겠습니다!"',
-    response: '남들의 두 배로 땀을 흘려야 하는 험난한 길이지만, 자네의 재능과 열정이라면 분명 해낼 수 있을 걸세! 전폭적으로 지원하겠네.',
-    coachReply: '투수와 타자 양쪽 능력치가 고르게 균형 성장하며 양 포지션에 출전 가능합니다.',
-    statBoosts: { stuff: 8, control: 8, contact: 8, power: 8, stamina: 6 },
-    gainedTrait: '만능 이도류',
-    traitDescription: '투수 등판 경기에서 타격 보너스 획득 및 포지션 피로도 감소',
-    icon: '⭐'
+    step: 2,
+    questionTitle: '질문 2. 지향하는 야구 철학과 플레이 스타일',
+    questionDialogue: '"자네가 생각하는 이상적인 야구란 무엇이며, 그라운드에서 어떤 플레이를 보여줄 텐가?"',
+    options: [
+      {
+        id: 'q2_smart_baseball',
+        title: '데이터와 수 싸움의 스마트 야구',
+        dialogue: '"철저한 전력 분석과 볼카운트 수 싸움으로 상대를 두뇌로 제압하는 스마트 야구입니다."',
+        coachReply: '영리하군! 현대 야구는 정보와 두뇌의 승부지. 자네의 뛰어난 야구 지능을 극대화시켜 주겠네.',
+        statBoosts: { academics: 8, control: 2, eye: 2, relationshipCoach: 5 },
+        gainedTrait: '스마트플레이',
+        traitDescription: '상대 분석 및 시험 준비 활동 시 추가 효율',
+        icon: '🧠',
+      },
+      {
+        id: 'q2_physical_power',
+        title: '압도적인 힘과 피지컬 야구',
+        dialogue: '"피와 땀으로 빚어낸 강력한 피지컬로 상대를 힘으로 찍어누르는 파워풀한 야구입니다."',
+        coachReply: '탄탄한 체격과 폭발력이야말로 마운드와 타석을 지배하는 무기지! 강철 하체를 만들어주겠네.',
+        statBoosts: { stuff: 2, power: 2, stamina: 4, relationshipCoach: 4 },
+        gainedTrait: '피지컬괴물',
+        traitDescription: '웨이트 및 피칭/타격 훈련 시 추가 스탯 상승',
+        icon: '🏋️',
+      },
+      {
+        id: 'q2_one_team_spirit',
+        title: '동료들과 하나 되는 원팀 스피릿',
+        dialogue: '"9명이 눈빛만 봐도 호흡이 맞는 끈끈한 수비와 조직력으로 기적을 만드는 팀 스포츠입니다."',
+        coachReply: '훌륭한 통찰이야. 야구는 혼자 하는 게 아니지. 자네가 우리 팀 조직력의 중심축이 되어주게.',
+        statBoosts: { relationshipTeam: 10, relationshipFriends: 8, relationshipCoach: 5 },
+        gainedTrait: '원팀스피릿',
+        traitDescription: '팀원과의 관계도에 따라 실전 경기에서 클러치 능력 보정',
+        icon: '🤝',
+      },
+      {
+        id: 'q2_family_duty',
+        title: '가족을 향한 보답과 책임감',
+        dialogue: '"새벽마다 도시락을 싸주시는 부모님을 생각하며, 무거운 책임감을 갖고 던지고 치겠습니다."',
+        coachReply: '가슴이 뭉클하군. 든든한 가족의 사랑을 아는 선수는 결코 쉽게 무너지지 않는 법이지.',
+        statBoosts: { relationshipFamily: 12, condition: 10, relationshipCoach: 5 },
+        gainedTrait: '효심과책임',
+        traitDescription: '가족과의 소통 시 멘탈 회복 극대화 및 집중력 증가',
+        icon: '🏠',
+      },
+    ],
   },
+
+  // 3단계: 팀 내 태도 및 역할 (세트 C 기반)
   {
-    id: 'ace_pitcher_focus',
-    title: '투수 중심 에이스 겸업 (마운드 주력)',
-    dialogue: '"마운드 위의 에이스로 팀을 이끌면서 필요할 때 결정적인 한 방을 보태겠습니다!"',
-    response: '에이스 투수로서 중심을 잡되, 타석에서의 장점도 살리는 실리적인 선택이군. 마운드 훈련에 70%를 쏟아보세.',
-    coachReply: '투수 스탯에 더 큰 보너스를 받으며 선발 로테이션의 주축이 됩니다.',
-    statBoosts: { stuff: 12, control: 10, stamina: 8, power: 6 },
-    gainedTrait: '마운드의 지휘관',
-    traitDescription: '선발 등판 시 팀 타선 득점 지원 확률 증가',
-    icon: '👑'
-  }
+    step: 3,
+    questionTitle: '질문 3. 팀에서의 역할과 마음가짐',
+    questionDialogue: '"마지막으로 묻겠네. 자네는 고교 3년간 우리 야구부에서 어떤 존재로 기억되고 싶나?"',
+    options: [
+      {
+        id: 'q3_coach_disciple',
+        title: '스승의 가르침을 흡수하는 충직한 제자',
+        dialogue: '"감독님의 지도 방식을 전폭적으로 믿고 따르겠습니다. 무엇이든 스펀지처럼 배우겠습니다!"',
+        coachReply: '스승으로서 더없이 고마운 말이군. 내 모든 야구 노하우를 자네에게 아낌없이 쏟아붓겠네.',
+        statBoosts: { relationshipCoach: 12, condition: 10 },
+        gainedTrait: '감독의애제자',
+        traitDescription: '감독 면담 시 보너스 스탯 증폭 및 기용 신뢰도 최고치',
+        icon: '👨‍🏫',
+      },
+      {
+        id: 'q3_fierce_freshman',
+        title: '선배도 뛰어넘는 패기의 신입생',
+        dialogue: '"선배들이라고 양보할 생각 없습니다! 당당히 실력으로 주전 자리를 빼앗아 오겠습니다!"',
+        coachReply: '하하하! 당돌하지만 패기 넘쳐서 좋군. 실력으로 증명해보게. 기회는 공평하게 줄 테니!',
+        statBoosts: { fame: 6, condition: 10, speed: 2 },
+        gainedTrait: '패기의신입',
+        traitDescription: '주전 경쟁도 높은 학교에서도 빠른 1군 발탁 기회 부여',
+        icon: '⚡',
+      },
+      {
+        id: 'q3_scholar_athlete',
+        title: '공부와 야구를 모두 잡는 문무겸비',
+        dialogue: '"그라운드 밖에서도 모범을 보여, 학업과 인성을 두루 갖춘 당당한 학생 선수가 되겠습니다."',
+        coachReply: '학생 야구의 본질을 아는군! 프로에 가든 사회에 나가든 자네의 지성과 인품은 큰 빛이 될 걸세.',
+        statBoosts: { academics: 12, relationshipFriends: 6, condition: 10 },
+        gainedTrait: '문무겸비',
+        traitDescription: '시험 기간 페널티 무효화 및 학업 성적 우수 장학금',
+        icon: '📜',
+      },
+      {
+        id: 'q3_mood_maker',
+        title: '더그아웃을 뜨겁게 달구는 무드메이커',
+        dialogue: '"언제나 파이팅 넘치게 소리치며, 지친 동료들의 사기를 북돋우는 팀의 비타민이 되겠습니다!"',
+        coachReply: '더그아웃의 활력소로군! 힘든 경기 흐름을 한순간에 바꿀 수 있는 귀한 재능이야.',
+        statBoosts: { relationshipFriends: 10, relationshipTeam: 10, condition: 15 },
+        gainedTrait: '분위기메이커',
+        traitDescription: '팀 전체 컨디션 상승 유도 및 동료들과의 인연 보너스',
+        icon: '🎉',
+      },
+    ],
+  },
 ];
