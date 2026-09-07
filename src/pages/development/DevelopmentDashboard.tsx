@@ -176,6 +176,7 @@ export default function DevelopmentDashboard() {
             <section className="home-center-stage">
               <SlotActionPanel
                 currentSlot={clock.currentSlot}
+                date={clock.date}
                 assignment={currentSlotAssignment}
                 player={player}
                 onExecuteForced={executeForcedSlot}

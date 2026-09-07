@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import type { TimeSlot } from '../../types/calendar';
+import type { TimeSlot, GameDate } from '../../types/calendar';
 import { TIME_SLOT_LABELS } from '../../types/calendar';
 import type { SlotAssignment, DailyActivityCategory } from '../../types/dailySchedule';
+import { isSchoolDay } from '../../types/academicCalendar';
 import type { Player } from '../../types';
 import type { ActivityOption } from '../../types/activity';
 import {
-  ACTIVITY_CATEGORIES,
+  getActivityCategories,
   sampleSubActivities,
   evaluateActivityWithGating,
 } from '../../types/activity';
@@ -20,6 +21,7 @@ import {
 
 interface SlotActionPanelProps {
   currentSlot: TimeSlot;
+  date: GameDate;
   assignment: SlotAssignment;
   player: Player;
   onExecuteForced: (slot: TimeSlot) => Promise<void>;
@@ -32,16 +34,19 @@ interface SlotActionPanelProps {
 
 export function SlotActionPanel({
   currentSlot,
+  date,
   assignment,
   player,
   onExecuteForced,
   onSelectActivity,
 }: SlotActionPanelProps) {
-  // 1차 카테고리 상태
-  const availableCategories = ACTIVITY_CATEGORIES[currentSlot] || [];
+  // 등교일 여부(주말/방학)에 따른 1차 카테고리 동적 산출
+  const schoolDay = isSchoolDay(date);
+  const availableCategories = getActivityCategories(currentSlot, schoolDay);
+
   const defaultCat = assignment.category !== 'exam' && assignment.category !== 'match' && assignment.category !== 'event'
     ? assignment.category
-    : availableCategories[0]?.category || 'training';
+    : availableCategories[0]?.category || 'rest';
 
   const [selectedCategory, setSelectedCategory] = useState<DailyActivityCategory>(defaultCat);
 
@@ -52,9 +57,9 @@ export function SlotActionPanel({
   const [selectedSubId, setSelectedSubId] = useState<string>(() => sampledSubActivities[0]?.id || '');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  // 슬롯이 변경되었을 때 상태 재설정
-  const [prevKey, setPrevKey] = useState(`${currentSlot}-${assignment.forced}`);
-  const currentKey = `${currentSlot}-${assignment.forced}`;
+  // 슬롯 또는 등교일 상태가 변경되었을 때 상태 재설정
+  const [prevKey, setPrevKey] = useState(`${currentSlot}-${assignment.forced}-${schoolDay}`);
+  const currentKey = `${currentSlot}-${assignment.forced}-${schoolDay}`;
   if (prevKey !== currentKey) {
     setPrevKey(currentKey);
     setSelectedCategory(defaultCat);

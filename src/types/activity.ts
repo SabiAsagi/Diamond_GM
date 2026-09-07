@@ -76,6 +76,26 @@ export const ACTIVITY_CATEGORIES: Record<TimeSlot, CategoryOption[]> = {
 };
 
 /**
+ * 주말 및 방학 기간 오전 자유 카테고리 후보군 (수업 등 학교 활동 제외)
+ */
+export const WEEKEND_VACATION_MORNING_CATEGORIES: CategoryOption[] = [
+  { id: 'cat_rest_w', category: 'rest', label: '늦잠 & 온전한 휴식', description: '주말 늦잠을 자거나 마사지로 한 주의 피로를 풉니다.', icon: '🛏️' },
+  { id: 'cat_training_w', category: 'training', label: '자율 아침 운동', description: '가벼운 조깅과 러닝, 코어 운동으로 체력을 다집니다.', icon: '🏃' },
+  { id: 'cat_relationship_w', category: 'relationship', label: '친구 & 가족과의 시간', description: '동기들과 만나거나 가족들과 오붓한 시간을 보냅니다.', icon: '🍕' },
+  { id: 'cat_special_w', category: 'special', label: '취미 생활 & 경기 분석', description: '좋아하는 취미를 즐기거나 프로야구 하이라이트를 분석합니다.', icon: '🎮' },
+];
+
+/**
+ * 슬롯과 등교일 여부(주말/방학)에 따른 동적 1차 카테고리 반환
+ */
+export function getActivityCategories(slot: TimeSlot, isSchoolDay: boolean): CategoryOption[] {
+  if (slot === 'morning') {
+    return isSchoolDay ? ACTIVITY_CATEGORIES.morning : WEEKEND_VACATION_MORNING_CATEGORIES;
+  }
+  return ACTIVITY_CATEGORIES[slot] || [];
+}
+
+/**
  * 2차 세부 행동 전체 풀 (가중치 기반 랜덤 샘플링 대상)
  */
 export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> = {
