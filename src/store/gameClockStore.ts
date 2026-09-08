@@ -7,7 +7,7 @@ import { buildDailyPlan } from '../types/dailySchedule';
 import type { AcademicEvent } from '../types/academicCalendar';
 import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent } from '../types/academicCalendar';
 import type { ScheduledMatch } from '../types/tournament';
-import { generateSeasonMatches, getPlayerMatchForDate } from '../types/tournament';
+import { generateSeasonMatches, getPlayerMatchForDate, progressTournament } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
 import { SUB_ACTIVITY_POOL, evaluateActivityWithGating } from '../types/activity';
 import { resolveMatchPlaceholder } from './matchResolver';
@@ -18,6 +18,9 @@ import type { EventCutscene, CutsceneTriggerHistory } from '../types/randomEvent
 import { shouldTriggerCutscene } from '../types/randomEvent';
 import { CUTSCENE_EVENTS_POOL } from '../data/cutsceneEvents';
 import { db } from '../db';
+import type { EquipmentSlot } from '../types/equipment';
+import { EQUIPMENT_CATALOG } from '../types/equipment';
+import type { OutdoorLocation } from '../types/outdoorMap';
 
 export interface DayLogRecord {
   date: GameDate;
@@ -51,6 +54,9 @@ export interface GameClockState {
   selectActivity: (slot: TimeSlot, category: DailyActivityCategory, subActivityId: string) => Promise<void>;
   executeForcedSlot: (slot: TimeSlot) => Promise<void>;
   regenerateDailyPlan: () => void;
+  purchaseEquipment: (itemId: string) => Promise<boolean>;
+  equipItem: (itemId: string, slot: EquipmentSlot) => Promise<void>;
+  visitOutdoorLocation: (location: OutdoorLocation) => Promise<boolean>;
   setOnCareerEnd?: (cb: () => void) => void;
 }
 
@@ -144,6 +150,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     let newCondition = player.condition;
     let newAcademics = player.academics;
     let newFame = player.fame || 10;
+    const newMoney = Math.max(0, (player.money || 0) + (result.moneyDelta || 0));
     let newRelFam = player.relationshipFamily;
     let newRelFri = player.relationshipFriends;
     let newRelTeam = player.relationshipTeam;
@@ -238,6 +245,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         condition: newCondition,
         academics: newAcademics,
         fame: newFame,
+        money: newMoney,
         relationshipFamily: newRelFam,
         relationshipFriends: newRelFri,
         relationshipTeam: newRelTeam,
@@ -298,6 +306,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       condition: newCondition,
       academics: newAcademics,
       fame: newFame,
+      money: newMoney,
       relationshipFamily: newRelFam,
       relationshipFriends: newRelFri,
       relationshipTeam: newRelTeam,
@@ -366,6 +375,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       const match = getPlayerMatchForDate(clock.date, seasonMatches);
       if (match) {
         result = resolveMatchPlaceholder(match, player, school);
+        if (result.matchOutcome) set({ seasonMatches: progressTournament(seasonMatches, result.matchOutcome, school, HIGH_SCHOOLS_DATA) });
       } else {
         result = {
           statChanges: { fame: 2, condition: -15 },
@@ -396,5 +406,28 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       academicEvents,
     });
     set({ dailyPlan });
+  },
+  purchaseEquipment: async (itemId) => {
+    const { player } = get();
+    const item = EQUIPMENT_CATALOG.find(e => e.id === itemId);
+    if (!player || !item || (player.money || 0) < item.price || player.inventory?.includes(itemId)) return false;
+    const updated = { ...player, money: (player.money || 0) - item.price, inventory: [...(player.inventory || []), itemId] };
+    await db.players.put(updated); set({ player: updated }); return true;
+  },
+  equipItem: async (itemId, slot) => {
+    const { player } = get();
+    if (!player || !player.inventory?.includes(itemId)) return;
+    const updated = { ...player, equippedItems: { ...(player.equippedItems || {}), [slot]: itemId } };
+    await db.players.put(updated); set({ player: updated });
+  },
+  visitOutdoorLocation: async (location) => {
+    const { player } = get();
+    if (!player || (player.money || 0) < location.cost) return false;
+    const updated: Player = { ...player, money: (player.money || 0) - location.cost + (location.effects.money || 0), condition: Math.max(5, Math.min(100, player.condition + location.effects.condition)) };
+    for (const [key, value] of Object.entries(location.effects.statChanges)) {
+      const stat = key as keyof Player;
+      if (typeof updated[stat] === 'number' && typeof value === 'number') (updated as unknown as Record<string, number>)[key] = Math.max(0, Math.min(100, (updated[stat] as number) + value));
+    }
+    await db.players.put(updated); set({ player: updated }); return true;
   },
 }));

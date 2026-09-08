@@ -15,6 +15,7 @@ import { RelationshipsView } from '../../components/navigation/views/Relationshi
 import { PlayerStatsView } from '../../components/navigation/views/PlayerStatsView';
 import { TrophiesView } from '../../components/navigation/views/TrophiesView';
 import { SettingsView } from '../../components/navigation/views/SettingsView';
+import { TownView } from '../../components/navigation/views/TownView';
 
 import { Heart, Star, Sparkles, Trophy } from 'lucide-react';
 import '../../index.css';
@@ -41,6 +42,9 @@ export default function DevelopmentDashboard() {
     initClock,
     selectActivity,
     executeForcedSlot,
+    purchaseEquipment,
+    equipItem,
+    visitOutdoorLocation,
   } = useGameClockStore();
 
   useEffect(() => {
@@ -203,6 +207,7 @@ export default function DevelopmentDashboard() {
         {activeNavTab === 'stats' && (
           <PlayerStatsView player={player} onClose={() => setActiveNavTab('home')} />
         )}
+        {activeNavTab === 'town' && <TownView player={player} onPurchase={purchaseEquipment} onEquip={equipItem} onVisit={visitOutdoorLocation} />}
 
         {activeNavTab === 'trophies' && (
           <TrophiesView player={player} onClose={() => setActiveNavTab('home')} />

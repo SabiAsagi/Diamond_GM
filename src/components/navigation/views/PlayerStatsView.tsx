@@ -8,6 +8,7 @@ interface PlayerStatsViewProps {
 
 export function PlayerStatsView({ player }: PlayerStatsViewProps) {
   const isPitcher = player.position === 'P';
+  const isTwoWay = player.position === 'TwoWay';
 
   const renderStatRow = (label: string, value: number, max = 100, color = 'var(--primary)') => (
     <div className="stat-detail-row">
@@ -66,11 +67,13 @@ export function PlayerStatsView({ player }: PlayerStatsViewProps) {
               {isPitcher ? '⚾ 투수 세부 평가' : '⚔️ 타격 & 수비 세부 평가'}
             </h4>
 
-            {isPitcher ? (
+            {isPitcher || isTwoWay ? (
               <div className="stat-rows-stack">
+                <strong>투수 평가</strong>
                 {renderStatRow('구위 (Stuff)', player.stuff, 100, '#ef4444')}
                 {renderStatRow('제구력 (Control)', player.control, 100, '#3b82f6')}
                 {renderStatRow('스태미너 (Stamina)', player.stamina, 100, '#10b981')}
+                {isTwoWay && <><strong style={{ marginTop: 8 }}>타격·주루·수비 평가</strong>{renderStatRow('정교한 타격', player.contact, 100, '#3b82f6')}{renderStatRow('장타 생산력', player.power, 100, '#ef4444')}{renderStatRow('선구·존 판단', player.eye, 100, '#10b981')}{renderStatRow('주루·가속력', player.speed, 100, '#f59e0b')}{renderStatRow('포구·송구·범위', player.defense, 100, '#8b5cf6')}</>}
               </div>
             ) : (
               <div className="stat-rows-stack">

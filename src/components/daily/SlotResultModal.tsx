@@ -96,6 +96,9 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
           )}
 
           {/* 세부 스탯 변화 */}
+          {result.moneyDelta !== undefined && result.moneyDelta !== 0 && (
+            <div className={`delta-item ${result.moneyDelta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">소지금</span><span className="delta-val">{result.moneyDelta > 0 ? '+' : ''}{result.moneyDelta.toLocaleString()}원</span></div>
+          )}
           {statEntries.map(([key, val]) => {
             const numVal = val as number;
             const isPos = numVal > 0;

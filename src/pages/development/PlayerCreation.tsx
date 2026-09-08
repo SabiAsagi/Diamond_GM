@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../db';
-import type { Player, Position, Handedness, PitchingForm, BattingForm, PitcherRole } from '../../types';
+import type { Player, Position, Handedness, PitchingForm, BattingForm, PitcherRole, Gender } from '../../types';
 import { HIGH_SCHOOLS_BY_REGION, getHighSchoolDataByName } from '../../data/highSchools';
 import { PITCHING_FORM_GUIDES, BATTING_FORM_GUIDES, type FormGuide } from '../../data/formGuides';
 import { SchoolEmblem } from '../../components/SchoolEmblem';
@@ -36,6 +36,7 @@ export default function PlayerCreation() {
   }, [previewSchoolName, selectedFormGuide]);
 
   const [name, setName] = useState('');
+  const [gender, setGender] = useState<Gender>('male');
   const [uniformNumber, setUniformNumber] = useState('1');
   const [handedness, setHandedness] = useState<Handedness>('R/R');
   
@@ -93,8 +94,10 @@ export default function PlayerCreation() {
     // 등번호 처리 (00, 0, 1~99 등 완벽 지원)
     const finalUniformNumber = uniformNumber.trim() === '' ? 1 : (uniformNumber === '00' ? '00' : parseInt(uniformNumber, 10));
 
+    const baseRating = gender === 'female' ? 17 : 20;
     const newPlayer: Omit<Player, 'id'> = {
       name: name.trim(),
+      gender,
       age: 16, // 고1 시작
       position: finalPosition,
       status: 'HighSchool',
@@ -107,18 +110,23 @@ export default function PlayerCreation() {
       battingForm: finalBattingForm,
       
       // Base stats
-      overall: 20,
-      potential: Math.floor(Math.random() * 20) + 70, // 70-90
+      overall: baseRating,
+      potential: Math.floor(Math.random() * 20) + (gender === 'female' ? 65 : 70),
       
-      contact: 20, power: 20, eye: 20, speed: 20, defense: 20,
-      stuff: 20, control: 20, stamina: 20,
+      contact: baseRating, power: baseRating, eye: baseRating, speed: baseRating, defense: baseRating,
+      stuff: baseRating, control: baseRating, stamina: baseRating,
       
       condition: 100,
       academics: 50,
       relationshipFamily: 50,
       relationshipFriends: 50,
       relationshipTeam: 50,
-      relationshipCoach: 50
+      relationshipCoach: 50,
+      money: 50000,
+      inventory: [],
+      equippedItems: {},
+      careerGoal: 'KBO',
+      familyBackground: 'parents'
     };
 
     const id = await db.players.add(newPlayer);
@@ -471,6 +479,14 @@ export default function PlayerCreation() {
                 />
               </div>
               <div className="form-group">
+                <label>성별</label>
+                <div className="responsive-btn-grid">
+                  <button className={`select-btn ${gender === 'male' ? 'active' : ''}`} onClick={() => setGender('male')}>남자 선수</button>
+                  <button className={`select-btn ${gender === 'female' ? 'active' : ''}`} onClick={() => setGender('female')}>여자 선수</button>
+                </div>
+                <small style={{ color: 'var(--text-muted)' }}>여자 선수는 희소한 도전 경로로 시작 능력치가 조금 낮지만, 같은 훈련·대회·진출 기회를 가집니다.</small>
+              </div>
+              <div className="form-group">
                 <label>등번호</label>
                 <input 
                   type="text" 
@@ -487,6 +503,7 @@ export default function PlayerCreation() {
               <div className="summary-box">
                 <h4>최종 생성 정보 요약</h4>
                 <p><strong>소속:</strong> {highSchool} ({selectedSchoolData?.tier} Tier / {selectedSchoolData?.region})</p>
+                <p><strong>성별:</strong> {gender === 'male' ? '남자' : '여자'}</p>
                 <p><strong>유형:</strong> {roleType === 'Pitcher' ? '투수' : (roleType === 'Batter' ? '타자' : '투타 겸업')} ({handedness})</p>
                 <p><strong>포지션:</strong> {roleType === 'Pitcher' ? 'P' : (roleType === 'TwoWay' ? 'TwoWay' : position)}</p>
                 {roleType !== 'Batter' && (

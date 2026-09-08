@@ -29,6 +29,7 @@ export default function CoachInterview() {
   const [confirmedAnswers, setConfirmedAnswers] = useState<InterviewChoiceOption[]>([]);
   const [isApplying, setIsApplying] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
 
   useEffect(() => {
     async function loadPlayer() {
@@ -193,7 +194,17 @@ export default function CoachInterview() {
         </div>
 
         {/* 면담 완료 최종 결과 카드 */}
-        {isCompleted ? (
+        {!introComplete ? (
+          <div className="interview-confirmed-view animate-fade-in">
+            <div className="interview-dialogue-box">
+              <div className="coach-avatar-section"><div className="coach-avatar-circle"><UserCheck size={32} color="#60a5fa" /></div></div>
+              <div className="coach-speech-bubble">
+                <p className="coach-quote">“어서 오게, {player.name}. 오늘부터 자네도 {player.highSchool} 야구부의 한 식구야. 긴장할 필요 없네. 먼저 서로 어떤 사람인지 천천히 이야기해 보지.”</p>
+              </div>
+            </div>
+            <button className="btn btn-primary btn-lg" style={{ width:'100%', marginTop:20 }} onClick={() => setIntroComplete(true)}>감독님과 면담 시작하기 <ArrowRight size={18}/></button>
+          </div>
+        ) : isCompleted ? (
           <div className="interview-confirmed-view animate-fade-in">
             <div className="confirmed-badge-box">
               <CheckCircle size={48} color="#10b981" />
