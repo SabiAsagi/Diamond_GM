@@ -132,8 +132,7 @@ export function generateSeasonMatches(
     }
   }
 
-  // 2. 4대 전국대회 토너먼트 경기 생성 (학교 Tier 조건 체크)
-  const rounds = ['32강전', '16강전', '8강전', '4강 준결승', '결승전'];
+  // 2. 전국대회는 첫 경기만 편성합니다. 다음 상대는 승리한 뒤에 확정됩니다.
 
   for (const tour of MAJOR_TOURNAMENT_TEMPLATES) {
     if (!tour.participatingTiers.includes(playerSchool.tier)) {
@@ -143,30 +142,20 @@ export function generateSeasonMatches(
     let m = tour.startDate.month;
     let d = tour.startDate.day;
 
-    for (let rIdx = 0; rIdx < rounds.length; rIdx++) {
-      const opp = getNextOpponent();
-      matches.push({
-        id: `${tour.id}_r${rIdx + 1}`,
+    const opp = getNextOpponent();
+    matches.push({
+        id: `${tour.id}_r1`,
         date: { month: m, day: d },
         tournamentId: tour.id,
         tournamentName: tour.name,
-        round: rounds[rIdx],
+        round: '예선/32강전',
         homeSchoolId: playerSchool.id,
         homeSchoolName: playerSchool.name,
         awaySchoolId: opp.id,
         awaySchoolName: opp.name,
         isPlayerTeamMatch: true,
-        description: `${tour.name} ${rounds[rIdx]} (${opp.name}전)`,
+        description: `${tour.name} 첫 경기 (${opp.name}전) · 승리 시 다음 대진 공개`,
       });
-
-      // 다음 라운드 일자 가산
-      d += tour.roundIntervalDays;
-      const daysInM = (m === 4 || m === 6 || m === 9 || m === 11) ? 30 : 31;
-      if (d > daysInM) {
-        d -= daysInM;
-        m += 1;
-      }
-    }
   }
 
   // 일자 순서로 정렬
@@ -176,6 +165,21 @@ export function generateSeasonMatches(
   });
 
   return matches;
+}
+
+export function progressTournament(matches: ScheduledMatch[], outcome: { matchId: string; tournamentId: string; won: boolean }, playerSchool: HighSchoolData, schools: HighSchoolData[]): ScheduledMatch[] {
+  if (outcome.tournamentId === 'weekend_league' || !outcome.won) return matches;
+  const current = matches.find(m => m.id === outcome.matchId);
+  if (!current || matches.some(m => m.tournamentId === outcome.tournamentId && m.id !== current.id)) return matches;
+  const rounds = ['예선/32강전','16강전','8강전','4강 준결승','결승전'];
+  const currentIndex = rounds.indexOf(current.round);
+  if (currentIndex < 0 || currentIndex === rounds.length - 1) return matches;
+  const candidates = schools.filter(s => s.id !== playerSchool.id && s.id !== current.awaySchoolId);
+  const opponent = candidates[Math.floor(Math.random() * candidates.length)];
+  let month = current.date.month, day = current.date.day + 3;
+  const daysInMonth = new Date(2026, month, 0).getDate(); if (day > daysInMonth) { day -= daysInMonth; month += 1; }
+  const next: ScheduledMatch = { ...current, id:`${outcome.tournamentId}_r${currentIndex+2}`, date:{month,day}, round:rounds[currentIndex+1], awaySchoolId:opponent.id, awaySchoolName:opponent.name, description:`이전 경기 승리로 진출 · ${opponent.name}전` };
+  return [...matches, next].sort((a,b)=>a.date.month-b.date.month || a.date.day-b.date.day);
 }
 
 /**

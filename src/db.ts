@@ -30,6 +30,7 @@ export async function initDummyDataIfNeeded() {
     await db.players.bulkAdd([
       {
         name: 'Kim Min-su',
+        gender: 'male',
         age: 18,
         position: 'P',
         status: 'HighSchool',
@@ -58,6 +59,7 @@ export async function initDummyDataIfNeeded() {
       },
       {
         name: 'Lee Seung-yeop',
+        gender: 'male',
         age: 22,
         position: '1B',
         status: 'Pro',

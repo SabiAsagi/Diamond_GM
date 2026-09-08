@@ -3,7 +3,7 @@ import { calculateDaysUntilDraft, WEEKDAY_NAMES, TIME_SLOT_LABELS } from '../../
 import type { Player } from '../../types';
 import type { HighSchoolData } from '../../types/highSchool';
 import { SchoolEmblem } from '../SchoolEmblem';
-import { Calendar, Trophy } from 'lucide-react';
+import { Calendar, Trophy, Wallet } from 'lucide-react';
 
 interface DailyTopBarProps {
   player: Player;
@@ -75,6 +75,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
           <Trophy size={14} className="text-accent" />
           <span>KBO 드래프트 D-{daysUntilDraft}</span>
         </div>
+        <div className="daily-draft-dday-pill"><Wallet size={14}/><span>{(player.money || 0).toLocaleString()}원</span></div>
       </div>
     </div>
   );

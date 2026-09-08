@@ -4,11 +4,15 @@ export * from './academicCalendar';
 export * from './tournament';
 export * from './dailySchedule';
 export * from './activity';
+export * from './equipment';
+export * from './outdoorMap';
+export * from './relationship';
 
 import type { GameDate, TimeSlot } from './calendar';
 
 export type Position = 'P' | 'C' | '1B' | '2B' | '3B' | 'SS' | 'LF' | 'CF' | 'RF' | 'TwoWay';
 export type PlayerStatus = 'HighSchool' | 'Pro' | 'Minor' | 'Military' | 'Retired';
+export type Gender = 'male' | 'female';
 
 export type Handedness = 'R/R' | 'R/L' | 'L/R' | 'L/L'; // 우투우타, 우투좌타, 좌투우타, 좌투좌타
 export type PitchingForm = 'Overhand' | 'ThreeQuarter' | 'Sidearm' | 'Underhand' | 'None';
@@ -18,6 +22,7 @@ export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 export interface Player {
   id?: number; // Auto-incremented
   name: string;
+  gender: Gender;
   age: number;
   position: Position;
   status: PlayerStatus;
@@ -68,6 +73,11 @@ export interface Player {
   week?: number; // 1주 ~ 4주 (하위 호환 유지)
   day?: number; // 1 ~ 31
   fame?: number; // 전국 인지도 / 스카우트 주목도 (0-100)
+  money?: number;
+  familyBackground?: 'parents' | 'grandmother' | 'olderSibling' | 'youngerSibling';
+  careerGoal?: 'KBO' | 'Overseas' | 'University';
+  inventory?: string[];
+  equippedItems?: Partial<Record<'bat' | 'glove' | 'catcherGear' | 'spikes' | 'trainingGear', string>>;
 
   // 신규 일일 생활 시뮬레이션 & 캘린더 시계 필드
   gameDate?: GameDate;

@@ -13,11 +13,12 @@ export function resolveMatchPlaceholder(
   playerSchool: HighSchoolData
 ): ActivityResult {
   const isPitcher = player.position === 'P';
+  const isTwoWay = player.position === 'TwoWay';
 
   // 학교 및 선수 역량 기반 승률 계산
   const baseSkill = isPitcher
     ? (player.stuff + player.control + player.stamina) / 3
-    : (player.contact + player.power + player.eye) / 3;
+    : isTwoWay ? ((player.stuff + player.control + player.stamina) / 3 + (player.contact + player.power + player.eye) / 3) / 2 : (player.contact + player.power + player.eye) / 3;
 
   const isWin = Math.random() < 0.5 + (baseSkill - 20) * 0.005;
 
@@ -43,13 +44,14 @@ export function resolveMatchPlaceholder(
   let eyeGain = 0;
   const fameGain = isWin ? 3 : 1;
 
-  if (isPitcher) {
+  if (isPitcher || isTwoWay) {
     const innings = Math.min(9, 4 + Math.floor(Math.random() * 5));
     const kCount = Math.floor(Math.random() * 6) + (player.stuff > 30 ? 4 : 2);
     const runs = isWin ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 4) + 1;
     personalPerformance = `[선발 등판] ${innings}이닝 ${kCount}탈삼진 ${runs}실점`;
     stuffGain = 1;
     controlGain = 1;
+    if (isTwoWay) { const hits = Math.random() > .45 ? 2 : 1; personalPerformance += ` · [타석] 4타수 ${hits}안타 ${hits}타점`; contactGain = 1; eyeGain = 1; }
   } else {
     const atBats = 4;
     const hits = isWin ? (Math.random() > 0.4 ? 2 : 1) : (Math.random() > 0.6 ? 1 : 0);
@@ -78,5 +80,6 @@ export function resolveMatchPlaceholder(
     staminaDelta: -25, // 경기 소모 체력
     mentalDelta: isWin ? 10 : -8,
     logMessage,
+    matchOutcome: { matchId: match.id, tournamentId: match.tournamentId, won: isWin },
   };
 }

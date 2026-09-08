@@ -84,6 +84,17 @@ export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
       },
     ],
   },
+  {
+    step: 4,
+    questionTitle: '질문 4. 곁에서 힘이 되어주는 가족',
+    questionDialogue: '“힘든 고교 생활을 버티게 해줄 가족이나 보호자는 누구인가? 내가 알아두면 좋겠군.”',
+    options: [
+      { id:'q4_parents', title:'어머니와 아버지', dialogue:'“두 분 모두 제 꿈을 응원해 주십니다.”', coachReply:'든든한 버팀목이 있군. 감사한 마음을 잊지 말게.', statBoosts:{ relationshipFamily:8, condition:5 }, gainedTrait:'가족의응원', traitDescription:'가족 활동 회복 보너스', icon:'🏠' },
+      { id:'q4_grandma', title:'할머니 손에서 성장', dialogue:'“할머니께서 저를 키워주셨습니다. 꼭 보답하고 싶습니다.”', coachReply:'그 마음이 자네를 더욱 단단하게 만들 걸세.', statBoosts:{ relationshipFamily:10, condition:8 }, gainedTrait:'굳센효심', traitDescription:'위기 상황 멘탈 저항', icon:'💐' },
+      { id:'q4_older', title:'누나 또는 형', dialogue:'“늘 앞에서 길을 보여주는 누나·형이 있습니다.”', coachReply:'좋은 조언자를 두었군. 힘들 땐 혼자 참지 말게.', statBoosts:{ relationshipFamily:7, academics:3 }, gainedTrait:'든든한조언', traitDescription:'진로 이벤트 보너스', icon:'🧭' },
+      { id:'q4_younger', title:'지켜주고 싶은 동생', dialogue:'“저를 자랑스러워하는 동생에게 멋진 선수가 되고 싶습니다.”', coachReply:'책임감은 선수를 성장시키는 큰 힘이지.', statBoosts:{ relationshipFamily:7, condition:6 }, gainedTrait:'맏이의책임', traitDescription:'중요 경기 집중력 보너스', icon:'🌱' },
+    ],
+  },
 
   // 2단계: 야구관 및 플레이 스타일 (세트 B 기반)
   {

@@ -31,6 +31,8 @@ export interface ActivityOption {
   mentalDelta?: number;         // 컨디션/멘탈 소모(-) 또는 회복(+)
   statChanges: PlayerStatsSubset;
   targetPosition?: 'P' | 'B' | 'ALL'; // 투수/타자/공통
+  allowedSlots?: TimeSlot[];
+  moneyDelta?: number;
 }
 
 export interface ActivityResult {
@@ -41,6 +43,8 @@ export interface ActivityResult {
   logMessage: string;
   isInjured?: boolean;
   injuryNotice?: string;
+  moneyDelta?: number;
+  matchOutcome?: { matchId: string; tournamentId: string; won: boolean };
 }
 
 export interface CategoryOption {
@@ -287,10 +291,16 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
       mentalDelta: 2,
       statChanges: { contact: 1, stuff: 1, relationshipTeam: 3, fame: 1 },
       targetPosition: 'ALL',
+      allowedSlots: ['afternoon'],
     },
+    { id: 'train_flat_ground', label: '플랫그라운드 릴리스 점검', category: 'training', weight: 2, description: '짧은 거리에서 릴리스와 회전을 섬세하게 교정합니다.', icon: '🎯', staminaDelta: -10, statChanges: { control: 2 }, targetPosition: 'P' },
+    { id: 'train_opposite_field', label: '밀어치기·코스별 배팅', category: 'training', weight: 2, description: '코스에 맞춰 강한 타구를 보내는 능력을 기릅니다.', icon: '⚾', staminaDelta: -12, statChanges: { contact: 2, eye: 1 }, targetPosition: 'B' },
+    { id: 'train_reaction', label: '순간 반응·첫발 훈련', category: 'training', weight: 2, description: '수비 첫발과 타구 판단 속도를 끌어올립니다.', icon: '⚡', staminaDelta: -11, statChanges: { defense: 1, speed: 1 }, targetPosition: 'ALL' },
   ],
 
   rest: [
+    { id: 'job_convenience', label: '동네 편의점 아르바이트', category: 'rest', weight: 1, description: '짧게 일해 장비 구입비를 모읍니다.', icon: '🏪', staminaDelta: -10, mentalDelta: -2, statChanges: {}, targetPosition: 'ALL', allowedSlots: ['night'], moneyDelta: 30000 },
+    { id: 'job_batting_center', label: '배팅센터 보조 아르바이트', category: 'rest', weight: 1, description: '정리와 안내를 돕고 남는 시간에 감각을 익힙니다.', icon: '🪙', staminaDelta: -8, statChanges: { contact: 1 }, targetPosition: 'ALL', allowedSlots: ['night'], moneyDelta: 18000 },
     {
       id: 'rest_deep_sleep',
       label: '충분한 숙면과 낮잠',
@@ -519,14 +529,18 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
 export function sampleSubActivities(
   category: DailyActivityCategory,
   count = 4,
-  playerPosition: Position = 'P'
+  playerPosition: Position = 'P',
+  slot?: TimeSlot
 ): ActivityOption[] {
   const pool = SUB_ACTIVITY_POOL[category] || [];
   const isPitcher = playerPosition === 'P';
+  const isTwoWay = playerPosition === 'TwoWay';
 
   // 플레이어 포지션에 적합한 후보군 필터링
   const filteredPool = pool.filter(opt => {
+    if (slot && opt.allowedSlots && !opt.allowedSlots.includes(slot)) return false;
     if (!opt.targetPosition || opt.targetPosition === 'ALL') return true;
+    if (isTwoWay) return true;
     if (isPitcher) return opt.targetPosition === 'P';
     return opt.targetPosition === 'B';
   });
@@ -632,6 +646,7 @@ export function evaluateActivityWithGating(
     logMessage: logMessage.trim(),
     isInjured,
     injuryNotice,
+    moneyDelta: option.moneyDelta,
   };
 }
 
