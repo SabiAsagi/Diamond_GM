@@ -1,4 +1,5 @@
 import { pitchingRating, battingRating, normalizePlayer } from '../data/playerDevelopment';
+import { getEffectiveStat } from '../types/equipment';
 import type { ScheduledMatch } from '../types/tournament';
 import type { Player } from '../types';
 import type { HighSchoolData } from '../types/highSchool';
@@ -44,9 +45,12 @@ export function resolveMatchPlaceholder(
   let eyeGain = 0;
   const fameGain = isWin ? 3 : 1;
 
+  const effectiveStuff = getEffectiveStat(player, 'stuff');
+  const effectivePower = getEffectiveStat(player, 'power');
+
   if (isPitcher || isTwoWay) {
     const innings = Math.min(9, 4 + Math.floor(Math.random() * 5));
-    const kCount = Math.floor(Math.random() * 6) + (player.stuff > 30 ? 4 : 2);
+    const kCount = Math.floor(Math.random() * 6) + (effectiveStuff > 30 ? 4 : 2);
     const runs = Math.min(oppScore,Math.floor(Math.random() * (oppScore+1)));
     personalPerformance = `[선발 등판] ${innings}이닝 ${kCount}탈삼진 ${runs}실점`;
     stuffGain = 1;
@@ -55,7 +59,7 @@ export function resolveMatchPlaceholder(
   } else {
     const atBats = 4;
     let hits = isWin ? (Math.random() > 0.4 ? 2 : 1) : (Math.random() > 0.6 ? 1 : 0);
-    const isHr = Math.random() < (player.power > 30 ? 0.25 : 0.08);
+    const isHr = Math.random() < (effectivePower > 30 ? 0.25 : 0.08);
     if(isHr)hits=Math.max(1,hits);
     const hrText = isHr ? ' 1홈런' : '';
     const rbi = hits + (isHr ? 2 : 0);

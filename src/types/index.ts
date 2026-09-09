@@ -9,8 +9,23 @@ export * from './outdoorMap';
 export * from './relationship';
 
 import type { GameDate, TimeSlot } from './calendar';
+import type { EquipmentSlot } from './equipment';
 
 export type Position = 'P' | 'C' | '1B' | '2B' | '3B' | 'SS' | 'LF' | 'CF' | 'RF' | 'TwoWay';
+
+export const POSITION_LABELS: Record<Position, string> = {
+  P: '투수',
+  C: '포수',
+  '1B': '1루수',
+  '2B': '2루수',
+  '3B': '3루수',
+  SS: '유격수',
+  LF: '좌익수',
+  CF: '중견수',
+  RF: '우익수',
+  TwoWay: '투타겸업',
+};
+
 export type PlayerStatus = 'HighSchool' | 'Pro' | 'Minor' | 'Military' | 'Retired';
 export type Gender = 'male' | 'female';
 
@@ -88,7 +103,8 @@ export interface Player {
   familyBackground?: 'parents' | 'grandmother' | 'olderSibling' | 'youngerSibling';
   careerGoal?: 'KBO' | 'Overseas' | 'University';
   inventory?: string[];
-  equippedItems?: Partial<Record<'bat' | 'glove' | 'catcherGear' | 'spikes' | 'trainingGear', string>>;
+  equippedItems?: Partial<Record<EquipmentSlot, string>>;
+  lastOutdoorVisitDate?: string;
 
   // 신규 일일 생활 시뮬레이션 & 캘린더 시계 필드
   gameDate?: GameDate;

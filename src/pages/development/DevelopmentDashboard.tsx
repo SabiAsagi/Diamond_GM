@@ -9,11 +9,9 @@ import { SlotResultModal } from '../../components/daily/SlotResultModal';
 import { EventCutsceneModal } from '../../components/daily/EventCutsceneModal';
 import { AppNavigation, type MainNavTab } from '../../components/navigation/AppNavigation';
 
-// 5대 서브 메뉴 뷰
-import { MatchesView } from '../../components/navigation/views/MatchesView';
-import { RelationshipsView } from '../../components/navigation/views/RelationshipsView';
-import { PlayerStatsView } from '../../components/navigation/views/PlayerStatsView';
-import { TrophiesView } from '../../components/navigation/views/TrophiesView';
+// 통합 네비게이션 뷰
+import { RecordsView } from '../../components/navigation/views/RecordsView';
+import { PeopleView } from '../../components/navigation/views/PeopleView';
 import { SettingsView } from '../../components/navigation/views/SettingsView';
 import { TownView } from '../../components/navigation/views/TownView';
 
@@ -193,9 +191,9 @@ export default function DevelopmentDashboard() {
           </div>
         )}
 
-        {/* 5대 서브 메뉴 뷰 렌더링 */}
-        {activeNavTab === 'matches' && (
-          <MatchesView
+        {/* 통합 네비게이션 뷰 렌더링 */}
+        {activeNavTab === 'records' && (
+          <RecordsView
             player={player}
             matches={seasonMatches}
             historyLogs={historyLogs}
@@ -203,17 +201,17 @@ export default function DevelopmentDashboard() {
           />
         )}
 
-        {activeNavTab === 'relationships' && (
-          <RelationshipsView player={player} onClose={() => setActiveNavTab('home')} />
+        {activeNavTab === 'people' && (
+          <PeopleView player={player} onClose={() => setActiveNavTab('home')} />
         )}
 
-        {activeNavTab === 'stats' && (
-          <PlayerStatsView player={player} onClose={() => setActiveNavTab('home')} />
-        )}
-        {activeNavTab === 'town' && <TownView player={player} onPurchase={purchaseEquipment} onEquip={equipItem} onVisit={visitOutdoorLocation} />}
-
-        {activeNavTab === 'trophies' && (
-          <TrophiesView player={player} onClose={() => setActiveNavTab('home')} />
+        {activeNavTab === 'outing' && (
+          <TownView
+            player={player}
+            onPurchase={purchaseEquipment}
+            onEquip={equipItem}
+            onVisit={visitOutdoorLocation}
+          />
         )}
 
         {activeNavTab === 'settings' && (
@@ -244,8 +242,8 @@ export default function DevelopmentDashboard() {
               <p>{player.name} 선수는 3년간의 모든 고교 일정과 대회를 완주하였습니다.</p>
             </div>
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('trophies')}>
-            트로피/업적 확인
+          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('records')}>
+            대회 기록 & 트로피 확인
           </button>
         </div>
       )}

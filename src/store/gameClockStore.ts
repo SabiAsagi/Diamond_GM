@@ -471,18 +471,39 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   },
   equipItem: async (itemId, slot) => {
     const { player } = get();
-    if (!player || !player.inventory?.includes(itemId)) return;
-    const updated = { ...player, equippedItems: { ...(player.equippedItems || {}), [slot]: itemId } };
-    await db.players.put(updated); set({ player: updated });
+    if (!player) return;
+    const currentEquipped = player.equippedItems?.[slot];
+    const nextEquipped = { ...(player.equippedItems || {}) };
+    if (!itemId || currentEquipped === itemId) {
+      delete nextEquipped[slot];
+    } else {
+      if (!player.inventory?.includes(itemId)) return;
+      nextEquipped[slot] = itemId;
+    }
+    const updated = { ...player, equippedItems: nextEquipped };
+    updated.overall = overallRating(updated);
+    await db.players.put(updated);
+    set({ player: updated });
   },
   visitOutdoorLocation: async (location) => {
-    const { player } = get();
+    const { player, clock } = get();
     if (!player || (player.money || 0) < location.cost) return false;
-    const updated: Player = { ...player, money: (player.money || 0) - location.cost + (location.effects.money || 0), condition: Math.max(5, Math.min(100, player.condition + location.effects.condition)) };
+    const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
+    if (player.lastOutdoorVisitDate === todayDateStr) return false;
+
+    const updated: Player = {
+      ...player,
+      money: (player.money || 0) - location.cost + (location.effects.money || 0),
+      condition: Math.max(5, Math.min(100, player.condition + location.effects.condition)),
+      lastOutdoorVisitDate: todayDateStr,
+    };
     for (const [key, value] of Object.entries(location.effects.statChanges)) {
       const stat = key as keyof Player;
       if (typeof updated[stat] === 'number' && typeof value === 'number') (updated as unknown as Record<string, number>)[key] = Math.max(0, Math.min(100, (updated[stat] as number) + value));
     }
-    await db.players.put(updated); set({ player: updated }); return true;
+    updated.overall = overallRating(updated);
+    await db.players.put(updated);
+    set({ player: updated });
+    return true;
   },
 }));

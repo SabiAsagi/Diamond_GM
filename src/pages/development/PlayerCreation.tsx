@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../db';
 import type { Player, Position, Handedness, PitchingForm, BattingForm, PitcherRole, Gender } from '../../types';
+import { POSITION_LABELS } from '../../types';
 import { HIGH_SCHOOLS_BY_REGION, getHighSchoolDataByName } from '../../data/highSchools';
 import { PITCHING_FORM_GUIDES, BATTING_FORM_GUIDES, type FormGuide } from '../../data/formGuides';
 import { SchoolEmblem } from '../../components/SchoolEmblem';
@@ -72,7 +73,11 @@ export default function PlayerCreation() {
       alert("입학할 고등학교를 선택해주세요.");
       return;
     }
-    setStep(s => Math.min(s + 1, 4));
+    if (step === 4 && !name.trim()) {
+      alert("선수 이름을 입력해주세요.");
+      return;
+    }
+    setStep(s => Math.min(s + 1, 5));
   };
   
   const handlePrev = () => setStep(s => Math.max(s - 1, 1));
@@ -80,6 +85,7 @@ export default function PlayerCreation() {
   const handleCreate = async () => {
     if (!name.trim()) {
       alert("선수 이름을 입력해주세요.");
+      setStep(4);
       return;
     }
     if (!highSchool) {
@@ -122,10 +128,10 @@ export default function PlayerCreation() {
       
       condition: 100,
       academics: 50,
-      relationshipFamily: 50,
-      relationshipFriends: 50,
-      relationshipTeam: 50,
-      relationshipCoach: 50,
+      relationshipFamily: 20,
+      relationshipFriends: 15,
+      relationshipTeam: 10,
+      relationshipCoach: 10,
       money: 50000,
       inventory: [],
       equippedItems: {},
@@ -171,13 +177,13 @@ export default function PlayerCreation() {
 
             {/* 중앙: 상단 Step 배지 + 바로 아래 새로운 스타 생성 타이틀 */}
             <div className="nav-center-col">
-              <div className="step-indicator-large">Step {step} of 4</div>
+              <div className="step-indicator-large">Step {step} of 5</div>
               <h2 className="wizard-main-title">새로운 스타 생성</h2>
             </div>
 
             {/* 우측: 다음 / 생성 완료 버튼 */}
             <div className="nav-side-col right">
-              {step < 4 ? (
+              {step < 5 ? (
                 <button 
                   className={`btn btn-sm btn-primary nav-action-btn ${step === 1 && !highSchool ? 'disabled' : ''}`} 
                   onClick={handleNext}
@@ -411,7 +417,7 @@ export default function PlayerCreation() {
                           className={`select-btn ${position === pos ? 'active' : ''}`}
                           onClick={() => setPosition(pos)}
                         >
-                          {pos}
+                          {POSITION_LABELS[pos]} ({pos})
                         </button>
                       ))}
                     </div>
@@ -470,11 +476,10 @@ export default function PlayerCreation() {
             </div>
           )}
 
-          {/* STEP 4: 선수 프로필 최종 입력 */}
+          {/* STEP 4: 선수 프로필 기본 입력 */}
           {step === 4 && (
-            <div className="step-content">
-              <AppearanceEditor value={appearance} onChange={setAppearance} number={uniformNumber}/>
-              <h3>선수 프로필 최종 입력</h3>
+            <div className="step-content animate-fade-in">
+              <h3>선수 프로필 기본 입력</h3>
               <div className="form-group">
                 <label>선수 이름</label>
                 <input 
@@ -486,12 +491,14 @@ export default function PlayerCreation() {
                 />
               </div>
               <div className="form-group">
-                <label>성별</label>
+                <label>성별 선택</label>
                 <div className="responsive-btn-grid">
                   <button className={`select-btn ${gender === 'male' ? 'active' : ''}`} onClick={() => setGender('male')}>남자 선수</button>
                   <button className={`select-btn ${gender === 'female' ? 'active' : ''}`} onClick={() => setGender('female')}>여자 선수</button>
                 </div>
-                <small style={{ color: 'var(--text-muted)' }}>여자 선수는 희소한 도전 경로로 시작 능력치가 조금 낮지만, 같은 훈련·대회·진출 기회를 가집니다.</small>
+                <small style={{ color: 'var(--text-muted)' }}>
+                  여자 선수는 희소한 도전 경로로 시작 능력치가 조금 낮지만, 동일한 훈련·대회·진출 기회를 가지며 전용 인연·로맨스 스토리가 열립니다.
+                </small>
               </div>
               <div className="form-group">
                 <label>등번호</label>
@@ -507,12 +514,40 @@ export default function PlayerCreation() {
                 />
               </div>
 
+              <div className="form-group" style={{ marginTop: '24px' }}>
+                <div style={{ padding: '14px 16px', background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.35)', borderRadius: '10px' }}>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#93c5fd' }}>
+                    💡 '다음' 버튼을 누르면 선택한 <strong>{gender === 'male' ? '남자 선수' : '여자 선수'}</strong> 체형과 등번호를 반영한 <strong>외형 커스터마이징 화면</strong>으로 이동합니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 5: 외형 커스터마이징 & 최종 확인 */}
+          {step === 5 && (
+            <div className="step-content animate-fade-in">
+              <h3>선수 외형 커스터마이징 & 최종 확인</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
+                선택한 <strong>{gender === 'male' ? '남자 선수' : '여자 선수'}</strong> 실루엣에 맞추어 피부톤, 헤어스타일, 유니폼 색상을 조율하세요.
+              </p>
+
+              <div style={{ marginBottom: '24px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <AppearanceEditor
+                  value={appearance}
+                  onChange={setAppearance}
+                  number={uniformNumber || '1'}
+                  gender={gender}
+                />
+              </div>
+
               <div className="summary-box">
                 <h4>최종 생성 정보 요약</h4>
                 <p><strong>소속:</strong> {highSchool} ({selectedSchoolData?.tier} Tier / {selectedSchoolData?.region})</p>
-                <p><strong>성별:</strong> {gender === 'male' ? '남자' : '여자'}</p>
+                <p><strong>선수명:</strong> {name || '무명 선수'}</p>
+                <p><strong>성별:</strong> {gender === 'male' ? '남자 선수' : '여자 선수'}</p>
                 <p><strong>유형:</strong> {roleType === 'Pitcher' ? '투수' : (roleType === 'Batter' ? '타자' : '투타 겸업')} ({handedness})</p>
-                <p><strong>포지션:</strong> {roleType === 'Pitcher' ? 'P' : (roleType === 'TwoWay' ? 'TwoWay' : position)}</p>
+                <p><strong>포지션:</strong> {roleType === 'Pitcher' ? POSITION_LABELS.P : (roleType === 'TwoWay' ? POSITION_LABELS.TwoWay : `${POSITION_LABELS[position]} (${position})`)}</p>
                 {roleType !== 'Batter' && (
                   <p><strong>투구 폼:</strong> {currentPitchingGuide?.name} ({currentPitchingGuide?.releaseAngle})</p>
                 )}
@@ -520,6 +555,16 @@ export default function PlayerCreation() {
                   <p><strong>타격 폼:</strong> {currentBattingGuide?.name} ({currentBattingGuide?.stanceType})</p>
                 )}
                 <p><strong>등번호:</strong> #{uniformNumber || '1'}</p>
+              </div>
+
+              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  className="btn btn-primary btn-lg"
+                  onClick={handleCreate}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '1rem', fontWeight: 700 }}
+                >
+                  <Save size={18} /> 선수 생성 완료 및 감독 면담 입장
+                </button>
               </div>
             </div>
           )}

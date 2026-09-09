@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');const os=require('node:os');const ts=require('typescript');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'diamond-tests-'));
 function compile(folder){for(const item of fs.readdirSync(folder,{withFileTypes:true})){const file=path.join(folder,item.name);if(item.isDirectory())compile(file);else if(file.endsWith('.ts')){const target=path.join(dir,path.relative(path.resolve('src'),file).replace(/\.ts$/,'.js'));fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText);}}}
-compile(path.resolve('src'));fs.symlinkSync(path.resolve('node_modules'),path.join(dir,'node_modules'),'dir');
+compile(path.resolve('src'));fs.symlinkSync(path.resolve('node_modules'),path.join(dir,'node_modules'),process.platform === 'win32' ? 'junction' : 'dir');
 let saved;
 require.cache[path.join(dir,'db.js')]={id:path.join(dir,'db.js'),filename:path.join(dir,'db.js'),loaded:true,exports:{db:{players:{put:async p=>{saved=structuredClone(p);}}}}};
 const {HIGH_SCHOOLS_DATA}=require(path.join(dir,'data/highSchools.js'));

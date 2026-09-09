@@ -1,6 +1,6 @@
-import { Home, Trophy, Users, Activity, Award, Settings, Map } from 'lucide-react';
+import { Home, Trophy, Users, MapPin, Settings } from 'lucide-react';
 
-export type MainNavTab = 'home' | 'matches' | 'relationships' | 'town' | 'stats' | 'trophies' | 'settings';
+export type MainNavTab = 'home' | 'records' | 'people' | 'outing' | 'settings';
 
 interface AppNavigationProps {
   activeTab: MainNavTab;
@@ -16,11 +16,9 @@ interface NavItem {
 export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
   const navItems: NavItem[] = [
     { id: 'home', label: '홈', icon: <Home size={18} /> },
-    { id: 'matches', label: '경기·대회', icon: <Trophy size={18} /> },
-    { id: 'relationships', label: '인연', icon: <Users size={18} /> },
-    { id: 'town', label: '연고지', icon: <Map size={18} /> },
-    { id: 'stats', label: '내 선수', icon: <Activity size={18} /> },
-    { id: 'trophies', label: '업적', icon: <Award size={18} /> },
+    { id: 'records', label: '기록', icon: <Trophy size={18} /> },
+    { id: 'people', label: '인물', icon: <Users size={18} /> },
+    { id: 'outing', label: '외출', icon: <MapPin size={18} /> },
     { id: 'settings', label: '설정', icon: <Settings size={18} /> },
   ];
 

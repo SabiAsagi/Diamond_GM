@@ -2,6 +2,7 @@ import { PlayerPortrait } from '../PlayerAppearance';
 import type { GameDate, TimeSlot } from '../../types/calendar';
 import { calculateDaysUntilDraft, WEEKDAY_NAMES, TIME_SLOT_LABELS } from '../../types/calendar';
 import type { Player } from '../../types';
+import { POSITION_LABELS } from '../../types';
 import type { HighSchoolData } from '../../types/highSchool';
 import { SchoolEmblem } from '../SchoolEmblem';
 import { Calendar, Trophy, Wallet } from 'lucide-react';
@@ -43,13 +44,13 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
   return (
     <div className="daily-top-bar glass-panel animate-fade-in">
       {/* 1. 학교 및 선수 기본 프로필 정보 */}
-      <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber}/></div>
+      <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber} gender={player.gender}/></div>
         {school && <SchoolEmblem school={school} size="sm" />}
         <div className="daily-player-meta">
           <div className="daily-player-row">
             <span className="player-name-bold">{player.name}</span>
             <span className="player-num-chip">#{player.uniformNumber}</span>
-            <span className="player-pos-chip">{player.position}</span>
+            <span className="player-pos-chip">{POSITION_LABELS[player.position] || player.position}</span>
             <span className="player-school-chip">{school?.name || player.highSchool}</span>
           </div>
           <div className="daily-player-sub">
