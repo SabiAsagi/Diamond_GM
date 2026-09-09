@@ -1,3 +1,4 @@
+import { normalizePlayer, overallRating } from '../../data/playerDevelopment';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../db';
@@ -119,7 +120,8 @@ export default function CoachInterview() {
       }
     }
 
-    const pathTitle = `${allAnswers[0]?.title} · ${allAnswers[2]?.title}`;
+    const pathTitle = allAnswers.find(a=>a.id.startsWith('q1_'))?.title || '';
+    const siblings = allAnswers.find(a=>a.id.startsWith('sibling_'))?.id.replace('sibling_','') as Player['siblings'];
 
     const updatedPlayer: Player = {
       ...player,
@@ -141,6 +143,8 @@ export default function CoachInterview() {
       traits: newTraits,
       interviewCompleted: true,
       chosenPathTitle: pathTitle,
+      familyBackground: allAnswers.some(a=>a.id==='q4_grandma') ? 'grandmother' : 'parents',
+      siblings,
       grade: 1,
       month: 3,
       day: 2,
@@ -166,6 +170,8 @@ export default function CoachInterview() {
       updatedPlayer.overall = Math.round((newContact + newPower + newEye + newSpeed + newDefense) / 5);
     }
 
+    Object.assign(updatedPlayer,normalizePlayer(updatedPlayer));
+    updatedPlayer.overall=overallRating(updatedPlayer);
     await db.players.put(updatedPlayer);
     setPlayer(updatedPlayer);
     setIsApplying(false);

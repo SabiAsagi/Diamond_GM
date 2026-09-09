@@ -1,46 +1,7 @@
+import { useState, useRef, useEffect } from 'react';
 import type { EventCutscene } from '../../types/randomEvent';
-import { Sparkles, ArrowRight, UserCheck } from 'lucide-react';
-
-interface EventCutsceneModalProps {
-  cutscene: EventCutscene;
-  onConfirm: () => void;
-}
-
-export function EventCutsceneModal({ cutscene, onConfirm }: EventCutsceneModalProps) {
-  return (
-    <div className="cutscene-modal-backdrop animate-fade-in">
-      <div className="cutscene-modal-card glass-panel animate-scale-up">
-        {/* 상단 뱃지 */}
-        <div className="cutscene-top-tag">
-          <Sparkles size={15} color="#fbbf24" />
-          <span>특별 이벤트 컷신 발생</span>
-        </div>
-
-        <div className="cutscene-header">
-          <span className="cutscene-icon-huge">{cutscene.icon}</span>
-          <div className="cutscene-header-texts">
-            <h3 className="cutscene-title">{cutscene.title}</h3>
-            <p className="cutscene-subtitle">{cutscene.subtitle}</p>
-          </div>
-        </div>
-
-        {/* 대사창 박스 */}
-        <div className="cutscene-dialogue-box">
-          <div className="cutscene-speaker-badge">
-            <UserCheck size={14} color="#60a5fa" />
-            <strong>{cutscene.speakerName}</strong>
-            <span className="speaker-role-chip">{cutscene.speakerRole}</span>
-          </div>
-          <p className="cutscene-quote">{cutscene.dialogue}</p>
-        </div>
-
-        <div className="cutscene-footer">
-          <button className="btn btn-primary btn-lg cutscene-confirm-btn" onClick={onConfirm}>
-            <span>계속 진행하기</span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+export function EventCutsceneModal({cutscene,onChoose}:{cutscene:EventCutscene;onChoose:(choice:'learn'|'reflect')=>Promise<void>}){
+ const [step,setStep]=useState(0);const [busy,setBusy]=useState(false);const [error,setError]=useState('');const dialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{const element=dialog.current;element?.showModal();return ()=>element?.close();},[]);
+ return <dialog ref={dialog} className="story-dialog" aria-labelledby="story-title" onCancel={e=>e.preventDefault()}><div className="story-stage"><span className="story-location">{cutscene.subtitle}</span><span className="story-portrait">{cutscene.icon}</span><h2 id="story-title">{cutscene.title}</h2></div><div className="story-dialogue"><strong>{cutscene.speakerName} · {cutscene.speakerRole}</strong><p>{step===0?cutscene.subtitle:cutscene.dialogue}</p>{step===0?<button className="btn btn-primary" onClick={()=>setStep(1)}>이야기 듣기 →</button>:<div className="story-choices">{([['learn','마음을 열고 이야기를 나눈다','이벤트 고유 효과'],['reflect','지금은 생각을 정리할 시간을 갖는다','컨디션 +8']] as const).map(([id,label,reward])=><button className="btn btn-secondary" disabled={busy} key={id} onClick={async()=>{setBusy(true);try{await onChoose(id);}catch{setError('저장하지 못했습니다. 다시 선택해 주세요.');setBusy(false);}}}>{label}<small>{reward}</small></button>)}</div>}<p role="alert">{error}</p></div></dialog>;
 }

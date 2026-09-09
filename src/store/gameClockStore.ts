@@ -1,3 +1,4 @@
+import { normalizePlayer, EXTRA_RATINGS, trainPitch, overallRating } from '../data/playerDevelopment';
 import { create } from 'zustand';
 import type { Player } from '../types';
 import type { GameClock, GameDate, TimeSlot } from '../types/calendar';
@@ -7,7 +8,7 @@ import { buildDailyPlan } from '../types/dailySchedule';
 import type { AcademicEvent } from '../types/academicCalendar';
 import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent } from '../types/academicCalendar';
 import type { ScheduledMatch } from '../types/tournament';
-import { generateSeasonMatches, getPlayerMatchForDate, progressTournament } from '../types/tournament';
+import { generateSeasonMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
 import { SUB_ACTIVITY_POOL, evaluateActivityWithGating } from '../types/activity';
 import { resolveMatchPlaceholder } from './matchResolver';
@@ -46,6 +47,9 @@ export interface GameClockState {
   clearLastActionResult: () => void;
   activeCutscene: EventCutscene | null;
   clearActiveCutscene: () => void;
+  resolveCutscene: (choice: 'learn' | 'reflect') => Promise<void>;
+  saveAppearance: (appearance: NonNullable<Player['appearance']>) => Promise<void>;
+  revealTournament: (id: string) => Promise<void>;
   cutsceneHistory: CutsceneTriggerHistory;
 
   // Actions
@@ -85,10 +89,11 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   lastActionResult: null,
   clearLastActionResult: () => set({ lastActionResult: null }),
   activeCutscene: null,
-  clearActiveCutscene: () => set({ activeCutscene: null }),
+  clearActiveCutscene: () => { void get().resolveCutscene('reflect'); },
   cutsceneHistory: {},
 
   initClock: async (player: Player) => {
+    player = normalizePlayer(player);
     set({ isLoading: true });
 
     const school = getHighSchoolDataByName(player.highSchool) || HIGH_SCHOOLS_DATA[0];
@@ -104,7 +109,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const initialSlot: TimeSlot = player.currentSlot || 'morning';
 
     // 시즌 대회 대진표 생성
-    const seasonMatches = generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? player.savedMatches : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    player.savedMatches=seasonMatches;
+    player.savedSeasonYear=initialDate.year;
+    await db.players.put(player);
     const academicEvents = [...ACADEMIC_CALENDAR_TEMPLATE];
 
     // 첫 날 일일 계획 수립
@@ -129,15 +137,17 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       isCareerEnded: false,
       isLoading: false,
       lastActionResult: null,
-      activeCutscene: null,
+      activeCutscene: CUTSCENE_EVENTS_POOL.find(e=>e.id===player.pendingEventId) ?? null,
+      cutsceneHistory: player.eventHistory ?? {},
     });
   },
 
   advanceSlot: async (result: ActivityResult) => {
     const state = get();
     const { player, clock, school, seasonMatches, academicEvents, todayLogs, cutsceneHistory } = state;
-    if (!player) return;
-
+    if (!player || state.isLoading || state.activeCutscene || state.isCareerEnded) return;
+    set({isLoading:true});
+    try {
     // 1. 스탯 변동 반영
     let newStuff = player.stuff;
     let newControl = player.control;
@@ -149,7 +159,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     let newDefense = player.defense;
     let newCondition = player.condition;
     let newAcademics = player.academics;
-    let newFame = player.fame || 10;
+    let newFame = player.fame ?? 10;
     const newMoney = Math.max(0, (player.money || 0) + (result.moneyDelta || 0));
     let newRelFam = player.relationshipFamily;
     let newRelFri = player.relationshipFriends;
@@ -157,6 +167,13 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     let newRelCoach = player.relationshipCoach;
 
     const sc = result.statChanges;
+    const extra = normalizePlayer(player);
+    for(const key of Object.keys(EXTRA_RATINGS) as (keyof typeof EXTRA_RATINGS)[]) extra[key]=Math.max(0,Math.min(100,extra[key]!+(sc[key]??0)));
+    extra.velocity=Math.round(Math.max(80,Math.min(170,extra.velocity!+(sc.velocity??0)))*10)/10;
+    if(result.pitchTraining) extra.pitches=trainPitch(extra,result.pitchTraining,result.pitchXp??0);
+    extra.savedMatches=seasonMatches;
+    extra.savedSeasonYear=clock.date.year;
+    if(result.matchOutcome) extra.matchRecords=[...(player.matchRecords??[]),{matchId:result.matchOutcome.matchId,year:clock.date.year,log:result.logMessage}];
     if (sc.stuff) newStuff = Math.min(100, newStuff + sc.stuff);
     if (sc.control) newControl = Math.min(100, newControl + sc.control);
     if (sc.stamina) newStaminaRating = Math.min(100, newStaminaRating + sc.stamina);
@@ -175,7 +192,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     // 체력 및 컨디션(멘탈) 복합 반영
     const netStaminaDelta = result.staminaDelta;
     const netMentalDelta = result.mentalDelta || 0;
-    newCondition = Math.max(5, Math.min(100, newCondition + netStaminaDelta + netMentalDelta));
+    newCondition = Math.max(5, Math.min(100, newCondition + (sc.condition ?? 0) + netStaminaDelta + netMentalDelta));
 
     // OVR 재계산
     let newOverall = player.overall;
@@ -195,7 +212,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const currentSlot = clock.currentSlot;
     let nextSlot: TimeSlot = 'morning';
     let nextDate = clock.date;
-    let isCareerEnded = state.isCareerEnded;
+    let isCareerEnded: boolean = state.isCareerEnded;
     let historyLogs = state.historyLogs;
 
     if (currentSlot === 'morning') {
@@ -212,7 +229,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         isCareerEnded = true;
       }
 
-      let updatedMatches = seasonMatches;
+      let updatedMatches = school ? advanceOtherTournamentMatches(seasonMatches,clock.date,school) : seasonMatches;
       if (advanceRes.nextDate.year !== clock.date.year && school) {
         updatedMatches = generateSeasonMatches(advanceRes.nextDate.year, school, HIGH_SCHOOLS_DATA);
       }
@@ -233,7 +250,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       });
 
       const updatedPlayer: Player = {
-        ...player,
+        ...extra,
+        savedMatches:updatedMatches,
+        savedSeasonYear:nextDate.year,
         stuff: newStuff,
         control: newControl,
         stamina: newStaminaRating,
@@ -261,7 +280,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       // 3. 확률적 컷신 이벤트 체크
       let triggeredCutscene: EventCutscene | null = null;
       const nextHistory = { ...cutsceneHistory };
-      for (const evt of CUTSCENE_EVENTS_POOL) {
+      for (const evt of CUTSCENE_EVENTS_POOL.map(evt=>({evt,rank:Math.random()})).sort((a,b)=>a.rank-b.rank).map(x=>x.evt)) {
+        if (!result.activityCategory || !['training','relationship','study','special'].includes(result.activityCategory)) continue;
+        if (evt.categories && !evt.categories.includes(result.activityCategory)) continue;
         if (shouldTriggerCutscene(evt, updatedPlayer, nextDate, nextHistory)) {
           triggeredCutscene = evt;
           nextHistory[evt.id] = {
@@ -269,12 +290,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
             month: nextDate.month,
             day: nextDate.day,
           };
-          const eff = evt.effect(updatedPlayer);
-          Object.assign(updatedPlayer, eff.statChanges);
+
           break;
         }
       }
 
+      updatedPlayer.overall=overallRating(updatedPlayer);
+      updatedPlayer.eventHistory=nextHistory;
+      updatedPlayer.pendingEventId=triggeredCutscene?.id;
       await db.players.put(updatedPlayer);
 
       set({
@@ -294,7 +317,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     // 중간 슬롯 진행 (morning -> afternoon 또는 afternoon -> night)
     const updatedPlayer: Player = {
-      ...player,
+      ...extra,
       stuff: newStuff,
       control: newControl,
       stamina: newStaminaRating,
@@ -319,7 +342,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     // 중간 슬롯에서도 확률적 컷신 체크
     let triggeredCutscene: EventCutscene | null = null;
     const nextHistory = { ...cutsceneHistory };
-    for (const evt of CUTSCENE_EVENTS_POOL) {
+    for (const evt of CUTSCENE_EVENTS_POOL.map(evt=>({evt,rank:Math.random()})).sort((a,b)=>a.rank-b.rank).map(x=>x.evt)) {
+        if (!result.activityCategory || !['training','relationship','study','special'].includes(result.activityCategory)) continue;
+        if (evt.categories && !evt.categories.includes(result.activityCategory)) continue;
       if (shouldTriggerCutscene(evt, updatedPlayer, clock.date, nextHistory)) {
         triggeredCutscene = evt;
         nextHistory[evt.id] = {
@@ -327,12 +352,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
           month: clock.date.month,
           day: clock.date.day,
         };
-        const eff = evt.effect(updatedPlayer);
-        Object.assign(updatedPlayer, eff.statChanges);
+
         break;
       }
     }
 
+    updatedPlayer.overall=overallRating(updatedPlayer);
+    updatedPlayer.eventHistory=nextHistory;
+    updatedPlayer.pendingEventId=triggeredCutscene?.id;
     await db.players.put(updatedPlayer);
 
     set({
@@ -343,14 +370,16 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       activeCutscene: triggeredCutscene,
       cutsceneHistory: nextHistory,
     });
+    } finally { set({isLoading:false}); }
   },
 
   selectActivity: async (_slot: TimeSlot, category: DailyActivityCategory, subActivityId: string) => {
     const { player } = get();
-    if (!player) return;
+    if (!player || get().isLoading || get().activeCutscene || _slot!==get().clock.currentSlot || get().dailyPlan.slots[_slot].forced) return;
 
     const pool = SUB_ACTIVITY_POOL[category] || [];
-    const option = pool.find(o => o.id === subActivityId) || pool[0];
+    const option = pool.find(o => o.id === subActivityId);
+    if(!option || (option.allowedSlots && !option.allowedSlots.includes(_slot)) || (player.position!=='TwoWay' && option.targetPosition && option.targetPosition!=='ALL' && option.targetPosition!==(player.position==='P'?'P':'B'))) return;
 
     // 체력 및 멘탈 게이팅 평가 (체력 20 이하 효율 반감 및 부상 롤)
     const result = evaluateActivityWithGating(
@@ -359,12 +388,13 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       player.condition
     );
 
+    if(result.pitchTraining) result.logMessage+=` · 구종 경험치 +${result.pitchXp} XP`;
     await get().advanceSlot(result);
   },
 
   executeForcedSlot: async (slot: TimeSlot) => {
     const { player, school, clock, dailyPlan, seasonMatches, academicEvents } = get();
-    if (!player || !school) return;
+    if (!player || !school || get().isLoading || get().activeCutscene || slot!==clock.currentSlot) return;
 
     const assignment = dailyPlan.slots[slot];
     if (!assignment || !assignment.forced) return;
@@ -396,9 +426,34 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       }
     }
 
+    if(result.pitchTraining) result.logMessage+=` · 구종 경험치 +${result.pitchXp} XP`;
     await get().advanceSlot(result);
   },
 
+  resolveCutscene: async (choice) => {
+    const {player,activeCutscene,isLoading}=get(); if(!player||!activeCutscene||isLoading)return;
+    set({isLoading:true});
+    try {
+      const effect=choice==='learn'?activeCutscene.effect(player):{statChanges:{condition:Math.min(100,player.condition+8)},logMessage:'서두르지 않고 마음을 정리했습니다. 컨디션 +8'};
+      const updated={...player,...effect.statChanges,pendingEventId:undefined};
+      for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics','relationshipCoach','relationshipTeam','relationshipFriends','relationshipFamily',...Object.keys(EXTRA_RATINGS)]){
+        const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
+      }
+      updated.overall=overallRating(updated);
+      await db.players.put(updated);
+      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:{},staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
+    }finally{set({isLoading:false});}
+  },
+  saveAppearance: async (appearance) => {
+    const {player}=get(); if(!player)return;
+    const updated={...player,appearance}; await db.players.put(updated);set({player:updated});
+  },
+  revealTournament: async (id) => {
+    const {player,seasonMatches,clock}=get(); if(!player)return;
+    const matches=seasonMatches.map(m=>m.tournamentId===id?{...m,drawn:true}:m);
+    const updated={...player,savedMatches:matches,savedSeasonYear:clock.date.year};
+    await db.players.put(updated);set({player:updated,seasonMatches:matches});get().regenerateDailyPlan();
+  },
   regenerateDailyPlan: () => {
     const { clock, seasonMatches, academicEvents } = get();
     const dailyPlan = buildDailyPlan(clock.date, {

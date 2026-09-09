@@ -1,6 +1,6 @@
 import type { EventCutscene } from '../types/randomEvent';
 
-export const CUTSCENE_EVENTS_POOL: EventCutscene[] = [
+const BASE_CUTSCENES: EventCutscene[] = [
   { id:'homeroom_checkin', title:'담임 선생님의 조용한 배려', subtitle:'수업과 원정 일정을 함께 챙겨주십니다.', dialogue:'“운동도 중요하지만 졸업까지 네 생활 전체를 같이 챙겨보자.”', speakerName:'담임 선생님', speakerRole:'Homeroom Teacher', icon:'📚', baseChance:.09, cooldownDays:12, effect:p=>({statChanges:{academics:Math.min(100,p.academics+3),relationshipFriends:Math.min(100,p.relationshipFriends+2)},logMessage:'담임 선생님과 학업 계획을 정리했습니다.'}) },
   { id:'pe_recovery', title:'체육 선생님의 회복 루틴', subtitle:'훈련 전후 몸 관리법을 배웁니다.', dialogue:'“강하게 훈련하는 것만큼 제대로 회복하는 것도 실력이다.”', speakerName:'체육 선생님', speakerRole:'Physical Education', icon:'🏃', baseChance:.08, cooldownDays:14, conditions:p=>p.condition<65, effect:p=>({statChanges:{condition:Math.min(100,p.condition+12),stamina:Math.min(100,p.stamina+1)},logMessage:'회복 루틴을 배워 컨디션을 되찾았습니다.'}) },
   { id:'childhood_date', title:'소꿉친구와의 첫 데이트', subtitle:'오랜 친구 사이에 새로운 감정이 피어납니다.', dialogue:'“야구 이야기 말고… 오늘은 우리 이야기만 하면 안 될까?”', speakerName:'한서윤', speakerRole:'소꿉친구', icon:'🌸', baseChance:.06, cooldownDays:30, conditions:p=>(p.relationshipFriends||0)>=75, effect:p=>({statChanges:{relationshipFriends:Math.min(100,p.relationshipFriends+6),condition:Math.min(100,p.condition+10)},logMessage:'소꿉친구와 특별한 시간을 보냈습니다. 연애 인연이 깊어졌습니다.'}) },
@@ -85,4 +85,10 @@ export const CUTSCENE_EVENTS_POOL: EventCutscene[] = [
       logMessage: '🔥 라이벌과의 팽팽한 신경전으로 가슴속 투지가 불타오릅니다! (승부욕 및 능력치 상승)',
     }),
   },
+];
+
+export const CUTSCENE_EVENTS_POOL: EventCutscene[] = [
+ ...BASE_CUTSCENES.map(e=>({...e,categories:(e.id.includes('coach')||e.id.includes('scout')||e.id==='pe_recovery'?['training','special']:e.id==='homeroom_checkin'?['study']:['relationship']) as EventCutscene['categories']})),
+ {id:'pitch_grip_discovery',title:'손끝에서 달라진 공',subtitle:'불펜 · 훈련을 마친 뒤',dialogue:'방금 공은 회전이 달랐어. 손가락이 걸리는 느낌을 기억해 봐. 무리해서 던지기보다 그립부터 함께 확인하자.',speakerName:'투수 코치',speakerRole:'투구 지도',icon:'⚾',baseChance:.22,cooldownDays:7,categories:['training'],conditions:p=>p.position==='P'||p.position==='TwoWay',effect:p=>({statChanges:{movement:Math.min(100,(p.movement??p.stuff)+2),control:Math.min(100,p.control+1)},logMessage:'그립을 복기했습니다. 무브먼트 +2 · 제구 +1'})},
+ {id:'two_strike_lesson',title:'마지막 한 공을 버티는 법',subtitle:'배팅 케이지 · 오후',dialogue:'두 스트라이크라고 조급해질 필요 없어. 배트를 짧게 잡고 바깥쪽 공은 끝까지 보자. 네 타석은 아직 끝나지 않았어.',speakerName:'타격 코치',speakerRole:'타격 지도',icon:'🏏',baseChance:.22,cooldownDays:7,categories:['training'],conditions:p=>p.position!=='P',effect:p=>({statChanges:{avoidK:Math.min(100,(p.avoidK??p.contact)+2),eye:Math.min(100,p.eye+1)},logMessage:'2스트라이크 접근법을 배웠습니다. 삼진 회피 +2 · 선구안 +1'})}
 ];

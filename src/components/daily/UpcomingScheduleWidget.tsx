@@ -31,6 +31,7 @@ export function UpcomingScheduleWidget({
 
     // 1. 경기 일정 필터링
     for (const m of matches) {
+      if(!m.isPlayerTeamMatch || m.result) continue;
       // 같은 해의 일자 기준 (월/일)
       let matchYear = currentDate.year;
       // 1~2월인 경우 다음 연도일 수도 있음
@@ -46,7 +47,7 @@ export function UpcomingScheduleWidget({
         items.push({
           id: m.id,
           title: `${m.tournamentName} ${m.round}`,
-          subtitle: `vs ${m.awaySchoolName}`,
+          subtitle: m.drawn===false?'조 추첨 예정':`${m.homeSchoolName} vs ${m.awaySchoolName}`,
           diffDays,
           dDayStr: diffDays === 0 ? 'D-Day' : `D-${diffDays}`,
           category: 'match',

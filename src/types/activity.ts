@@ -1,8 +1,10 @@
+import { PITCH_NAMES, EXTRA_RATINGS, type PitchType } from '../data/playerDevelopment';
 import type { TimeSlot } from './calendar';
 import type { DailyActivityCategory } from './dailySchedule';
 import type { Position } from './index';
 
 export interface PlayerStatsSubset {
+  gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number; stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
   contact?: number;
   power?: number;
   eye?: number;
@@ -21,6 +23,7 @@ export interface PlayerStatsSubset {
 }
 
 export interface ActivityOption {
+  pitchTraining?: PitchType;
   id: string;
   label: string;
   category: DailyActivityCategory;
@@ -36,6 +39,9 @@ export interface ActivityOption {
 }
 
 export interface ActivityResult {
+  pitchTraining?: PitchType;
+  pitchXp?: number;
+  activityCategory?: DailyActivityCategory;
   statChanges: PlayerStatsSubset;
   staminaDelta: number;
   mentalDelta?: number;
@@ -179,6 +185,9 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   training: [
+    ...Object.entries(PITCH_NAMES).map(([type,label]): ActivityOption => ({id:`pitch_${type}`,label:`${label} 습득·집중 훈련`,description:'미습득 구종은 100 XP부터 사용 가능. 이후 100 XP마다 숙련도 +2.',category:'training',icon:'⚾',weight:2,staminaDelta:-12,statChanges:{control:1},targetPosition:'P',allowedSlots:['afternoon'],pitchTraining:type as PitchType})),
+    ...Object.entries(EXTRA_RATINGS).map(([key,[label,description]]): ActivityOption => ({id:`skill_${key}`,label:`${label} 집중 훈련`,description,category:'training',icon:'🎯',weight:2,staminaDelta:-12,statChanges:{[key]:2},targetPosition:['movement','holdRunners'].includes(key)?'P':'B',allowedSlots:['afternoon']})),
+    {id:'train_velocity',label:'구속 향상 메커니즘 훈련',description:'하체 전달과 릴리스 개선. 구속 +0.2 km/h',category:'training',icon:'🔥',weight:2,staminaDelta:-16,statChanges:{velocity:0.2},targetPosition:'P',allowedSlots:['afternoon']},
     // 투수 특화
     {
       id: 'train_bullpen_pitching',
@@ -647,6 +656,9 @@ export function evaluateActivityWithGating(
     isInjured,
     injuryNotice,
     moneyDelta: option.moneyDelta,
+    activityCategory: option.category,
+    pitchTraining: option.pitchTraining,
+    pitchXp: option.pitchTraining ? (currentStamina <= 20 ? 20 : 40) : undefined,
   };
 }
 
@@ -668,5 +680,5 @@ function translateStatKey(key: string): string {
     relationshipTeam: '팀신뢰',
     relationshipCoach: '감독신뢰',
   };
-  return map[key] || key;
+  return map[key] || (EXTRA_RATINGS[key as keyof typeof EXTRA_RATINGS]?.[0]) || (key === 'velocity' ? '구속' : key);
 }

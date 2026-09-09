@@ -20,6 +20,11 @@ export interface TournamentSchedule {
 }
 
 export interface ScheduledMatch {
+  year?: number;
+  group?: string;
+  drawn?: boolean;
+  result?: 'home' | 'away';
+
   id: string;
   date: { month: number; day: number };
   tournamentId: string;
@@ -132,32 +137,23 @@ export function generateSeasonMatches(
     }
   }
 
-  // 2. 전국대회는 첫 경기만 편성합니다. 다음 상대는 승리한 뒤에 확정됩니다.
-
+  // 16개 조, 각 조 4팀 토너먼트 예선. 조 우승팀만 본선 16강 진출 (게임 규칙).
   for (const tour of MAJOR_TOURNAMENT_TEMPLATES) {
-    if (!tour.participatingTiers.includes(playerSchool.tier)) {
-      continue; // 참가 자격이 안 되면 스킵
+    const entrants = otherSchools.slice();
+    for(let i=entrants.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[entrants[i],entrants[j]]=[entrants[j],entrants[i]];}
+    const field=[playerSchool,...entrants.slice(0,63)];
+    const size=2 ** Math.floor(Math.log2(field.length));
+    if(size<2) continue;
+    field.length=size;
+    for(let i=field.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[field[i],field[j]]=[field[j],field[i]];}
+    for(let i=0;i<field.length;i+=2){
+      const home=field[i],away=field[i+1];
+      matches.push({id:`${tour.id}_r0_${i/2}`,year,date:{...tour.startDate},tournamentId:tour.id,tournamentName:tour.name,
+        round:size>32?'조 예선 1차전':size>16?'조 예선 결정전':`${size}강전`,group:`${Math.floor(i/4)+1}조`,drawn:false,
+        homeSchoolId:home.id,homeSchoolName:home.name,awaySchoolId:away.id,awaySchoolName:away.name,
+        isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,description:'조 추첨 후 예선 상대 공개'});
     }
-
-    let m = tour.startDate.month;
-    let d = tour.startDate.day;
-
-    const opp = getNextOpponent();
-    matches.push({
-        id: `${tour.id}_r1`,
-        date: { month: m, day: d },
-        tournamentId: tour.id,
-        tournamentName: tour.name,
-        round: '예선/32강전',
-        homeSchoolId: playerSchool.id,
-        homeSchoolName: playerSchool.name,
-        awaySchoolId: opp.id,
-        awaySchoolName: opp.name,
-        isPlayerTeamMatch: true,
-        description: `${tour.name} 첫 경기 (${opp.name}전) · 승리 시 다음 대진 공개`,
-      });
   }
-
   // 일자 순서로 정렬
   matches.sort((a, b) => {
     if (a.date.month !== b.date.month) return a.date.month - b.date.month;
@@ -167,19 +163,26 @@ export function generateSeasonMatches(
   return matches;
 }
 
-export function progressTournament(matches: ScheduledMatch[], outcome: { matchId: string; tournamentId: string; won: boolean }, playerSchool: HighSchoolData, schools: HighSchoolData[]): ScheduledMatch[] {
-  if (outcome.tournamentId === 'weekend_league' || !outcome.won) return matches;
-  const current = matches.find(m => m.id === outcome.matchId);
-  if (!current || matches.some(m => m.tournamentId === outcome.tournamentId && m.id !== current.id)) return matches;
-  const rounds = ['예선/32강전','16강전','8강전','4강 준결승','결승전'];
-  const currentIndex = rounds.indexOf(current.round);
-  if (currentIndex < 0 || currentIndex === rounds.length - 1) return matches;
-  const candidates = schools.filter(s => s.id !== playerSchool.id && s.id !== current.awaySchoolId);
-  const opponent = candidates[Math.floor(Math.random() * candidates.length)];
-  let month = current.date.month, day = current.date.day + 3;
-  const daysInMonth = new Date(2026, month, 0).getDate(); if (day > daysInMonth) { day -= daysInMonth; month += 1; }
-  const next: ScheduledMatch = { ...current, id:`${outcome.tournamentId}_r${currentIndex+2}`, date:{month,day}, round:rounds[currentIndex+1], awaySchoolId:opponent.id, awaySchoolName:opponent.name, description:`이전 경기 승리로 진출 · ${opponent.name}전` };
-  return [...matches, next].sort((a,b)=>a.date.month-b.date.month || a.date.day-b.date.day);
+export function progressTournament(matches: ScheduledMatch[], outcome: { matchId: string; tournamentId: string; won: boolean }, playerSchool: HighSchoolData, _schools: HighSchoolData[]): ScheduledMatch[] {
+ const current=matches.find(m=>m.id===outcome.matchId);
+ if(!current || current.result) return matches;
+ const playerHome=current.homeSchoolId===playerSchool.id;
+ const result: 'home'|'away' = outcome.won===playerHome?'home':'away';
+ if(current.tournamentId==='weekend_league') return matches.map(m=>m.id===current.id?{...m,result}:m);
+ const peers=matches.filter(m=>m.tournamentId===current.tournamentId && m.round===current.round);
+ const resolved=matches.map(m=>peers.includes(m)?{...m,drawn:true,result:m.id===current.id?result:m.result??(Math.random()<0.5?'home' as const:'away' as const)}:m);
+ const winners=resolved.filter(m=>peers.some(p=>p.id===m.id)).map(m=>m.result==='home'?{id:m.homeSchoolId,name:m.homeSchoolName}:{id:m.awaySchoolId,name:m.awaySchoolName});
+ if(winners.length<2) return resolved;
+ const date=new Date(current.year??2026,current.date.month-1,current.date.day+3);
+ const nextRound=winners.length>16?'조 예선 결정전':winners.length===2?'결승전':winners.length===4?'4강 준결승':`${winners.length}강전`;
+ for(let i=0;i<winners.length;i+=2){ const home=winners[i],away=winners[i+1];
+ resolved.push({...current,id:`${current.tournamentId}_${nextRound}_${i/2}`,date:{month:date.getMonth()+1,day:date.getDate()},round:nextRound,
+ group:winners.length>16?`${i/2+1}조`:undefined,result:undefined,drawn:true,
+ homeSchoolId:home.id,homeSchoolName:home.name,awaySchoolId:away.id,awaySchoolName:away.name,
+ isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,description:'이전 라운드 승리 학교끼리 대결'});
+ }
+
+ return resolved.sort((a,b)=>a.date.month-b.date.month||a.date.day-b.date.day);
 }
 
 /**
@@ -190,8 +193,19 @@ export function getPlayerMatchForDate(
   matches: ScheduledMatch[]
 ): ScheduledMatch | null {
   return (
-    matches.find(
-      m => m.date.month === date.month && m.date.day === date.day && m.isPlayerTeamMatch
+    [...matches].sort((a,b)=>Number(a.tournamentId==='weekend_league')-Number(b.tournamentId==='weekend_league')).find(
+      m => m.date.month === date.month && m.date.day === date.day && m.isPlayerTeamMatch && !m.result
     ) || null
   );
+}
+
+/** Advance non-player rounds only when their scheduled date has arrived. */
+export function advanceOtherTournamentMatches(matches: ScheduledMatch[], date: GameDate, playerSchool: HighSchoolData): ScheduledMatch[] {
+ let updated=matches;
+ for(let i=0;i<32;i++){
+  const due=updated.find(m=>m.tournamentId!=='weekend_league'&&!m.result&&!m.isPlayerTeamMatch&&m.date.month*32+m.date.day<=date.month*32+date.day&&!updated.some(p=>p.tournamentId===m.tournamentId&&p.round===m.round&&p.isPlayerTeamMatch&&!p.result));
+  if(!due)break;
+  updated=progressTournament(updated,{matchId:due.id,tournamentId:due.tournamentId,won:Math.random()<.5},playerSchool,[]);
+ }
+ return updated;
 }

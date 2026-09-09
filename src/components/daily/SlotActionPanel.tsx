@@ -6,6 +6,7 @@ import { isSchoolDay } from '../../types/academicCalendar';
 import type { Player } from '../../types';
 import type { ActivityOption } from '../../types/activity';
 import {
+  SUB_ACTIVITY_POOL,
   getActivityCategories,
   sampleSubActivities,
   evaluateActivityWithGating,
@@ -194,6 +195,11 @@ export function SlotActionPanel({
         })}
       </div>
 
+      {selectedCategory==='training' && currentSlot==='afternoon' && <label className="training-focus">집중 훈련 선택
+        <select value={selectedSubId.startsWith('pitch_')||selectedSubId.startsWith('skill_')?selectedSubId:''} onChange={e=>{const option=SUB_ACTIVITY_POOL.training.find(o=>o.id===e.target.value);if(option){setSampledSubActivities([option]);setSelectedSubId(option.id);}}}>
+          <option value="">원하는 능력치·구종 선택</option>
+          {SUB_ACTIVITY_POOL.training.filter(o=>(o.id.startsWith('pitch_')||o.id.startsWith('skill_'))&&(player.position==='TwoWay'||o.targetPosition===(player.position==='P'?'P':'B'))).map(o=><option key={o.id} value={o.id}>{o.label}</option>)}
+        </select></label>}
       {/* 2단계: 2차 세부 행동 랜덤 샘플링 카드 그리드 */}
       <div className="sub-activities-grid">
         {sampledSubActivities.map(opt => {

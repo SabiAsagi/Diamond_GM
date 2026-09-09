@@ -35,7 +35,7 @@ export interface InterviewQuestion {
 /**
  * 3단계 연속 질문 세트 (A: 목표/각오 + B: 야구관/플레이스타일 + C: 팀내 태도/역할)
  */
-export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
+const BASE_INTERVIEW_QUESTIONS: InterviewQuestion[] = [
   // 1단계: 야구를 향한 궁극적인 목표 (세트 A 기반)
   {
     step: 1,
@@ -135,7 +135,7 @@ export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
       {
         id: 'q2_family_duty',
         title: '가족을 향한 보답과 책임감',
-        dialogue: '"새벽마다 도시락을 싸주시는 부모님을 생각하며, 무거운 책임감을 갖고 던지고 치겠습니다."',
+        dialogue: '"언제나 응원해주는 가족을 생각하며, 무거운 책임감을 갖고 던지고 치겠습니다."',
         coachReply: '가슴이 뭉클하군. 든든한 가족의 사랑을 아는 선수는 결코 쉽게 무너지지 않는 법이지.',
         statBoosts: { relationshipFamily: 12, condition: 10, relationshipCoach: 5 },
         gainedTrait: '효심과책임',
@@ -194,3 +194,10 @@ export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
     ],
   },
 ];
+
+const guardian = BASE_INTERVIEW_QUESTIONS.find(q=>q.step===4)!;
+export const INTERVIEW_QUESTIONS: InterviewQuestion[] = [
+ {...guardian, options:guardian.options.slice(0,2), questionDialogue:'먼저 자네를 좀 알아가고 싶네. 지금은 부모님과 지내나, 조부모님과 지내나?'},
+ {step:2,questionTitle:'형제자매',questionDialogue:'그렇군. 형제자매도 있나? 집에서는 어떤 이야기를 나누는지 궁금하군.',options:[['none','외동이에요'],['older','형·누나·오빠·언니가 있어요'],['younger','동생이 있어요'],['both','위아래로 형제자매가 있어요']].map(([id,title])=>({id:`sibling_${id}`,title,dialogue:title,coachReply:'이야기해 줘서 고맙네. 학교에서도 편하게 의지할 사람들을 만나게 될 걸세.',statBoosts:{},gainedTrait:'가족이야기',traitDescription:'가족 배경 기록',icon:'🏠'}))},
+ ...BASE_INTERVIEW_QUESTIONS.filter(q=>q.step!==4)
+].map((q,i)=>({...q,step:i+1,questionTitle:`질문 ${i+1}. ${i===0?'함께 지내는 보호자':q.questionTitle.replace(/^질문 \d+\. /,'')}`}));

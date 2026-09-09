@@ -2,6 +2,7 @@ import type { GameDate } from './calendar';
 import type { Player } from './index';
 
 export interface EventCutscene {
+  categories?: import('./dailySchedule').DailyActivityCategory[];
   id: string;
   title: string;
   subtitle: string;

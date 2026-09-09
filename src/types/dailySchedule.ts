@@ -95,7 +95,7 @@ export function buildDailyPlan(date: GameDate, context: DailyPlanContext): Daily
       slot: 'afternoon',
       forced: true,
       category: 'match',
-      label: `${matchToday.tournamentName} ${matchToday.round} (vs ${matchToday.awaySchoolName})`,
+      label: `${matchToday.tournamentName} ${matchToday.round} · ${matchToday.drawn===false?'추첨 예정':`${matchToday.homeSchoolName} vs ${matchToday.awaySchoolName}`}`,
       sourceEventId: matchToday.id,
       description: matchToday.description || `${matchToday.awaySchoolName}와의 공식 대회 경기입니다.`,
     };

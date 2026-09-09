@@ -1,3 +1,4 @@
+import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useEffect } from 'react';
 import type { ActivityResult } from '../../types/activity';
 import { CheckCircle2, ArrowUp, ArrowDown, X } from 'lucide-react';
@@ -21,6 +22,7 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
 
   // 스탯 키 번역 맵
   const statLabels: Record<string, string> = {
+    ...Object.fromEntries(Object.entries(EXTRA_RATINGS).map(([k,v])=>[k,v[0]])),velocity:'구속',
     stuff: '구위',
     control: '제구',
     stamina: '스태미너',
