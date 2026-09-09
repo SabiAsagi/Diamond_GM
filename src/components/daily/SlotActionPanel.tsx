@@ -1,3 +1,4 @@
+import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useState } from 'react';
 import type { TimeSlot, GameDate } from '../../types/calendar';
 import { TIME_SLOT_LABELS } from '../../types/calendar';
@@ -231,6 +232,9 @@ export function SlotActionPanel({
 
                 {Object.entries(opt.statChanges).map(([k, v]) => (
                   <span key={k} className="stat-chip">
+                    {EXTRA_RATINGS[k as keyof typeof EXTRA_RATINGS]?.[0]}
+                    {k === 'velocity' && '구속'}
+                    {k === 'relationshipFamily' && '가족'}
                     {k === 'stuff' && '구위'}
                     {k === 'control' && '제구'}
                     {k === 'stamina' && '스태미너'}

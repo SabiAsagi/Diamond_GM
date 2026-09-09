@@ -60,7 +60,7 @@ export function MatchesView({ player, matches, historyLogs }: MatchesViewProps) 
                 <Shield size={20} className="text-primary" />
                 <span>{player.highSchool} 야구부 {player.gameDate?.year??2026} 시즌 공식 경기 현황</span>
               </div>
-              <span className="record-badge">총 {matches.length}경기 편성</span>
+              <span className="record-badge">우리 학교 {matches.filter(m=>m.isPlayerTeamMatch).length}경기 편성</span>
             </div>
 
             <div className="match-cards-grid">
