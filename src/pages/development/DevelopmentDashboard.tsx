@@ -17,6 +17,7 @@ import { TrophiesView } from '../../components/navigation/views/TrophiesView';
 import { SettingsView } from '../../components/navigation/views/SettingsView';
 import { TownView } from '../../components/navigation/views/TownView';
 
+import { TournamentBracket } from '../../components/navigation/views/TournamentBracket';
 import { Heart, Star, Sparkles, Trophy } from 'lucide-react';
 import '../../index.css';
 
@@ -38,7 +39,7 @@ export default function DevelopmentDashboard() {
     lastActionResult,
     clearLastActionResult,
     activeCutscene,
-    clearActiveCutscene,
+    resolveCutscene,
     initClock,
     selectActivity,
     executeForcedSlot,
@@ -73,6 +74,8 @@ export default function DevelopmentDashboard() {
   }
 
   const currentSlotAssignment = dailyPlan.slots[clock.currentSlot];
+  const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
+
 
   return (
     <div className="onepage-viewport-container">
@@ -85,8 +88,8 @@ export default function DevelopmentDashboard() {
       />
 
       {/* 2. 메인 중앙 콘텐츠 영역 */}
-      <main className="onepage-main-stage">
-        {activeNavTab === 'home' && (
+      <main className="onepage-main-stage">{drawDue&&<div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><TournamentBracket matches={seasonMatches.filter(m=>m.tournamentId===drawDue.tournamentId)}/></div>}
+        {activeNavTab === 'home' && !drawDue && (
           <div className="home-dashboard-layout animate-fade-in">
             {/* 좌측 패널 (데스크톱) 또는 상단 요약 (모바일) */}
             <section className="home-left-rail">
@@ -222,13 +225,13 @@ export default function DevelopmentDashboard() {
       <AppNavigation activeTab={activeNavTab} onTabChange={setActiveNavTab} />
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
-      {lastActionResult && (
+      {lastActionResult && !activeCutscene && (
         <SlotResultModal result={lastActionResult} onClose={clearLastActionResult} />
       )}
 
       {/* 5. 확률적 이벤트 컷신 모달 */}
       {activeCutscene && (
-        <EventCutsceneModal cutscene={activeCutscene} onConfirm={clearActiveCutscene} />
+        <EventCutsceneModal key={activeCutscene.id} cutscene={activeCutscene} onChoose={resolveCutscene} />
       )}
 
       {/* 6. 졸업 축하 배너 */}

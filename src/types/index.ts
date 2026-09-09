@@ -20,6 +20,17 @@ export type PitcherRole = 'Starter' | 'Reliever' | 'Closer' | 'None';
 export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 
 export interface Player {
+  gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number;
+  stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
+  pitches?: import('../data/playerDevelopment').PitchRating[];
+  appearance?: import('../data/playerDevelopment').Appearance;
+  siblings?: 'none' | 'older' | 'younger' | 'both';
+  savedMatches?: import('./tournament').ScheduledMatch[];
+  savedSeasonYear?: number;
+  eventHistory?: import('./randomEvent').CutsceneTriggerHistory;
+  pendingEventId?: string;
+  matchRecords?: { matchId: string; year: number; log: string }[];
+
   id?: number; // Auto-incremented
   name: string;
   gender: Gender;

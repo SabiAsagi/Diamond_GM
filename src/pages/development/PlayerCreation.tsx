@@ -1,3 +1,5 @@
+import { AppearanceEditor } from '../../components/PlayerAppearance';
+import { DEFAULT_APPEARANCE, normalizePlayer, overallRating } from '../../data/playerDevelopment';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +14,7 @@ import '../../index.css';
 
 export default function PlayerCreation() {
   const navigate = useNavigate();
+  const [appearance,setAppearance]=useState(DEFAULT_APPEARANCE);
   const [step, setStep] = useState(1);
 
   const [activeRegion, setActiveRegion] = useState('서울');
@@ -96,6 +99,7 @@ export default function PlayerCreation() {
 
     const baseRating = gender === 'female' ? 17 : 20;
     const newPlayer: Omit<Player, 'id'> = {
+      appearance,
       name: name.trim(),
       gender,
       age: 16, // 고1 시작
@@ -129,7 +133,9 @@ export default function PlayerCreation() {
       familyBackground: 'parents'
     };
 
-    const id = await db.players.add(newPlayer);
+    const normalized = normalizePlayer(newPlayer);
+    normalized.overall=overallRating(normalized);
+    const id = await db.players.add(normalized);
     navigate(`/development/interview/${id}`);
   };
 
@@ -467,6 +473,7 @@ export default function PlayerCreation() {
           {/* STEP 4: 선수 프로필 최종 입력 */}
           {step === 4 && (
             <div className="step-content">
+              <AppearanceEditor value={appearance} onChange={setAppearance} number={uniformNumber}/>
               <h3>선수 프로필 최종 입력</h3>
               <div className="form-group">
                 <label>선수 이름</label>

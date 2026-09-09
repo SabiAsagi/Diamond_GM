@@ -16,10 +16,10 @@ interface NavItem {
 export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
   const navItems: NavItem[] = [
     { id: 'home', label: '홈', icon: <Home size={18} /> },
-    { id: 'matches', label: '경기기록', icon: <Trophy size={18} /> },
+    { id: 'matches', label: '경기·대회', icon: <Trophy size={18} /> },
     { id: 'relationships', label: '인연', icon: <Users size={18} /> },
     { id: 'town', label: '연고지', icon: <Map size={18} /> },
-    { id: 'stats', label: '스탯', icon: <Activity size={18} /> },
+    { id: 'stats', label: '내 선수', icon: <Activity size={18} /> },
     { id: 'trophies', label: '업적', icon: <Award size={18} /> },
     { id: 'settings', label: '설정', icon: <Settings size={18} /> },
   ];

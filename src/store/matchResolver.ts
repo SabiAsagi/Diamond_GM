@@ -1,3 +1,4 @@
+import { pitchingRating, battingRating, normalizePlayer } from '../data/playerDevelopment';
 import type { ScheduledMatch } from '../types/tournament';
 import type { Player } from '../types';
 import type { HighSchoolData } from '../types/highSchool';
@@ -16,11 +17,10 @@ export function resolveMatchPlaceholder(
   const isTwoWay = player.position === 'TwoWay';
 
   // 학교 및 선수 역량 기반 승률 계산
-  const baseSkill = isPitcher
-    ? (player.stuff + player.control + player.stamina) / 3
-    : isTwoWay ? ((player.stuff + player.control + player.stamina) / 3 + (player.contact + player.power + player.eye) / 3) / 2 : (player.contact + player.power + player.eye) / 3;
+  player=normalizePlayer(player);
+  const baseSkill=isPitcher?pitchingRating(player):isTwoWay?(pitchingRating(player)+battingRating(player))/2:battingRating(player);
 
-  const isWin = Math.random() < 0.5 + (baseSkill - 20) * 0.005;
+  const isWin = Math.random() < Math.min(.9,Math.max(.1,0.5 + (baseSkill - 20) * 0.005));
 
   let myScore: number;
   let oppScore: number;
@@ -32,7 +32,7 @@ export function resolveMatchPlaceholder(
     oppScore = myScore + 1 + Math.floor(Math.random() * 4);
   }
 
-  const scoreText = `${playerSchool.name} ${myScore} : ${oppScore} ${match.awaySchoolName}`;
+  const scoreText = `${playerSchool.name} ${myScore} : ${oppScore} ${match.homeSchoolName===playerSchool.name?match.awaySchoolName:match.homeSchoolName}`;
   const winStatus = isWin ? '승리! 🎉' : '아쉬운 패배 😢';
 
   // 개인 성적 및 스탯 변동
@@ -47,15 +47,16 @@ export function resolveMatchPlaceholder(
   if (isPitcher || isTwoWay) {
     const innings = Math.min(9, 4 + Math.floor(Math.random() * 5));
     const kCount = Math.floor(Math.random() * 6) + (player.stuff > 30 ? 4 : 2);
-    const runs = isWin ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 4) + 1;
+    const runs = Math.min(oppScore,Math.floor(Math.random() * (oppScore+1)));
     personalPerformance = `[선발 등판] ${innings}이닝 ${kCount}탈삼진 ${runs}실점`;
     stuffGain = 1;
     controlGain = 1;
     if (isTwoWay) { const hits = Math.random() > .45 ? 2 : 1; personalPerformance += ` · [타석] 4타수 ${hits}안타 ${hits}타점`; contactGain = 1; eyeGain = 1; }
   } else {
     const atBats = 4;
-    const hits = isWin ? (Math.random() > 0.4 ? 2 : 1) : (Math.random() > 0.6 ? 1 : 0);
+    let hits = isWin ? (Math.random() > 0.4 ? 2 : 1) : (Math.random() > 0.6 ? 1 : 0);
     const isHr = Math.random() < (player.power > 30 ? 0.25 : 0.08);
+    if(isHr)hits=Math.max(1,hits);
     const hrText = isHr ? ' 1홈런' : '';
     const rbi = hits + (isHr ? 2 : 0);
     personalPerformance = `[타석 기록] ${atBats}타수 ${hits}안타${hrText} ${rbi}타점`;
