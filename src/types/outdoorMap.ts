@@ -7,6 +7,13 @@ export interface OutdoorLocation {
   description: string;
   cost: number;
   effects: { statChanges: PlayerStatsSubset; condition: number; money?: number };
+  mapX?: number;
+  mapY?: number;
+}
+
+const MAP_POSITIONS = [[18,24],[48,18],[78,29],[27,58],[62,55],[84,70],[43,82],[12,78]] as const;
+function withMapCoordinates(locations: OutdoorLocation[]): OutdoorLocation[] {
+  return locations.map((location,index)=>({...location,mapX:location.mapX??MAP_POSITIONS[index%MAP_POSITIONS.length][0],mapY:location.mapY??MAP_POSITIONS[index%MAP_POSITIONS.length][1]}));
 }
 
 const common: OutdoorLocation[] = [
@@ -426,18 +433,18 @@ const landmarks: Record<string, OutdoorLocation[]> = {
 export function getOutdoorLocations(region: string): OutdoorLocation[] {
   // 1. 완전 일치
   if (landmarks[region]) {
-    return [...landmarks[region], ...common];
+    return withMapCoordinates([...landmarks[region], ...common]);
   }
 
   // 2. 복합 권역 키워드 매칭 (예: '경기/인천', '강원/충청', '전라/제주', '경상')
   for (const [key, locs] of Object.entries(landmarks)) {
     if (region.includes(key)) {
-      return [...locs, ...common];
+      return withMapCoordinates([...locs, ...common]);
     }
   }
 
   // 3. 기본 폴백
-  return [
+  return withMapCoordinates([
     {
       id: 'regional_park',
       name: `${region} 종합운동장 야구장`,
@@ -455,5 +462,5 @@ export function getOutdoorLocations(region: string): OutdoorLocation[] {
       effects: { statChanges: {}, condition: 18 },
     },
     ...common,
-  ];
+  ]);
 }

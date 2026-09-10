@@ -44,7 +44,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
   return (
     <div className="daily-top-bar glass-panel animate-fade-in">
       {/* 1. 학교 및 선수 기본 프로필 정보 */}
-      <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber} gender={player.gender}/></div>
+      <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber} gender={player.gender} schoolName={player.highSchool}/></div>
         {school && <SchoolEmblem school={school} size="sm" />}
         <div className="daily-player-meta">
           <div className="daily-player-row">

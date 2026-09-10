@@ -29,9 +29,9 @@ function compile(folder) {
 compile(path.resolve('src'));
 fs.symlinkSync(path.resolve('node_modules'), path.join(dir, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir');
 
-const { EQUIPMENT_CATALOG, getEffectiveStat } = require(path.join(dir, 'types/equipment.js'));
+const { EQUIPMENT_CATALOG, getEffectiveStat, getRelevantSlots, getRelevantGloveCategory, isEquipmentRelevant, SHOP_TIERS, EQUIPMENT_STAT_LABELS } = require(path.join(dir, 'types/equipment.js'));
 const { normalizePlayer, overallRating } = require(path.join(dir, 'data/playerDevelopment.js'));
-const { buildBondProfiles, scoreToStage } = require(path.join(dir, 'types/relationship.js'));
+const { buildBondProfiles, scoreToStage, getTrainingEfficiencyMultiplier } = require(path.join(dir, 'types/relationship.js'));
 const { getOutdoorLocations } = require(path.join(dir, 'types/outdoorMap.js'));
 const { POSITION_LABELS } = require(path.join(dir, 'types/index.js'));
 
@@ -99,6 +99,27 @@ test('Equipment catalog contains all 7 slots and bonuses affect getEffectiveStat
   const effectivePower = getEffectiveStat(equippedPlayer, 'power');
   assert.equal(effectivePower, 20 + proBat.bonuses.power);
   assert.ok(overallRating(equippedPlayer) >= baseOvr);
+});
+
+test('Equipment shops, Korean labels, position slots and glove categories are enforced', () => {
+  assert.deepEqual(SHOP_TIERS.map(s => s.id), ['basic', 'premium']);
+  assert.equal(EQUIPMENT_STAT_LABELS.contact, '컨택');
+  assert.equal(EQUIPMENT_STAT_LABELS.control, '제구');
+  assert.ok(getRelevantSlots('P').includes('glove'));
+  assert.ok(!getRelevantSlots('P').includes('bat'));
+  assert.ok(getRelevantSlots('C').includes('catcherGear'));
+  assert.ok(getRelevantSlots('SS').includes('baseRunningGloves'));
+  assert.equal(getRelevantGloveCategory('1B'), 'firstBase');
+  assert.equal(getRelevantGloveCategory('CF'), 'outfield');
+  const pitcherGlove = EQUIPMENT_CATALOG.find(e => e.slot === 'glove' && e.gloveCategory === 'pitcher');
+  assert.ok(pitcherGlove);
+  assert.ok(isEquipmentRelevant({ position: 'P' }, pitcherGlove));
+  assert.ok(!isEquipmentRelevant({ position: 'SS' }, pitcherGlove));
+});
+
+test('Relationship stages change the actual training multiplier', () => {
+  assert.equal(getTrainingEfficiencyMultiplier({ relationshipCoach: 10, relationshipTeam: 10 }), 1);
+  assert.equal(getTrainingEfficiencyMultiplier({ relationshipCoach: 90, relationshipTeam: 90 }), 1.18);
 });
 
 test('Relationship system starts at Stage 1 (<35) and branches romance targets by gender', () => {

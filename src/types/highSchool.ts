@@ -35,6 +35,8 @@ export interface HighSchoolData {
   // 로고 & 엠블럼 정보
   emblem?: HighSchoolEmblem;
   logoUrl?: string;
+  uniformPrimaryColor?: string;
+  uniformSecondaryColor?: string;
 
   // 게임 스탯 수치 (0 ~ 100)
   prestige: number;          // 명성 (스카우트 관심도, 신입생 유입에 영향)

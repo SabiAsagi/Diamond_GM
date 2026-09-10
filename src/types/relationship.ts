@@ -5,6 +5,16 @@ export const STAGE_LABELS = ['', '아는 사이', '친한 사이', '가까운 �
 export const scoreToStage = (score: number): RelationshipStage =>
   score >= 90 ? 5 : score >= 75 ? 4 : score >= 55 ? 3 : score >= 35 ? 2 : 1;
 
+export function getTrainingEfficiencyMultiplier(player: Player): number {
+  const coachStage = scoreToStage(player.relationshipCoach || 0);
+  const teamStage = scoreToStage(player.relationshipTeam || 0);
+  let multiplier = 1;
+  if (coachStage >= 2) multiplier += 0.03;
+  if (coachStage >= 5) multiplier += 0.05;
+  if (teamStage >= 5) multiplier += 0.10;
+  return Math.round(multiplier * 100) / 100;
+}
+
 export interface BondProfile {
   id: string;
   name: string;
@@ -31,7 +41,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       role: '감독',
       score: coach,
       icon: '🧢',
-      note: '훈련 효율과 출전 기회가 증가합니다.',
+      note: '2단계 훈련 효율 +3% · 4단계 출전 우대 · 5단계 훈련 효율 추가 +5%',
       stageLabels: ['관찰 대상 신입', '눈도장 찍은 선수', '주전급 신뢰', '팀의 기둥에 대한 신뢰', '감독의 페르소나'],
     },
     {
@@ -98,8 +108,8 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       score: team,
       icon: '🤝',
       note: isFemale
-        ? '함께 성장하는 동기입니다. 마음을 열면 특별한 연애 이벤트가 열립니다.'
-        : '함께 성장하며 주전 경쟁과 끈끈한 파트너십을 나눕니다.',
+        ? '함께 성장하는 동기입니다. 5단계에서 훈련 효율 +10%와 연애 이벤트가 열립니다.'
+        : '함께 성장하며 5단계에서 훈련 효율 +10%를 얻습니다.',
       romanceable: isFemale,
       stageLabels: isFemale
         ? [

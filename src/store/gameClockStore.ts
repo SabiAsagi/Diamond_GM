@@ -6,7 +6,7 @@ import { START_GAME_DATE, advanceGameDate } from '../types/calendar';
 import type { DailyPlan, DailyActivityCategory } from '../types/dailySchedule';
 import { buildDailyPlan } from '../types/dailySchedule';
 import type { AcademicEvent } from '../types/academicCalendar';
-import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent } from '../types/academicCalendar';
+import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent, isSchoolDay } from '../types/academicCalendar';
 import type { ScheduledMatch } from '../types/tournament';
 import { generateSeasonMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
@@ -20,8 +20,9 @@ import { shouldTriggerCutscene } from '../types/randomEvent';
 import { CUTSCENE_EVENTS_POOL } from '../data/cutsceneEvents';
 import { db } from '../db';
 import type { EquipmentSlot } from '../types/equipment';
-import { EQUIPMENT_CATALOG } from '../types/equipment';
+import { EQUIPMENT_CATALOG, isEquipmentRelevant } from '../types/equipment';
 import type { OutdoorLocation } from '../types/outdoorMap';
+import { getTrainingEfficiencyMultiplier } from '../types/relationship';
 
 export interface DayLogRecord {
   date: GameDate;
@@ -388,6 +389,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       player.condition
     );
 
+    if (option.category === 'training') {
+      const multiplier = getTrainingEfficiencyMultiplier(player);
+      for (const [key, value] of Object.entries(result.statChanges)) {
+        if (typeof value === 'number' && value > 0) (result.statChanges as Record<string, number>)[key] = Math.round(value * multiplier);
+      }
+      if (multiplier > 1) result.logMessage += ` · 인연 훈련 보정 x${multiplier.toFixed(2)}`;
+    }
+
     if(result.pitchTraining) result.logMessage+=` · 구종 경험치 +${result.pitchXp} XP`;
     await get().advanceSlot(result);
   },
@@ -478,6 +487,8 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       delete nextEquipped[slot];
     } else {
       if (!player.inventory?.includes(itemId)) return;
+      const item = EQUIPMENT_CATALOG.find(candidate => candidate.id === itemId);
+      if (!item || item.slot !== slot || !isEquipmentRelevant(player, item)) return;
       nextEquipped[slot] = itemId;
     }
     const updated = { ...player, equippedItems: nextEquipped };
@@ -488,6 +499,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   visitOutdoorLocation: async (location) => {
     const { player, clock } = get();
     if (!player || (player.money || 0) < location.cost) return false;
+    if (isSchoolDay(clock.date) && clock.currentSlot !== 'night') return false;
     const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
     if (player.lastOutdoorVisitDate === todayDateStr) return false;
 

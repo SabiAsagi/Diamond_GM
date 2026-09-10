@@ -1,5 +1,5 @@
 import { AppearanceEditor } from '../../components/PlayerAppearance';
-import { DEFAULT_APPEARANCE, normalizePlayer, overallRating } from '../../data/playerDevelopment';
+import { DEFAULT_APPEARANCE, normalizeAppearance, normalizePlayer, overallRating } from '../../data/playerDevelopment';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -105,7 +105,7 @@ export default function PlayerCreation() {
 
     const baseRating = gender === 'female' ? 17 : 20;
     const newPlayer: Omit<Player, 'id'> = {
-      appearance,
+      appearance: normalizeAppearance(appearance, gender),
       name: name.trim(),
       gender,
       age: 16, // 고1 시작
@@ -529,7 +529,7 @@ export default function PlayerCreation() {
             <div className="step-content animate-fade-in">
               <h3>선수 외형 커스터마이징 & 최종 확인</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
-                선택한 <strong>{gender === 'male' ? '남자 선수' : '여자 선수'}</strong> 실루엣에 맞추어 피부톤, 헤어스타일, 유니폼 색상을 조율하세요.
+                성별에 맞는 일러스트와 헤어스타일을 선택하세요. 유니폼은 소속 학교 색상으로 자동 적용됩니다.
               </p>
 
               <div style={{ marginBottom: '24px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -538,6 +538,7 @@ export default function PlayerCreation() {
                   onChange={setAppearance}
                   number={uniformNumber || '1'}
                   gender={gender}
+                  schoolName={highSchool}
                 />
               </div>
 

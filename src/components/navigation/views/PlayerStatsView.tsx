@@ -3,29 +3,8 @@ import type { Player } from '../../../types';
 import { EXTRA_RATINGS, normalizePlayer, PITCH_NAMES, DEFAULT_APPEARANCE, type Appearance } from '../../../data/playerDevelopment';
 import { AppearanceEditor } from '../../PlayerAppearance';
 import { useGameClockStore } from '../../../store/gameClockStore';
-import { EQUIPMENT_CATALOG, EQUIPMENT_SLOT_LABELS, type EquipmentSlot, type EquipmentStat } from '../../../types/equipment';
+import { EQUIPMENT_CATALOG, EQUIPMENT_SLOT_LABELS, EQUIPMENT_STAT_LABELS, getRelevantSlots, isEquipmentRelevant, type EquipmentStat } from '../../../types/equipment';
 import { Sparkles, ShoppingBag, X } from 'lucide-react';
-
-const STAT_NAMES: Record<EquipmentStat, string> = {
-  contact: '컨택',
-  power: '파워',
-  eye: '선구안',
-  speed: '주력',
-  defense: '수비',
-  stuff: '구위',
-  control: '제구',
-  stamina: '스태미너',
-};
-
-const ALL_SLOTS: EquipmentSlot[] = [
-  'bat',
-  'glove',
-  'catcherGear',
-  'spikes',
-  'trainingGear',
-  'protectiveGear',
-  'accessory',
-];
 
 const BAT = [
   ['contact', '컨택', '안타로 연결하는 타격 정확도'],
@@ -188,7 +167,7 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
                         fontWeight: 600,
                       }}
                     >
-                      {STAT_NAMES[stat as EquipmentStat] || stat} +{val}
+                      {EQUIPMENT_STAT_LABELS[stat as EquipmentStat] || stat} +{val}
                     </span>
                   ))}
                 </div>
@@ -201,11 +180,12 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
 
             {/* 7대 슬롯별 장착 카드 그리드 */}
             <div className="match-cards-grid">
-              {ALL_SLOTS.map(slot => {
+              {getRelevantSlots(p.position).map(slot => {
                 const equippedId = p.equippedItems?.[slot];
-                const equippedItem = equippedId ? EQUIPMENT_CATALOG.find(i => i.id === equippedId) : null;
+                const equippedCandidate = equippedId ? EQUIPMENT_CATALOG.find(i => i.id === equippedId) : null;
+                const equippedItem = equippedCandidate && isEquipmentRelevant(p, equippedCandidate) ? equippedCandidate : null;
                 const ownedItems = EQUIPMENT_CATALOG.filter(
-                  i => i.slot === slot && p.inventory?.includes(i.id) && i.id !== equippedId
+                  i => i.slot === slot && isEquipmentRelevant(p, i) && p.inventory?.includes(i.id) && i.id !== equippedId
                 );
 
                 return (
@@ -241,7 +221,7 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
                           <br />
                           <span style={{ color: '#34d399', fontWeight: 600 }}>
                             {Object.entries(equippedItem.bonuses)
-                              .map(([k, v]) => `${STAT_NAMES[k as EquipmentStat] || k} +${v}`)
+                              .map(([k, v]) => `${EQUIPMENT_STAT_LABELS[k as EquipmentStat] || k} +${v}`)
                               .join(' · ')}
                           </span>
                         </p>
@@ -346,6 +326,7 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
               }}
               number={p.uniformNumber}
               gender={p.gender}
+              schoolName={p.highSchool}
             />
             <button
               className="btn btn-primary"

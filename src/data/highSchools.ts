@@ -2028,6 +2028,8 @@ HIGH_SCHOOLS_DATA.forEach(school => {
     textColor: '#ffffff',
     symbolText: school.name.slice(0, 2)
   };
+  school.uniformPrimaryColor = school.emblem.primaryColor;
+  school.uniformSecondaryColor = school.emblem.secondaryColor;
 
   const titles = SCHOOL_TITLES_MAP[school.name];
   if (titles) {
