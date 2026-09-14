@@ -1,6 +1,6 @@
 import { AppearanceEditor } from '../../components/PlayerAppearance';
 import { DEFAULT_APPEARANCE, normalizeAppearance, normalizePlayer, overallRating } from '../../data/playerDevelopment';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../db';
@@ -17,6 +17,11 @@ export default function PlayerCreation() {
   const navigate = useNavigate();
   const [appearance,setAppearance]=useState(DEFAULT_APPEARANCE);
   const [step, setStep] = useState(1);
+  const wizardBodyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    wizardBodyRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [step]);
 
   const [activeRegion, setActiveRegion] = useState('서울');
   // 초기에는 아무 학교도 선택되어 있지 않음
@@ -199,7 +204,7 @@ export default function PlayerCreation() {
           </div>
         </div>
 
-        <div className="wizard-body">
+        <div className="wizard-body" ref={wizardBodyRef}>
           {/* STEP 1: 학교 선택 */}
           {step === 1 && (
             <div className="step-content">
@@ -778,3 +783,4 @@ export default function PlayerCreation() {
     </div>
   );
 }
+

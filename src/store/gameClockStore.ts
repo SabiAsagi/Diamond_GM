@@ -1,3 +1,4 @@
+import { captureAchievements } from '../data/achievements';
 import { normalizePlayer, EXTRA_RATINGS, trainPitch, overallRating } from '../data/playerDevelopment';
 import { create } from 'zustand';
 import type { Player } from '../types';
@@ -10,7 +11,7 @@ import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent, isSchoolDay } from 
 import type { ScheduledMatch } from '../types/tournament';
 import { generateSeasonMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
-import { SUB_ACTIVITY_POOL, evaluateActivityWithGating } from '../types/activity';
+import { SUB_ACTIVITY_POOL, evaluateActivityWithGating, isActivityAvailable } from '../types/activity';
 import { resolveMatchPlaceholder } from './matchResolver';
 import { resolveAcademicEvent } from './eventResolver';
 import type { HighSchoolData } from '../types/highSchool';
@@ -111,9 +112,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     // 시즌 대회 대진표 생성
     const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? player.savedMatches : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    captureAchievements(player);
     player.savedMatches=seasonMatches;
     player.savedSeasonYear=initialDate.year;
-    await db.players.put(player);
+    captureAchievements(player); await db.players.put(player);
     const academicEvents = [...ACADEMIC_CALENDAR_TEMPLATE];
 
     // 첫 날 일일 계획 수립
@@ -232,6 +234,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
       let updatedMatches = school ? advanceOtherTournamentMatches(seasonMatches,clock.date,school) : seasonMatches;
       if (advanceRes.nextDate.year !== clock.date.year && school) {
+        captureAchievements(extra);
         updatedMatches = generateSeasonMatches(advanceRes.nextDate.year, school, HIGH_SCHOOLS_DATA);
       }
 
@@ -299,7 +302,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       updatedPlayer.overall=overallRating(updatedPlayer);
       updatedPlayer.eventHistory=nextHistory;
       updatedPlayer.pendingEventId=triggeredCutscene?.id;
-      await db.players.put(updatedPlayer);
+      captureAchievements(updatedPlayer); await db.players.put(updatedPlayer);
 
       set({
         player: updatedPlayer,
@@ -361,7 +364,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     updatedPlayer.overall=overallRating(updatedPlayer);
     updatedPlayer.eventHistory=nextHistory;
     updatedPlayer.pendingEventId=triggeredCutscene?.id;
-    await db.players.put(updatedPlayer);
+    captureAchievements(updatedPlayer); await db.players.put(updatedPlayer);
 
     set({
       player: updatedPlayer,
@@ -380,7 +383,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     const pool = SUB_ACTIVITY_POOL[category] || [];
     const option = pool.find(o => o.id === subActivityId);
-    if(!option || (option.allowedSlots && !option.allowedSlots.includes(_slot)) || (player.position!=='TwoWay' && option.targetPosition && option.targetPosition!=='ALL' && option.targetPosition!==(player.position==='P'?'P':'B'))) return;
+    if (!option || !isActivityAvailable(option, player.position, _slot)) return;
 
     // 체력 및 멘탈 게이팅 평가 (체력 20 이하 효율 반감 및 부상 롤)
     const result = evaluateActivityWithGating(
@@ -449,19 +452,19 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
       }
       updated.overall=overallRating(updated);
-      await db.players.put(updated);
+      captureAchievements(updated); await db.players.put(updated);
       set({player:updated,activeCutscene:null,lastActionResult:{statChanges:{},staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
     }finally{set({isLoading:false});}
   },
   saveAppearance: async (appearance) => {
     const {player}=get(); if(!player)return;
-    const updated={...player,appearance}; await db.players.put(updated);set({player:updated});
+    const updated={...player,appearance}; captureAchievements(updated); await db.players.put(updated);set({player:updated});
   },
   revealTournament: async (id) => {
     const {player,seasonMatches,clock}=get(); if(!player)return;
     const matches=seasonMatches.map(m=>m.tournamentId===id?{...m,drawn:true}:m);
     const updated={...player,savedMatches:matches,savedSeasonYear:clock.date.year};
-    await db.players.put(updated);set({player:updated,seasonMatches:matches});get().regenerateDailyPlan();
+    captureAchievements(updated); await db.players.put(updated);set({player:updated,seasonMatches:matches});get().regenerateDailyPlan();
   },
   regenerateDailyPlan: () => {
     const { clock, seasonMatches, academicEvents } = get();
@@ -476,7 +479,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const item = EQUIPMENT_CATALOG.find(e => e.id === itemId);
     if (!player || !item || (player.money || 0) < item.price || player.inventory?.includes(itemId)) return false;
     const updated = { ...player, money: (player.money || 0) - item.price, inventory: [...(player.inventory || []), itemId] };
-    await db.players.put(updated); set({ player: updated }); return true;
+    captureAchievements(updated); await db.players.put(updated); set({ player: updated }); return true;
   },
   equipItem: async (itemId, slot) => {
     const { player } = get();
@@ -493,7 +496,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     }
     const updated = { ...player, equippedItems: nextEquipped };
     updated.overall = overallRating(updated);
-    await db.players.put(updated);
+    captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });
   },
   visitOutdoorLocation: async (location) => {
@@ -514,8 +517,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if (typeof updated[stat] === 'number' && typeof value === 'number') (updated as unknown as Record<string, number>)[key] = Math.max(0, Math.min(100, (updated[stat] as number) + value));
     }
     updated.overall = overallRating(updated);
-    await db.players.put(updated);
+    captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });
     return true;
   },
 }));
+

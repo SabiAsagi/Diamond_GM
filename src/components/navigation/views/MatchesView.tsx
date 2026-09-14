@@ -10,9 +10,10 @@ interface MatchesViewProps {
   matches: ScheduledMatch[];
   historyLogs: DayLogRecord[];
   onClose: () => void;
+  showBracket?: boolean;
 }
 
-export function MatchesView({ player, matches, historyLogs }: MatchesViewProps) {
+export function MatchesView({ player, matches, historyLogs, showBracket = true }: MatchesViewProps) {
   const [activeTab, setActiveTab] = useState<'schedule' | 'stats' | 'logs' | 'bracket'>('schedule');
 
 
@@ -29,7 +30,7 @@ export function MatchesView({ player, matches, historyLogs }: MatchesViewProps) 
         </div>
 
         {/* 탭 전환 바 */}
-        <div className="menu-view-tabs"><button className={`tab-btn ${activeTab==='bracket'?'active':''}`} onClick={()=>setActiveTab('bracket')}>조 추첨 · 대진표</button>
+        <div className="menu-view-tabs">{showBracket && <button className={`tab-btn ${activeTab==='bracket'?'active':''}`} onClick={()=>setActiveTab('bracket')}>조 추첨 · 대진표</button>}
           <button
             className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
             onClick={() => setActiveTab('schedule')}
@@ -120,3 +121,4 @@ export function MatchesView({ player, matches, historyLogs }: MatchesViewProps) 
     </div>
   );
 }
+

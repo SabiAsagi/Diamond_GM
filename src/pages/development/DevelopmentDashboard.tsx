@@ -11,7 +11,8 @@ import { AppNavigation, type MainNavTab } from '../../components/navigation/AppN
 
 // 통합 네비게이션 뷰
 import { RecordsView } from '../../components/navigation/views/RecordsView';
-import { PeopleView } from '../../components/navigation/views/PeopleView';
+import { InfoView } from '../../components/navigation/views/InfoView';
+import { GoalsView } from '../../components/navigation/views/GoalsView';
 import { SettingsView } from '../../components/navigation/views/SettingsView';
 import { TownView } from '../../components/navigation/views/TownView';
 
@@ -24,6 +25,8 @@ export default function DevelopmentDashboard() {
   const navigate = useNavigate();
 
   const [activeNavTab, setActiveNavTab] = useState<MainNavTab>('home');
+  const [outingOpen, setOutingOpen] = useState(false);
+  const [confirmedDraw, setConfirmedDraw] = useState<string | null>(null);
 
   const {
     player,
@@ -61,6 +64,10 @@ export default function DevelopmentDashboard() {
     loadData();
   }, [id, navigate, initClock]);
 
+  const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
+  const drawKey = drawDue ? `${clock.date.year}:${drawDue.tournamentId}` : null;
+  useEffect(() => { setConfirmedDraw(null); }, [drawKey]);
+
   if (!player) {
     return (
       <div className="onepage-viewport-container loading-state">
@@ -72,7 +79,7 @@ export default function DevelopmentDashboard() {
   }
 
   const currentSlotAssignment = dailyPlan.slots[clock.currentSlot];
-  const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
+
 
 
   return (
@@ -86,11 +93,14 @@ export default function DevelopmentDashboard() {
       />
 
       {/* 2. 메인 중앙 콘텐츠 영역 */}
-      <main className="onepage-main-stage">{drawDue&&<div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><TournamentBracket matches={seasonMatches.filter(m=>m.tournamentId===drawDue.tournamentId)}/></div>}
-        {activeNavTab === 'home' && !drawDue && (
+      {drawDue && confirmedDraw !== drawKey && !activeCutscene && !lastActionResult && <div className="cutscene-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draw-intro-title"><div className="cutscene-modal-card glass-panel"><span className="cutscene-top-tag">📢 대회 개막</span><h2 id="draw-intro-title">{drawDue.tournamentName} 조 추첨일</h2><p>전국 각지의 학교들이 대진 조 추첨을 위해 모였습니다. 우리 학교는 어떤 상대를 만나게 될까요?</p><button autoFocus className="btn btn-primary" onClick={() => setConfirmedDraw(drawKey)}>조 추첨 현장으로 이동</button></div></div>}
+      <main className="onepage-main-stage" inert={!!drawDue && confirmedDraw !== drawKey}>
+        {drawDue && confirmedDraw === drawKey && <div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><div className="menu-view-body"><TournamentBracket key={drawKey} matches={seasonMatches.filter(m => m.tournamentId === drawDue.tournamentId)} /></div></div>}
+        {activeNavTab === 'home' && !outingOpen && !drawDue && (
           <div className="home-dashboard-layout animate-fade-in">
             {/* 좌측 패널 (데스크톱) 또는 상단 요약 (모바일) */}
             <section className="home-left-rail">
+              <button className="btn btn-secondary" onClick={() => setOutingOpen(true)}>외출 · 상점</button>
               {/* 3대 핵심 게이지 요약 바 */}
               <div className="compact-gauges-row glass-panel">
                 {/* OVR */}
@@ -192,7 +202,7 @@ export default function DevelopmentDashboard() {
         )}
 
         {/* 통합 네비게이션 뷰 렌더링 */}
-        {activeNavTab === 'records' && (
+        {activeNavTab === 'records' && !drawDue && (
           <RecordsView
             player={player}
             matches={seasonMatches}
@@ -201,26 +211,29 @@ export default function DevelopmentDashboard() {
           />
         )}
 
-        {activeNavTab === 'people' && (
-          <PeopleView player={player} onClose={() => setActiveNavTab('home')} />
+        {activeNavTab === 'info' && !drawDue && (
+          <InfoView player={player} onClose={() => setActiveNavTab('home')} />
         )}
 
-        {activeNavTab === 'outing' && (
+        {activeNavTab === 'goals' && !drawDue && <GoalsView player={player} onClose={() => setActiveNavTab('home')} />}
+
+        {activeNavTab === 'home' && outingOpen && !drawDue && (
+          <div className="people-unified-wrapper"><button className="btn btn-secondary" onClick={() => setOutingOpen(false)}>홈으로 돌아가기</button>
           <TownView
             player={player}
             onPurchase={purchaseEquipment}
             onEquip={equipItem}
             onVisit={visitOutdoorLocation}
-          />
+          /></div>
         )}
 
-        {activeNavTab === 'settings' && (
+        {activeNavTab === 'settings' && !drawDue && (
           <SettingsView player={player} onClose={() => setActiveNavTab('home')} />
         )}
       </main>
 
       {/* 3. 앱 메인 네비게이션 (데스크톱 사이드 / 모바일 하단 탭바) */}
-      <AppNavigation activeTab={activeNavTab} onTabChange={setActiveNavTab} />
+      <div inert={!!drawDue}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
       {lastActionResult && !activeCutscene && (
@@ -242,11 +255,12 @@ export default function DevelopmentDashboard() {
               <p>{player.name} 선수는 3년간의 모든 고교 일정과 대회를 완주하였습니다.</p>
             </div>
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('records')}>
-            대회 기록 & 트로피 확인
+          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('goals')}>
+            트로피 확인
           </button>
         </div>
       )}
     </div>
   );
 }
+
