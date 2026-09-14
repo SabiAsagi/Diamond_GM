@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Diamond GM 화면 크기 검증</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070e19;color:#e2e8f0;font:14px system-ui}
+header{padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,input{font:inherit;padding:6px}input{width:80px}#route{width:260px}
+#stage{position:relative;overflow:hidden}iframe{border:0;display:block;transform-origin:top left}
+p{margin:8px 10px;color:#94a3b8}
+</style>
+</head>
+<body>
+<header>
+<strong>화면 크기 검증</strong>
+<button data-size="1366,768">1366 × 768</button>
+<button data-size="1440,900">1440 × 900</button>
+<button data-size="1024,600">1024 × 600</button>
+<button data-size="390,844">390 × 844</button>
+<label>너비 <input id="width" type="number" min="320" max="2560" value="1366"></label>
+<label>높이 <input id="height" type="number" min="320" max="1600" value="768"></label>
+<button id="apply">크기 적용</button>
+<label>게임 경로 <input id="route" placeholder="/development/dashboard/선수번호"></label>
+<button id="navigate">화면 열기</button>
+<output id="size"></output>
+</header>
+<div id="stage"><iframe id="game" title="검증할 게임 화면" src="./"></iframe></div>
+<p>게임의 실제 뷰포트를 지정한 크기로 유지하고 화면에 맞춰 축소 표시합니다. 게임 내 행동은 이 브라우저의 저장 데이터에 반영됩니다. 검증용 선수를 사용하세요.</p>
+<script>
+const frame=document.getElementById('game');
+const stage=document.getElementById('stage');
+const width=document.getElementById('width');
+const height=document.getElementById('height');
+function resize(){
+ const w=Math.min(2560,Math.max(320,Number(width.value)||1366));
+ const h=Math.min(1600,Math.max(320,Number(height.value)||768));
+ width.value=w; height.value=h;
+ const scale=Math.min(1,document.documentElement.clientWidth/w);
+ frame.style.width=w+'px';frame.style.height=h+'px';frame.style.transform='scale('+scale+')';
+ stage.style.height=(h*scale)+'px';
+ document.getElementById('size').textContent=w+' × '+h;
+}
+document.querySelectorAll('[data-size]').forEach(button=>button.addEventListener('click',()=>{
+ [width.value,height.value]=button.dataset.size.split(',');resize();
+}));
+document.getElementById('apply').addEventListener('click',resize);
+document.getElementById('navigate').addEventListener('click',()=>{
+ const route=document.getElementById('route').value;
+ if(route===''||/^\/development\/(create|dashboard\/\d+|interview\/\d+)$/.test(route)){
+  frame.src='./#'+route;
+ }
+});
+window.addEventListener('resize',resize);resize();
+</script>
+</body>
+</html>
