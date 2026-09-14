@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { Player } from '../../../types';
-import { EXTRA_RATINGS, normalizePlayer, PITCH_NAMES, DEFAULT_APPEARANCE, type Appearance } from '../../../data/playerDevelopment';
-import { AppearanceEditor } from '../../PlayerAppearance';
+import { EXTRA_RATINGS, normalizePlayer, PITCH_NAMES } from '../../../data/playerDevelopment';
 import { useGameClockStore } from '../../../store/gameClockStore';
 import { EQUIPMENT_CATALOG, EQUIPMENT_SLOT_LABELS, EQUIPMENT_STAT_LABELS, getRelevantSlots, isEquipmentRelevant, type EquipmentStat } from '../../../types/equipment';
 import { Sparkles, ShoppingBag, X } from 'lucide-react';
@@ -63,13 +62,11 @@ function RatingGroup({
   );
 }
 
-export function PlayerStatsView({ player: raw }: { player: Player; onClose: () => void }) {
+export function PlayerStatsView({ player: raw, section }: { player: Player; onClose: () => void; section?: 'ratings' | 'pitches' | 'equipment' }) {
   const p = normalizePlayer(raw);
-  const [tab, setTab] = useState<'ratings' | 'pitches' | 'equipment' | 'appearance'>('ratings');
-  const [appearance, setAppearance] = useState<Appearance>(p.appearance ?? DEFAULT_APPEARANCE);
-  const [saved, setSaved] = useState('');
+  const [localTab, setTab] = useState<'ratings' | 'pitches' | 'equipment'>('ratings');
+  const tab = section ?? localTab;
 
-  const saveAppearance = useGameClockStore(s => s.saveAppearance);
   const equipItem = useGameClockStore(s => s.equipItem);
   const pitcher = p.position === 'P' || p.position === 'TwoWay';
 
@@ -93,12 +90,11 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
           <h3>내 선수 · {p.name}</h3>
           <p>능력치 0–100 · 종합 {p.overall} · 잠재력 {p.potential}</p>
         </div>
-        <div className="menu-view-tabs">
+        {!section && <div className="menu-view-tabs">
           {[
             ['ratings', '능력치'],
             ['equipment', '장비'],
             ['pitches', '구종 성장'],
-            ['appearance', '커스터마이징'],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -108,7 +104,7 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
               {label}
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       <div className="menu-view-body">
@@ -316,30 +312,6 @@ export function PlayerStatsView({ player: raw }: { player: Player; onClose: () =
             <p>투수와 투타겸업 선수가 구종을 훈련할 수 있습니다.</p>
           ))}
 
-        {tab === 'appearance' && (
-          <>
-            <AppearanceEditor
-              value={appearance}
-              onChange={a => {
-                setAppearance(a);
-                setSaved('');
-              }}
-              number={p.uniformNumber}
-              gender={p.gender}
-              schoolName={p.highSchool}
-            />
-            <button
-              className="btn btn-primary"
-              onClick={async () => {
-                await saveAppearance(appearance);
-                setSaved('외형을 저장했습니다.');
-              }}
-            >
-              외형 저장
-            </button>
-            <p role="status">{saved}</p>
-          </>
-        )}
       </div>
     </div>
   );

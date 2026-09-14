@@ -4631,3 +4631,21 @@ p {
 .town-map-shell{position:relative;width:100%;min-height:480px;overflow:hidden;border:1px solid #ffffff1a;border-radius:18px;background:#10251f}.town-map-background{position:absolute;inset:0;width:100%;height:100%}.map-building{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid #ffffff33;background:#0f172adb;color:white;border-radius:12px;padding:8px;cursor:pointer;box-shadow:0 6px 14px #0006;max-width:110px}.map-building span{font-size:25px}.map-building small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px}.map-building:hover,.map-building.active{border-color:#60a5fa;background:#1d4ed8;z-index:3}.map-location-card{position:absolute;right:16px;bottom:16px;width:min(330px,calc(100% - 32px));padding:16px;z-index:5}.map-location-card p{font-size:.82rem;color:var(--text-muted);line-height:1.5}.map-card-close{position:absolute;right:8px;top:5px;border:0;background:none;color:white;font-size:22px;cursor:pointer}
 .shop-tier-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.shop-tier-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px;border:1px solid #ffffff1a;border-radius:12px;background:#14263a;color:white;cursor:pointer}.shop-tier-card small{color:var(--text-muted)}.shop-tier-card.active{border-color:#60a5fa;background:#1d4ed833}.shop-category-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px}.shop-category-tabs .tab-btn{white-space:nowrap}.equipment-bonus-text{color:#34d399;font-weight:700}
 @media(max-width:650px){.portrait-preset-grid{grid-template-columns:repeat(2,minmax(75px,1fr))}.town-map-shell{min-height:420px}.map-building{padding:6px}.map-building small{display:none}.shop-tier-tabs{grid-template-columns:1fr}.appearance-editor{align-items:flex-start}}
+
+
+/* Navigation wrappers own the remaining stage space; child views keep their scroll areas. */
+.records-unified-wrapper,
+.people-unified-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  gap: 12px;
+}
+.records-unified-wrapper > .menu-view-tabs,
+.people-unified-wrapper > .menu-view-tabs,
+.people-unified-wrapper > .home-traits-strip,
+.people-unified-wrapper > .btn {
+  flex-shrink: 0;
+}

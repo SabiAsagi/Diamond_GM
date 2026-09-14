@@ -3,7 +3,7 @@ import type { Player } from '../../../types';
 import type { ScheduledMatch } from '../../../types/tournament';
 import type { DayLogRecord } from '../../../store/gameClockStore';
 import { MatchesView } from './MatchesView';
-import { TrophiesView } from './TrophiesView';
+import { TournamentBracket } from './TournamentBracket';
 import { Trophy, Award } from 'lucide-react';
 
 interface RecordsViewProps {
@@ -11,7 +11,7 @@ interface RecordsViewProps {
   matches: ScheduledMatch[];
   historyLogs: DayLogRecord[];
   onClose: () => void;
-  defaultSubTab?: 'matches' | 'trophies';
+  defaultSubTab?: 'matches' | 'tournaments';
 }
 
 export function RecordsView({
@@ -21,7 +21,7 @@ export function RecordsView({
   onClose,
   defaultSubTab = 'matches',
 }: RecordsViewProps) {
-  const [subTab, setSubTab] = useState<'matches' | 'trophies'>(defaultSubTab);
+  const [subTab, setSubTab] = useState<'matches' | 'tournaments'>(defaultSubTab);
 
   return (
     <div className="records-unified-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -33,21 +33,29 @@ export function RecordsView({
           className={`tab-btn ${subTab === 'matches' ? 'active' : ''}`}
           onClick={() => setSubTab('matches')}
         >
-          <Trophy size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 경기 일정 & 결과
+          <Trophy size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 경기
         </button>
         <button
-          className={`tab-btn ${subTab === 'trophies' ? 'active' : ''}`}
-          onClick={() => setSubTab('trophies')}
+          className={`tab-btn ${subTab === 'tournaments' ? 'active' : ''}`}
+          onClick={() => setSubTab('tournaments')}
         >
-          <Award size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 트로피 & 업적
+          <Award size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 대회·리그
         </button>
       </div>
 
       {subTab === 'matches' ? (
-        <MatchesView player={player} matches={matches} historyLogs={historyLogs} onClose={onClose} />
+        <MatchesView showBracket={false} player={player} matches={matches} historyLogs={historyLogs} onClose={onClose} />
       ) : (
-        <TrophiesView player={player} onClose={onClose} />
+        <div className="menu-view-container glass-panel"><div className="menu-view-body"><TournamentBracket matches={matches} />
+          <section aria-label="주말리그"><h4>주말리그 일정·결과</h4>
+            {matches.filter(m => m.tournamentId === 'weekend_league' && m.isPlayerTeamMatch).map(m => <div className="bracket-game" key={m.id}>
+              <small>{m.date.month}/{m.date.day} · {m.round}</small>
+              <p>{m.homeSchoolName} vs {m.awaySchoolName}</p>
+              <strong>{m.result ? `${m.result === 'home' ? m.homeSchoolName : m.awaySchoolName} 승리` : '경기 예정'}</strong>
+            </div>)}
+          </section></div></div>
       )}
     </div>
   );
 }
+

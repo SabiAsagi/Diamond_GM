@@ -46,3 +46,55 @@ test('store saves pitch growth, rejects wrong slots, resumes draws and pending e
  await store.getState().resolveCutscene('learn');assert.equal(saved.movement,movement+2);assert.equal(saved.overall,overallRating(saved));
 });
 process.on('exit',()=>fs.rmSync(dir,{recursive:true,force:true}));
+
+
+test('v4 awards use real records and stages, and remain earned after reload or season rollover', async () => {
+  const {buildAchievements,buildTournamentTrophies,captureAchievements}=require(path.join(dir,'data/achievements.js'));
+  let p=player(); p.fame=100; p.relationshipCoach=89; p.pitches=[{type:'curve',rating:79,potential:80,xp:0}];
+  let awards=buildAchievements(p);
+  assert.equal(awards.find(a=>a.id==='ach_first_match').unlocked,false);
+  assert.equal(awards.find(a=>a.id==='ach_coach_trust').unlocked,false);
+  assert.equal(awards.find(a=>a.id==='ach_pitch_master').unlocked,false);
+  p.relationshipCoach=90;p.pitches=trainPitch(p,'curve',100);p.academics=90;
+  assert.equal(buildAchievements(p).find(a=>a.id==='ach_pitch_master').unlocked,true);
+  let matches=generateSeasonMatches(2026,school,HIGH_SCHOOLS_DATA);
+  p.savedMatches=matches;
+  assert.ok(buildTournamentTrophies(p).every(t=>!t.unlocked));
+  for(let i=0;i<6;i++) {
+    const m=matches.find(m=>m.tournamentId==='emart_spring'&&m.isPlayerTeamMatch&&!m.result);
+    matches=progressTournament(matches,{matchId:m.id,tournamentId:m.tournamentId,won:true},school,HIGH_SCHOOLS_DATA);
+  }
+  p.savedMatches=matches;p.savedSeasonYear=2026;
+  assert.equal(buildTournamentTrophies(p).filter(t=>t.unlocked).length,3);
+  captureAchievements(p);
+  p.academics=10;p.savedMatches=[];
+  assert.equal(buildAchievements(p).find(a=>a.id==='ach_academic_excellence').unlocked,true);
+  assert.equal(buildTournamentTrophies(p).filter(t=>t.unlocked).length,3);
+  await useGameClockStore.getState().initClock(p);
+  assert.equal(saved.earnedTrophyIds.length,3);
+  assert.ok(saved.earnedAchievementIds.includes('ach_academic_excellence'));
+});
+
+test('v4 activities cover each category, enforce positions and slots in sampling and execution', async () => {
+  const {SUB_ACTIVITY_POOL,isActivityAvailable}=require(path.join(dir,'types/activity.js'));
+  const all=Object.values(SUB_ACTIVITY_POOL).flat();
+  assert.equal(new Set(all.map(a=>a.id)).size,all.length);
+  for(const category of ['study','rest','relationship','special','training']) assert.ok(SUB_ACTIVITY_POOL[category].length>=10,category);
+  const block=all.find(a=>a.id==='train_catcher_block');
+  assert.equal(isActivityAvailable(block,'C','afternoon'),true);
+  for(const position of ['P','SS','TwoWay']) assert.equal(isActivityAvailable(block,position,'afternoon'),false);
+  assert.equal(isActivityAvailable(block,'C','night'),false);
+  for(const position of ['P','C','SS','TwoWay']) {
+    const choices=sampleSubActivities('training',1000,position,'afternoon');
+    assert.equal(choices.some(a=>a.id===block.id),position==='C');
+  }
+  const store=useGameClockStore;
+  await store.getState().initClock(player());
+  const before=structuredClone(store.getState().player);
+  await store.getState().selectActivity('afternoon','training',block.id);
+  assert.deepEqual(store.getState().player,before);
+  await store.getState().initClock({...player(),position:'C'});
+  await store.getState().selectActivity('afternoon','training',block.id);
+  assert.equal(saved.defense,player().defense+2);
+  assert.equal(saved.currentSlot,'night');
+});

@@ -1,6 +1,6 @@
-import { Home, Trophy, Users, MapPin, Settings } from 'lucide-react';
+import { Home, ClipboardList, Target, LineChart, Settings } from 'lucide-react';
 
-export type MainNavTab = 'home' | 'records' | 'people' | 'outing' | 'settings';
+export type MainNavTab = 'records' | 'goals' | 'home' | 'info' | 'settings';
 
 interface AppNavigationProps {
   activeTab: MainNavTab;
@@ -15,10 +15,10 @@ interface NavItem {
 
 export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
   const navItems: NavItem[] = [
+    { id: 'records', label: '기록', icon: <ClipboardList size={18} /> },
+    { id: 'goals', label: '목표', icon: <Target size={18} /> },
     { id: 'home', label: '홈', icon: <Home size={18} /> },
-    { id: 'records', label: '기록', icon: <Trophy size={18} /> },
-    { id: 'people', label: '인물', icon: <Users size={18} /> },
-    { id: 'outing', label: '외출', icon: <MapPin size={18} /> },
+    { id: 'info', label: '정보', icon: <LineChart size={18} /> },
     { id: 'settings', label: '설정', icon: <Settings size={18} /> },
   ];
 
@@ -41,3 +41,4 @@ export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
     </nav>
   );
 }
+

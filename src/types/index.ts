@@ -35,6 +35,8 @@ export type PitcherRole = 'Starter' | 'Reliever' | 'Closer' | 'None';
 export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 
 export interface Player {
+  earnedAchievementIds?: string[];
+  earnedTrophyIds?: string[];
   gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number;
   stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
   pitches?: import('../data/playerDevelopment').PitchRating[];
@@ -125,3 +127,4 @@ export interface LeagueSeason {
   year: number;
   currentStage: 'Offseason' | 'SpringTraining' | 'RegularSeason' | 'Playoffs' | 'Draft';
 }
+

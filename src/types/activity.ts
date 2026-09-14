@@ -33,7 +33,8 @@ export interface ActivityOption {
   staminaDelta: number;         // 체력 소모(-) 또는 회복(+)
   mentalDelta?: number;         // 컨디션/멘탈 소모(-) 또는 회복(+)
   statChanges: PlayerStatsSubset;
-  targetPosition?: 'P' | 'B' | 'ALL'; // 투수/타자/공통
+  targetPosition?: 'P' | 'B' | 'ALL';
+  positionSpecific?: Position[]; // 투수/타자/공통
   allowedSlots?: TimeSlot[];
   moneyDelta?: number;
 }
@@ -110,6 +111,12 @@ export function getActivityCategories(slot: TimeSlot, isSchoolDay: boolean): Cat
  */
 export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> = {
   study: [
+    {"id": "study_pe_theory", "label": "체육 이론 필기시험 대비", "description": "운동 원리와 경기 규칙을 정리하며 시험을 준비합니다.", "statChanges": {"academics": 3}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
+    {"id": "study_presentation", "label": "동아리 발표 준비", "description": "친구들과 발표 자료와 대본을 함께 완성합니다.", "statChanges": {"academics": 2, "relationshipFriends": 2}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
+    {"id": "study_mentoring", "label": "교내 멘토링 참여", "description": "선배에게 공부 계획을 점검받고 취약 과목을 복습합니다.", "statChanges": {"academics": 3, "relationshipTeam": 1}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
+    {"id": "study_math_stats", "label": "확률과 야구 통계", "description": "타율과 출루율을 예제로 확률 문제를 풉니다.", "statChanges": {"academics": 3, "eye": 1}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
+    {"id": "study_wrong_answers", "label": "오답 노트 정리", "description": "틀린 문제의 풀이 과정을 다시 적으며 이해합니다.", "statChanges": {"academics": 4}, "allowedSlots": ["morning"], "staminaDelta": -6, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
+    {"id": "study_reading_report", "label": "독서 감상문 작성", "description": "읽은 책의 내용을 자신의 말로 정리합니다.", "statChanges": {"academics": 3, "condition": 2}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "📚", "category": "study"},
     {
       id: 'study_focus_class',
       label: '교과 수업 집중 경청',
@@ -185,6 +192,12 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   training: [
+    {"id": "train_catcher_block", "label": "블로킹 훈련", "description": "낮게 떨어지는 공을 몸 앞에 막아냅니다.", "statChanges": {"defense": 2, "fieldingError": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -12, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["C"], "category": "training"},
+    {"id": "train_shortstop_double", "label": "더블플레이 풋워크", "description": "유격수 위치에서 포구와 연결 동작을 반복합니다.", "statChanges": {"fieldingRange": 2, "defense": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -12, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["SS"], "category": "training"},
+    {"id": "train_second_pivot", "label": "2루 베이스 피벗", "description": "2루 베이스에서 병살 연결 발동작을 익힙니다.", "statChanges": {"fieldingError": 2, "defense": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -12, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["2B"], "category": "training"},
+    {"id": "train_first_scoop", "label": "1루 바운드 포구", "description": "다양한 바운드의 송구를 안정적으로 받아냅니다.", "statChanges": {"fieldingError": 2, "defense": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -10, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["1B"], "category": "training"},
+    {"id": "train_outfield_relay", "label": "외야 중계 송구", "description": "외야에서 중계 플레이의 방향과 정확도를 익힙니다.", "statChanges": {"arm": 2, "defense": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -12, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["LF", "CF", "RF"], "category": "training"},
+    {"id": "train_third_reaction", "label": "핫코너 반응 훈련", "description": "3루에서 빠른 타구에 대응하는 첫 동작을 익힙니다.", "statChanges": {"fieldingRange": 2, "defense": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -12, "mentalDelta": 2, "weight": 2, "targetPosition": "ALL", "icon": "⚾", "positionSpecific": ["3B"], "category": "training"},
     ...Object.entries(PITCH_NAMES).map(([type,label]): ActivityOption => ({id:`pitch_${type}`,label:`${label} 습득·집중 훈련`,description:'미습득 구종은 100 XP부터 사용 가능. 이후 100 XP마다 숙련도 +2.',category:'training',icon:'⚾',weight:2,staminaDelta:-12,statChanges:{control:1},targetPosition:'P',allowedSlots:['afternoon'],pitchTraining:type as PitchType})),
     ...Object.entries(EXTRA_RATINGS).map(([key,[label,description]]): ActivityOption => ({id:`skill_${key}`,label:`${label} 집중 훈련`,description,category:'training',icon:'🎯',weight:2,staminaDelta:-12,statChanges:{[key]:2},targetPosition:['movement','holdRunners'].includes(key)?'P':'B',allowedSlots:['afternoon']})),
     {id:'train_velocity',label:'구속 향상 메커니즘 훈련',description:'하체 전달과 릴리스 개선. 구속 +0.2 km/h',category:'training',icon:'🔥',weight:2,staminaDelta:-16,statChanges:{velocity:0.2},targetPosition:'P',allowedSlots:['afternoon']},
@@ -308,6 +321,12 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   rest: [
+    {"id": "rest_roommate_chat", "label": "룸메이트와 잡담", "description": "숙소에서 오늘 있었던 일을 나누며 긴장을 풉니다.", "statChanges": {"condition": 7, "relationshipTeam": 2}, "allowedSlots": ["night"], "staminaDelta": 10, "mentalDelta": 6, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
+    {"id": "rest_diary", "label": "일기 쓰기", "description": "하루의 감정을 적어 생각을 정리합니다.", "statChanges": {"condition": 8}, "allowedSlots": ["night"], "staminaDelta": 8, "mentalDelta": 8, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
+    {"id": "rest_breathing", "label": "호흡 이완", "description": "느린 호흡으로 몸과 마음의 긴장을 풀어줍니다.", "statChanges": {"condition": 6}, "allowedSlots": ["morning", "afternoon", "night"], "staminaDelta": 10, "mentalDelta": 6, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
+    {"id": "rest_power_nap", "label": "점심시간 짧은 낮잠", "description": "쉬는 시간에 눈을 붙이고 오후를 준비합니다.", "statChanges": {"condition": 6}, "allowedSlots": ["morning"], "staminaDelta": 14, "mentalDelta": 4, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
+    {"id": "rest_sleep_routine", "label": "취침 루틴 정돈", "description": "훈련복을 정리하고 편안한 잠자리를 준비합니다.", "statChanges": {"condition": 9}, "allowedSlots": ["night"], "staminaDelta": 15, "mentalDelta": 7, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
+    {"id": "rest_light_walk", "label": "가벼운 회복 산책", "description": "숙소 주변을 천천히 걸으며 머리를 식힙니다.", "statChanges": {"condition": 7}, "allowedSlots": ["afternoon", "night"], "staminaDelta": 8, "mentalDelta": 8, "weight": 2, "targetPosition": "ALL", "icon": "🌙", "category": "rest"},
     { id: 'job_convenience', label: '동네 편의점 아르바이트', category: 'rest', weight: 1, description: '짧게 일해 장비 구입비를 모읍니다.', icon: '🏪', staminaDelta: -10, mentalDelta: -2, statChanges: {}, targetPosition: 'ALL', allowedSlots: ['night'], moneyDelta: 30000 },
     { id: 'job_batting_center', label: '배팅센터 보조 아르바이트', category: 'rest', weight: 1, description: '정리와 안내를 돕고 남는 시간에 감각을 익힙니다.', icon: '🪙', staminaDelta: -8, statChanges: { contact: 1 }, targetPosition: 'ALL', allowedSlots: ['night'], moneyDelta: 18000 },
     {
@@ -373,6 +392,13 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   relationship: [
+    {"id": "rel_partner_feedback", "label": "훈련 파트너와 피드백", "description": "서로의 플레이에서 좋았던 점을 이야기합니다.", "statChanges": {"relationshipTeam": 4, "condition": 2}, "allowedSlots": ["afternoon"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_class_help", "label": "반 친구 과제 도와주기", "description": "친구와 막힌 문제를 함께 해결합니다.", "statChanges": {"relationshipFriends": 4, "academics": 1}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_rival_greeting", "label": "상대 학교 선수와 인사", "description": "상대 팀 선수와 훈련 경험을 나누며 교류합니다.", "statChanges": {"relationshipFriends": 3, "condition": 2}, "allowedSlots": ["afternoon"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_family_letter", "label": "가족에게 감사 편지", "description": "평소 전하지 못한 감사한 마음을 편지로 적습니다.", "statChanges": {"relationshipFamily": 4, "condition": 3}, "allowedSlots": ["night"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_coach_questions", "label": "감독에게 전술 질문", "description": "훈련이 끝난 뒤 궁금했던 작전 의도를 묻습니다.", "statChanges": {"relationshipCoach": 4, "eye": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_team_cleanup", "label": "동료와 장비실 정리", "description": "팀 장비를 함께 정리하며 대화를 나눕니다.", "statChanges": {"relationshipTeam": 4}, "allowedSlots": ["afternoon"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
+    {"id": "rel_lunch_table", "label": "친구들과 점심 대화", "description": "점심시간에 취미 이야기를 나눕니다.", "statChanges": {"relationshipFriends": 4, "condition": 2}, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
     {
       id: 'rel_friends_arcade',
       label: '야구부 동기들과 오락실/PC방',
@@ -436,6 +462,12 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   special: [
+    {"id": "special_recovery_mobility", "label": "회복 가동성 스트레칭", "description": "무리하지 않는 범위에서 관절 가동성을 점검합니다.", "statChanges": {"condition": 5}, "allowedSlots": ["afternoon"], "staminaDelta": 8, "mentalDelta": 4, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "category": "special"},
+    {"id": "special_counseling", "label": "심리 상담 세션", "description": "상담 선생님과 경기 부담감을 이야기합니다.", "statChanges": {"condition": 10}, "allowedSlots": ["afternoon"], "staminaDelta": 3, "mentalDelta": 8, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "category": "special"},
+    {"id": "special_interview_practice", "label": "인터뷰 대응 연습", "description": "경기 후 질문에 차분히 대답하는 연습을 합니다.", "statChanges": {"academics": 1, "condition": 4}, "allowedSlots": ["afternoon"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "category": "special"},
+    {"id": "special_visualization", "label": "경기 장면 시각화", "description": "내일의 플레이를 떠올리며 집중력을 다집니다.", "statChanges": {"eye": 1, "control": 1, "condition": 3}, "allowedSlots": ["night"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "category": "special"},
+    {"id": "special_scorebook", "label": "스코어북 읽기", "description": "경기 기록지를 보며 수비 상황과 작전을 복기합니다.", "statChanges": {"academics": 2, "eye": 1}, "allowedSlots": ["morning", "night"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "category": "special"},
+    {"id": "special_catcher_signs", "label": "포수 사인 조합 연구", "description": "주자 상황에 맞는 사인 교환을 익힙니다.", "statChanges": {"defense": 2, "relationshipTeam": 1}, "allowedSlots": ["afternoon"], "staminaDelta": -5, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🧠", "positionSpecific": ["C"], "category": "special"},
     {
       id: 'special_video_scouting',
       label: 'KBO 프로 전력 분석 영상 시청',
@@ -535,6 +567,13 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
  * 가중치 기반 비복원 무작위 추출 (Weighted Sampling without Replacement)
  * 사용자가 카테고리를 누를 때마다 3~4개의 신선한 옵션을 랜덤으로 뽑아냅니다.
  */
+export function isActivityAvailable(option: ActivityOption, position: Position, slot?: TimeSlot): boolean {
+  if (slot && option.allowedSlots && !option.allowedSlots.includes(slot)) return false;
+  if (option.positionSpecific && !option.positionSpecific.includes(position)) return false;
+  if (!option.targetPosition || option.targetPosition === 'ALL') return true;
+  return position === 'TwoWay' || option.targetPosition === (position === 'P' ? 'P' : 'B');
+}
+
 export function sampleSubActivities(
   category: DailyActivityCategory,
   count = 4,
@@ -542,17 +581,7 @@ export function sampleSubActivities(
   slot?: TimeSlot
 ): ActivityOption[] {
   const pool = SUB_ACTIVITY_POOL[category] || [];
-  const isPitcher = playerPosition === 'P';
-  const isTwoWay = playerPosition === 'TwoWay';
-
-  // 플레이어 포지션에 적합한 후보군 필터링
-  const filteredPool = pool.filter(opt => {
-    if (slot && opt.allowedSlots && !opt.allowedSlots.includes(slot)) return false;
-    if (!opt.targetPosition || opt.targetPosition === 'ALL') return true;
-    if (isTwoWay) return true;
-    if (isPitcher) return opt.targetPosition === 'P';
-    return opt.targetPosition === 'B';
-  });
+  const filteredPool = pool.filter(opt => isActivityAvailable(opt, playerPosition, slot));
 
   if (filteredPool.length <= count) {
     return [...filteredPool];
@@ -682,3 +711,4 @@ function translateStatKey(key: string): string {
   };
   return map[key] || (EXTRA_RATINGS[key as keyof typeof EXTRA_RATINGS]?.[0]) || (key === 'velocity' ? '구속' : key);
 }
+
