@@ -50,7 +50,7 @@ document.getElementById('apply').addEventListener('click',resize);
 document.getElementById('navigate').addEventListener('click',()=>{
  const route=document.getElementById('route').value;
  if(route===''||/^\/development\/(create|dashboard\/\d+|interview\/\d+)$/.test(route)){
-  frame.src='./#'+route;
+  frame.src='./?layoutCheck='+Date.now()+'#'+route;
  }
 });
 window.addEventListener('resize',resize);resize();
