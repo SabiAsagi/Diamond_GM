@@ -3630,14 +3630,23 @@ p {
 
   .free-slot-panel > .sub-activities-grid {
     flex: 1;
-    min-height: 120px; /* 최소 한 줄을 확보하고 부족하면 패널 전체가 스크롤된다. */
+    min-height: 80px; /* 카드 영역이 사라지지 않게 하고 부족하면 패널 전체가 스크롤된다. */
     min-width: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     overflow-y: auto;
     align-content: start;
     padding: 4px;
     margin-bottom: 12px;
     scrollbar-gutter: stable;
   }
+}
+
+@media (min-width: 769px) and (min-height: 560px) and (max-height: 700px) {
+  .home-center-stage > .free-slot-panel { padding: 16px; }
+  .free-slot-panel > .slot-panel-header,
+  .free-slot-panel > .category-selection-row { margin-bottom: 10px; }
+  .free-slot-panel > .training-focus { margin: 6px 0; }
+  .free-slot-panel > .slot-action-footer { gap: 8px; padding-top: 10px; }
 }
 
 /* 컴팩트 3대 게이지 */
