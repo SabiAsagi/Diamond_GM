@@ -3604,7 +3604,40 @@ p {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
+}
+
+/* PC에서는 선택 카드만 스크롤하고 활동 완료 버튼은 화면 안에 유지한다.
+   아주 낮은 창에서는 기존 패널 전체 스크롤을 사용한다. */
+@media (min-width: 769px) and (min-height: 560px) {
+  .home-center-stage > .free-slot-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    margin-bottom: 0;
+    overflow-y: auto;
+  }
+
+  .free-slot-panel > .slot-panel-header,
+  .free-slot-panel > .category-selection-row,
+  .free-slot-panel > .training-focus,
+  .free-slot-panel > .slot-action-footer {
+    flex-shrink: 0;
+  }
+
+  .free-slot-panel > .sub-activities-grid {
+    flex: 1;
+    min-height: 120px; /* 최소 한 줄을 확보하고 부족하면 패널 전체가 스크롤된다. */
+    min-width: 0;
+    overflow-y: auto;
+    align-content: start;
+    padding: 4px;
+    margin-bottom: 12px;
+    scrollbar-gutter: stable;
+  }
 }
 
 /* 컴팩트 3대 게이지 */
