@@ -1,3 +1,4 @@
+import { INITIAL_RELATIONSHIPS } from './types/bondScores';
 import Dexie, { type Table } from 'dexie';
 import type { Player, Team, LeagueSeason } from './types';
 
@@ -52,10 +53,7 @@ export async function initDummyDataIfNeeded() {
         potential: 80,
         condition: 100,
         academics: 70,
-        relationshipFamily: 50,
-        relationshipFriends: 50,
-        relationshipTeam: 50,
-        relationshipCoach: 50
+        relationships: {...INITIAL_RELATIONSHIPS},
       },
       {
         name: 'Lee Seung-yeop',
@@ -82,10 +80,7 @@ export async function initDummyDataIfNeeded() {
         potential: 95,
         condition: 80,
         academics: 50,
-        relationshipFamily: 50,
-        relationshipFriends: 50,
-        relationshipTeam: 50,
-        relationshipCoach: 50
+        relationships: {...INITIAL_RELATIONSHIPS},
       }
     ]);
     
@@ -95,3 +90,4 @@ export async function initDummyDataIfNeeded() {
     });
   }
 }
+

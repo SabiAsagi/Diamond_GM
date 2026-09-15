@@ -1,3 +1,5 @@
+import { initializeRival, updateMonthlyRival } from '../data/rival';
+import { applyBondChanges, formatBondChanges, actualBondChanges, type RelationshipTargets } from '../types/bondScores';
 import { captureAchievements } from '../data/achievements';
 import { normalizePlayer, EXTRA_RATINGS, trainPitch, overallRating } from '../data/playerDevelopment';
 import { create } from 'zustand';
@@ -47,6 +49,7 @@ export interface GameClockState {
   // 신규: 결과 즉시 표시 팝업 & 이벤트 컷신
   lastActionResult: ActivityResult | null;
   clearLastActionResult: () => void;
+  dismissRivalReport: () => Promise<void>;
   activeCutscene: EventCutscene | null;
   clearActiveCutscene: () => void;
   resolveCutscene: (choice: 'learn' | 'reflect') => Promise<void>;
@@ -90,6 +93,12 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
   lastActionResult: null,
   clearLastActionResult: () => set({ lastActionResult: null }),
+  dismissRivalReport: async () => {
+    const {player,isLoading}=get(); if(!player || isLoading || !player.pendingRivalReport)return;
+    set({isLoading:true});
+    try { const updated={...player,pendingRivalReport:undefined}; await db.players.put(updated);set({player:updated}); }
+    finally {set({isLoading:false});}
+  },
   activeCutscene: null,
   clearActiveCutscene: () => { void get().resolveCutscene('reflect'); },
   cutsceneHistory: {},
@@ -108,6 +117,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       weekday: 1, // 3월 2일 월요일
       grade: (player.grade as 1 | 2 | 3) || 1,
     };
+    if(!player.rivalProgress) player.rivalProgress=initializeRival(player,initialDate);
     const initialSlot: TimeSlot = player.currentSlot || 'morning';
 
     // 시즌 대회 대진표 생성
@@ -164,13 +174,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     let newAcademics = player.academics;
     let newFame = player.fame ?? 10;
     const newMoney = Math.max(0, (player.money || 0) + (result.moneyDelta || 0));
-    let newRelFam = player.relationshipFamily;
-    let newRelFri = player.relationshipFriends;
-    let newRelTeam = player.relationshipTeam;
-    let newRelCoach = player.relationshipCoach;
 
     const sc = result.statChanges;
-    const extra = normalizePlayer(player);
+    const extra = applyBondChanges(normalizePlayer(player), result.relationshipTargets);
+    const expectedBonds = formatBondChanges(result.relationshipTargets);
+    result = {...result, relationshipTargets: actualBondChanges(player,extra)};
+    const actualBonds = formatBondChanges(result.relationshipTargets);
+    if(expectedBonds && result.logMessage.includes(expectedBonds)) result.logMessage=result.logMessage.replace(expectedBonds,actualBonds || '인연 변화 없음 (상한 도달)');
+    else if(actualBonds) result.logMessage += ` · ${actualBonds}`;
     for(const key of Object.keys(EXTRA_RATINGS) as (keyof typeof EXTRA_RATINGS)[]) extra[key]=Math.max(0,Math.min(100,extra[key]!+(sc[key]??0)));
     extra.velocity=Math.round(Math.max(80,Math.min(170,extra.velocity!+(sc.velocity??0)))*10)/10;
     if(result.pitchTraining) extra.pitches=trainPitch(extra,result.pitchTraining,result.pitchXp??0);
@@ -187,10 +198,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (sc.defense) newDefense = Math.min(100, newDefense + sc.defense);
     if (sc.academics) newAcademics = Math.max(0, Math.min(100, newAcademics + sc.academics));
     if (sc.fame) newFame = Math.max(0, Math.min(100, newFame + sc.fame));
-    if (sc.relationshipFamily) newRelFam = Math.max(0, Math.min(100, newRelFam + sc.relationshipFamily));
-    if (sc.relationshipFriends) newRelFri = Math.max(0, Math.min(100, newRelFri + sc.relationshipFriends));
-    if (sc.relationshipTeam) newRelTeam = Math.max(0, Math.min(100, newRelTeam + sc.relationshipTeam));
-    if (sc.relationshipCoach) newRelCoach = Math.max(0, Math.min(100, newRelCoach + sc.relationshipCoach));
 
     // 체력 및 컨디션(멘탈) 복합 반영
     const netStaminaDelta = result.staminaDelta;
@@ -253,7 +260,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         academicEvents,
       });
 
-      const updatedPlayer: Player = {
+      let updatedPlayer: Player = {
         ...extra,
         savedMatches:updatedMatches,
         savedSeasonYear:nextDate.year,
@@ -269,10 +276,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         academics: newAcademics,
         fame: newFame,
         money: newMoney,
-        relationshipFamily: newRelFam,
-        relationshipFriends: newRelFri,
-        relationshipTeam: newRelTeam,
-        relationshipCoach: newRelCoach,
         overall: newOverall,
         grade: nextDate.grade,
         month: nextDate.month,
@@ -280,6 +283,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         gameDate: nextDate,
         currentSlot: nextSlot,
       };
+
+      updatedPlayer.overall=overallRating(updatedPlayer);
+      if(advanceRes.isMonthChanged) updatedPlayer=updateMonthlyRival(updatedPlayer,nextDate);
 
       // 3. 확률적 컷신 이벤트 체크
       let triggeredCutscene: EventCutscene | null = null;
@@ -334,10 +340,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       academics: newAcademics,
       fame: newFame,
       money: newMoney,
-      relationshipFamily: newRelFam,
-      relationshipFriends: newRelFri,
-      relationshipTeam: newRelTeam,
-      relationshipCoach: newRelCoach,
       overall: newOverall,
       gameDate: clock.date,
       currentSlot: nextSlot,
@@ -383,7 +385,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     const pool = SUB_ACTIVITY_POOL[category] || [];
     const option = pool.find(o => o.id === subActivityId);
-    if (!option || !isActivityAvailable(option, player.position, _slot)) return;
+    if (!option || !isActivityAvailable(option, player.position, _slot, player.grade ?? 1)) return;
 
     // 체력 및 멘탈 게이팅 평가 (체력 20 이하 효율 반감 및 부상 롤)
     const result = evaluateActivityWithGating(
@@ -446,14 +448,16 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const {player,activeCutscene,isLoading}=get(); if(!player||!activeCutscene||isLoading)return;
     set({isLoading:true});
     try {
-      const effect=choice==='learn'?activeCutscene.effect(player):{statChanges:{condition:Math.min(100,player.condition+8)},logMessage:'서두르지 않고 마음을 정리했습니다. 컨디션 +8'};
-      const updated={...player,...effect.statChanges,pendingEventId:undefined};
-      for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics','relationshipCoach','relationshipTeam','relationshipFriends','relationshipFamily',...Object.keys(EXTRA_RATINGS)]){
+      const effect: {statChanges: Partial<Player>; relationshipTargets?: RelationshipTargets; logMessage:string}=choice==='learn'?activeCutscene.effect(player):{statChanges:{condition:Math.min(100,player.condition+8)},logMessage:'서두르지 않고 마음을 정리했습니다. 컨디션 +8'};
+      const updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
+      const relationshipTargets = actualBondChanges(player,updated);
+      if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
+      for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics',...Object.keys(EXTRA_RATINGS)]){
         const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
       }
       updated.overall=overallRating(updated);
       captureAchievements(updated); await db.players.put(updated);
-      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:{},staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
+      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:{},relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
     }finally{set({isLoading:false});}
   },
   saveAppearance: async (appearance) => {
@@ -507,7 +511,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (player.lastOutdoorVisitDate === todayDateStr) return false;
 
     const updated: Player = {
-      ...player,
+      ...applyBondChanges(player,location.effects.relationshipTargets),
       money: (player.money || 0) - location.cost + (location.effects.money || 0),
       condition: Math.max(5, Math.min(100, player.condition + location.effects.condition)),
       lastOutdoorVisitDate: todayDateStr,

@@ -75,6 +75,7 @@ export function resolveMatchPlaceholder(
   const logMessage = `🏆 [${match.tournamentName} ${match.round}] ${scoreText} (${winStatus})\n⚾ ${personalPerformance} | 인지도 +${fameGain}, 실전 감각 대폭 상승!${trustText}`;
 
   return {
+    relationshipTargets: { peer: 3 },
     statChanges: {
       stuff: stuffGain,
       control: controlGain,
@@ -83,7 +84,6 @@ export function resolveMatchPlaceholder(
       eye: eyeGain,
       fame: fameGain,
       condition: isWin ? 5 : -5,
-      relationshipTeam: 3,
     },
     staminaDelta: -25, // 경기 소모 체력
     mentalDelta: isWin ? 10 : -8,

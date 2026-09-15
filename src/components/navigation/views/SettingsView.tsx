@@ -1,3 +1,4 @@
+import { GAME_VERSION } from '../../../version';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Player } from '../../../types';
@@ -33,7 +34,7 @@ export function SettingsView({ player }: SettingsViewProps) {
           <Settings size={22} className="text-primary" />
           <div>
             <h3 className="menu-view-title">환경설정 & 데이터 관리</h3>
-            <p className="menu-view-sub">게임 진행 옵션, 음향, 세이브 데이터를 관리합니다.</p>
+            <p className="menu-view-sub">Diamond GM {GAME_VERSION} · 게임 진행 옵션, 음향, 세이브 데이터를 관리합니다.</p>
           </div>
         </div>
       </div>
@@ -140,3 +141,4 @@ export function SettingsView({ player }: SettingsViewProps) {
     </div>
   );
 }
+

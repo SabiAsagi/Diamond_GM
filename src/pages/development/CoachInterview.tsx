@@ -1,3 +1,4 @@
+import { applyBondChanges, getRelScore, TEAM_BOND_IDS, FRIEND_BOND_IDS, type RelationshipTargets } from '../../types/bondScores';
 import { normalizePlayer, overallRating } from '../../data/playerDevelopment';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -90,11 +91,8 @@ export default function CoachInterview() {
     let newCondition = player.condition;
     let newAcademics = player.academics || 50;
     let newFame = player.fame || 10;
-    let newRelCoach = player.relationshipCoach || 50;
-    let newRelTeam = player.relationshipTeam || 50;
-    let newRelFriends = player.relationshipFriends || 50;
-    let newRelFamily = player.relationshipFamily || 50;
 
+    const bondChanges: RelationshipTargets = {};
     const newTraits = [...(player.traits || [])];
 
     for (const ans of allAnswers) {
@@ -110,10 +108,10 @@ export default function CoachInterview() {
       if (b.condition) newCondition = Math.min(100, newCondition + b.condition);
       if (b.academics) newAcademics = Math.min(100, newAcademics + b.academics);
       if (b.fame) newFame += b.fame;
-      if (b.relationshipCoach) newRelCoach += b.relationshipCoach;
-      if (b.relationshipTeam) newRelTeam += b.relationshipTeam;
-      if (b.relationshipFriends) newRelFriends += b.relationshipFriends;
-      if (b.relationshipFamily) newRelFamily += b.relationshipFamily;
+      if (b.relationshipCoach) for (const id of ['coach','coach2'] as const) bondChanges[id]=(bondChanges[id] ?? 0)+b.relationshipCoach;
+      if (b.relationshipTeam) for (const id of TEAM_BOND_IDS) bondChanges[id]=(bondChanges[id] ?? 0)+b.relationshipTeam;
+      if (b.relationshipFriends) for (const id of FRIEND_BOND_IDS) bondChanges[id]=(bondChanges[id] ?? 0)+b.relationshipFriends;
+      if (b.relationshipFamily) for (const id of ['mother','father'] as const) bondChanges[id]=(bondChanges[id] ?? 0)+b.relationshipFamily;
 
       if (!newTraits.includes(ans.gainedTrait)) {
         newTraits.push(ans.gainedTrait);
@@ -124,7 +122,7 @@ export default function CoachInterview() {
     const siblings = allAnswers.find(a=>a.id.startsWith('sibling_'))?.id.replace('sibling_','') as Player['siblings'];
 
     const updatedPlayer: Player = {
-      ...player,
+      ...applyBondChanges(player,bondChanges),
       stuff: newStuff,
       control: newControl,
       stamina: newStamina,
@@ -136,10 +134,6 @@ export default function CoachInterview() {
       condition: newCondition,
       academics: newAcademics,
       fame: newFame,
-      relationshipCoach: newRelCoach,
-      relationshipTeam: newRelTeam,
-      relationshipFriends: newRelFriends,
-      relationshipFamily: newRelFamily,
       traits: newTraits,
       interviewCompleted: true,
       chosenPathTitle: pathTitle,
@@ -172,6 +166,7 @@ export default function CoachInterview() {
 
     Object.assign(updatedPlayer,normalizePlayer(updatedPlayer));
     updatedPlayer.overall=overallRating(updatedPlayer);
+    if(updatedPlayer.rivalProgress) updatedPlayer.rivalProgress={...updatedPlayer.rivalProgress,playerMonthStartOverall:updatedPlayer.overall};
     await db.players.put(updatedPlayer);
     setPlayer(updatedPlayer);
     setIsApplying(false);
@@ -232,7 +227,7 @@ export default function CoachInterview() {
                 ))}
               </div>
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                • 감독 신뢰도: <strong style={{ color: '#34d399' }}>{player.relationshipCoach} pt</strong> (+보너스 반영)<br />
+                • 감독 신뢰도: <strong style={{ color: '#34d399' }}>{getRelScore(player,'coach')} pt</strong> (+보너스 반영)<br />
                 • 목표 슬로건: <strong style={{ color: '#fbbf24' }}>"{player.chosenPathTitle}"</strong>
               </div>
             </div>
@@ -342,3 +337,4 @@ export default function CoachInterview() {
     </div>
   );
 }
+

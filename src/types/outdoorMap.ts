@@ -1,3 +1,4 @@
+import type { RelationshipTargets } from './bondScores';
 import type { PlayerStatsSubset } from './activity';
 
 export interface OutdoorLocation {
@@ -6,7 +7,7 @@ export interface OutdoorLocation {
   icon: string;
   description: string;
   cost: number;
-  effects: { statChanges: PlayerStatsSubset; condition: number; money?: number };
+  effects: { relationshipTargets?: RelationshipTargets; statChanges: PlayerStatsSubset; condition: number; money?: number };
   mapX?: number;
   mapY?: number;
 }
@@ -45,9 +46,9 @@ const common: OutdoorLocation[] = [
     id: 'karaoke',
     name: '코인 노래방 & 오락실',
     icon: '🎤',
-    description: '친구들과 신나게 노래를 부르고 게임을 즐기며 스트레스를 해소합니다.',
+    description: '최민재와 신나게 노래를 부르고 게임을 즐기며 스트레스를 해소합니다.',
     cost: 8000,
-    effects: { statChanges: { relationshipFriends: 3 }, condition: 15 },
+    effects: { relationshipTargets: { neighbor: 3 }, statChanges: {}, condition: 15 },
   },
 ];
 
@@ -167,9 +168,9 @@ const landmarks: Record<string, OutdoorLocation[]> = {
       id: 'starfield',
       name: '복합 스포츠 엔터테인먼트존',
       icon: '🎳',
-      description: '다양한 실내 구기 종목과 가상 스포츠로 동체시력을 훈련합니다.',
+      description: '최민재와 다양한 실내 구기 종목과 가상 스포츠로 동체시력을 훈련합니다.',
       cost: 12000,
-      effects: { statChanges: { relationshipFriends: 2 }, condition: 15 },
+      effects: { relationshipTargets: { neighbor: 2 }, statChanges: {}, condition: 15 },
     },
   ],
   대구: [
@@ -464,3 +465,4 @@ export function getOutdoorLocations(region: string): OutdoorLocation[] {
     ...common,
   ]);
 }
+

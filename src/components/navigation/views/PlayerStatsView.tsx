@@ -1,3 +1,5 @@
+import { getNationalPercentile } from '../../../data/nationalRanking';
+import { getRelScore } from '../../../types/relationship';
 import { useState } from 'react';
 import type { Player } from '../../../types';
 import { EXTRA_RATINGS, normalizePlayer, PITCH_NAMES } from '../../../data/playerDevelopment';
@@ -31,17 +33,19 @@ function RatingGroup({
   rows,
   player,
   bonuses = {},
+  values = {},
 }: {
   title: string;
   rows: string[][];
   player: Player;
   bonuses?: Partial<Record<EquipmentStat, number>>;
+  values?: Record<string, number>;
 }) {
   return (
     <section className="rating-card">
       <h4>{title}</h4>
       {rows.map(([key, label, help]) => {
-        const rawValue = Number(player[key as keyof Player] ?? 0);
+        const rawValue = Number(values[key] ?? player[key as keyof Player] ?? 0);
         const bonus = bonuses[key as EquipmentStat] || 0;
         const totalValue = Math.min(100, rawValue + bonus);
         return (
@@ -64,6 +68,7 @@ function RatingGroup({
 
 export function PlayerStatsView({ player: raw, section }: { player: Player; onClose: () => void; section?: 'ratings' | 'pitches' | 'equipment' }) {
   const p = normalizePlayer(raw);
+  const nationalRank = getNationalPercentile(p);
   const [localTab, setTab] = useState<'ratings' | 'pitches' | 'equipment'>('ratings');
   const tab = section ?? localTab;
 
@@ -89,6 +94,7 @@ export function PlayerStatsView({ player: raw, section }: { player: Player; onCl
         <div>
           <h3>내 선수 · {p.name}</h3>
           <p>능력치 0–100 · 종합 {p.overall} · 잠재력 {p.potential}</p>
+          {tab === 'ratings' && <><span className="rel-score-badge" style={{color:nationalRank.percentile <= 10 ? '#fbbf24' : nationalRank.percentile <= 30 ? '#cbd5e1' : '#93c5fd'}}>🏅 {nationalRank.label} (동학년 기준)</span><p className="menu-view-sub">학년별 가정 분포로 계산한 추정치 · 실제 선수 순위 아님</p></>}
         </div>
         {!section && <div className="menu-view-tabs">
           {[
@@ -125,10 +131,11 @@ export function PlayerStatsView({ player: raw, section }: { player: Player; onCl
               <RatingGroup title="주루 · 수비" rows={FIELD} player={p} bonuses={totalBonuses} />
               <RatingGroup
                 title="학교생활"
+                values={{coachBond:getRelScore(p,'coach'),peerBond:getRelScore(p,'peer')}}
                 rows={[
                   ['academics', '학업', '교과 이해도'],
-                  ['relationshipCoach', '감독 신뢰', '기용과 지도 관계'],
-                  ['relationshipTeam', '팀 신뢰', '동료와의 유대'],
+                  ['coachBond', '감독 신뢰', '감독과의 개별 인연'],
+                  ['peerBond', '동기 인연', '이도현과의 개별 인연'],
                 ]}
                 player={p}
               />

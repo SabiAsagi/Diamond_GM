@@ -1,3 +1,4 @@
+import { getBondScore, type RelationshipTargets } from './bondScores';
 import type { GameDate } from './calendar';
 import type { Player } from './index';
 
@@ -15,6 +16,7 @@ export interface EventCutscene {
   conditions?: (player: Player, date: GameDate) => boolean;
   effect: (player: Player) => {
     statChanges: Partial<Player>;
+    relationshipTargets?: RelationshipTargets;
     logMessage: string;
   };
 }
@@ -55,9 +57,10 @@ export function shouldTriggerCutscene(
   // 3. 확률 롤 (조건에 따른 보정 가능)
   let effectiveChance = event.baseChance;
   // 감독 신뢰도가 높으면 코칭/멘토 이벤트 확률 증가
-  if (player.relationshipCoach && player.relationshipCoach > 70) {
+  if (getBondScore(player, 'coach') > 70) {
     effectiveChance += 0.05;
   }
 
   return Math.random() < effectiveChance;
 }
+

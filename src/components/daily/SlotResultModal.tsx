@@ -1,3 +1,4 @@
+import { BOND_NAMES, type BondId } from '../../types/bondScores';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useEffect } from 'react';
 import type { ActivityResult } from '../../types/activity';
@@ -34,10 +35,6 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
     condition: '컨디션',
     academics: '학업',
     fame: '인지도',
-    relationshipFriends: '교우',
-    relationshipTeam: '팀신뢰',
-    relationshipCoach: '감독',
-    relationshipFamily: '가족',
   };
 
   const statEntries = Object.entries(result.statChanges).filter(
@@ -101,6 +98,7 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
           {result.moneyDelta !== undefined && result.moneyDelta !== 0 && (
             <div className={`delta-item ${result.moneyDelta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">소지금</span><span className="delta-val">{result.moneyDelta > 0 ? '+' : ''}{result.moneyDelta.toLocaleString()}원</span></div>
           )}
+          {Object.entries(result.relationshipTargets ?? {}).map(([id,delta]) => <div key={id} className={`delta-item ${delta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">{BOND_NAMES[id as BondId]} 인연</span><span className="delta-val">{delta > 0 ? '+' : ''}{delta}</span></div>)}
           {statEntries.map(([key, val]) => {
             const numVal = val as number;
             const isPos = numVal > 0;
@@ -135,3 +133,4 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
     </div>
   );
 }
+

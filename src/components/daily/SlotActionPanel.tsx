@@ -1,3 +1,4 @@
+import { BOND_NAMES, type BondId } from '../../types/bondScores';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useState } from 'react';
 import type { TimeSlot, GameDate } from '../../types/calendar';
@@ -54,19 +55,19 @@ export function SlotActionPanel({
 
   // 2차 세부 행동 후보군 (카테고리 선택 시마다 가중치 기반 3~4개 랜덤 샘플링!)
   const [sampledSubActivities, setSampledSubActivities] = useState<ActivityOption[]>(() =>
-    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot) : []
+    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1) : []
   );
   const [selectedSubId, setSelectedSubId] = useState<string>(() => sampledSubActivities[0]?.id || '');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   // 슬롯 또는 등교일 상태가 변경되었을 때 상태 재설정
-  const [prevKey, setPrevKey] = useState(`${currentSlot}-${assignment.forced}-${schoolDay}`);
-  const currentKey = `${currentSlot}-${assignment.forced}-${schoolDay}`;
+  const [prevKey, setPrevKey] = useState(`${player.id}-${player.grade}-${currentSlot}-${assignment.forced}-${schoolDay}`);
+  const currentKey = `${player.id}-${player.grade}-${currentSlot}-${assignment.forced}-${schoolDay}`;
   if (prevKey !== currentKey) {
     setPrevKey(currentKey);
     setSelectedCategory(defaultCat);
     if (!assignment.forced) {
-      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot);
+      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1);
       setSampledSubActivities(sampled);
       setSelectedSubId(sampled[0]?.id || '');
     }
@@ -74,7 +75,7 @@ export function SlotActionPanel({
 
   const handleCategorySelect = (cat: DailyActivityCategory) => {
     setSelectedCategory(cat);
-    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot);
+    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot, player.grade ?? 1);
     setSampledSubActivities(sampled);
     setSelectedSubId(sampled[0]?.id || '');
   };
@@ -230,11 +231,11 @@ export function SlotActionPanel({
                   체력 {opt.staminaDelta > 0 ? `+${opt.staminaDelta}` : opt.staminaDelta}
                 </span>
 
+                {Object.entries(opt.relationshipTargets ?? {}).map(([id,delta]) => <span key={id} className="stat-chip">{BOND_NAMES[id as BondId]} 인연 {delta > 0 ? '+' : ''}{delta}</span>)}
                 {Object.entries(opt.statChanges).map(([k, v]) => (
                   <span key={k} className="stat-chip">
                     {EXTRA_RATINGS[k as keyof typeof EXTRA_RATINGS]?.[0]}
                     {k === 'velocity' && '구속'}
-                    {k === 'relationshipFamily' && '가족'}
                     {k === 'stuff' && '구위'}
                     {k === 'control' && '제구'}
                     {k === 'stamina' && '스태미너'}
@@ -245,10 +246,7 @@ export function SlotActionPanel({
                     {k === 'defense' && '수비'}
                     {k === 'academics' && '학업'}
                     {k === 'condition' && '컨디션'}
-                    {k === 'fame' && '인지도'}
-                    {k === 'relationshipFriends' && '교우'}
-                    {k === 'relationshipTeam' && '팀신뢰'}
-                    {k === 'relationshipCoach' && '감독'} {v! > 0 ? `+${v}` : v}
+                    {k === 'fame' && '인지도'} {v! > 0 ? `+${v}` : v}
                   </span>
                 ))}
               </div>
@@ -301,3 +299,4 @@ export function SlotActionPanel({
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import type { Player } from '../../../types';
-import { buildBondProfiles, scoreToStage, RELATIONSHIP_GROUP_LABELS } from '../../../types/relationship';
+import { buildBondProfiles, scoreToStage } from '../../../types/relationship';
 import { Users, Heart, ChevronDown } from 'lucide-react';
 
 export function RelationshipsView({ player }: { player: Player; onClose: () => void }) {
@@ -13,7 +13,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
           <div>
             <h3 className="menu-view-title">선수 인연 & 인간관계도</h3>
             <p className="menu-view-sub">
-              인물을 눌러 단계별 실제 효과를 확인하세요. 같은 그룹의 인연 점수는 함께 변합니다.
+              인물을 눌러 단계별 실제 효과를 확인하세요. 인연은 인물마다 따로 쌓입니다.
             </p>
           </div>
         </div>
@@ -23,7 +23,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
         <div className="relationships-grid">
           {profiles.map(p => {
             const stage = scoreToStage(p.score);
-            const effectStage = scoreToStage(p.sharedScore);
+            const effectStage = stage;
             const currentLabel = p.stageLabels[stage - 1] || '인연 형성 중';
 
             return (
@@ -46,6 +46,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
                   <strong>현재 {stage}단계 · {currentLabel}</strong>
                 </div>
 
+                {p.id === 'rival' && player.rivalProgress && <p className="rel-effect-desc">현재 종합 {player.rivalProgress.overall} · {player.overall === player.rivalProgress.overall ? '당신과 동률' : player.overall > player.rivalProgress.overall ? `당신이 ${player.overall-player.rivalProgress.overall} 앞섬` : `당신이 ${player.rivalProgress.overall-player.overall} 뒤짐`}</p>}
                 <span className="rel-detail-prompt">
                   {p.stageEffects.some(effect => effect.hasEffect) ? '단계별 효과 보기' : '효과 없음 · 단계별 상세 보기'}
                   <ChevronDown size={16} aria-hidden="true" />
@@ -59,12 +60,8 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
                 </summary>
 
                 <div className="rel-stage-details">
-                  <p className="rel-shared-score">
-                    공유 {RELATIONSHIP_GROUP_LABELS[p.scoreKey]}: <strong>{p.sharedScore}점 · {effectStage}단계</strong>
-                  </p>
-                  {p.scoreAdjustmentNote && <p className="rel-detail-note">{p.scoreAdjustmentNote}</p>}
                   <h4>단계별 추가 효과</h4>
-                  <p className="rel-detail-note">달성 여부는 공유 인연 점수 기준입니다. 이전 단계의 효과는 계속 유지됩니다.</p>
+                  <p className="rel-detail-note">달성 여부는 이 인물의 인연 점수 기준입니다. 이전 단계의 효과는 계속 유지됩니다.</p>
                   <ol className="rel-stage-list">
                     {p.stageEffects.map(effect => {
                       const reached = effectStage >= effect.stage;
@@ -77,7 +74,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
                       </li>;
                     })}
                   </ol>
-                  {p.scoreKey === 'relationshipTeam' && <p className="rel-detail-note">팀 인연 보너스는 이 점수를 공유하는 인물 전체에 대해 한 번만 적용되며, 인물 수만큼 중복되지 않습니다.</p>}
+                  {p.id === 'peer' && <p className="rel-detail-note">이도현과의 인연 5단계에서 훈련 효율 +10%를 얻습니다. 감독의 훈련 효과와 합산됩니다.</p>}
                   {p.id === 'coach' && <p className="rel-detail-note">%p는 승리 확률에 더하는 값입니다. 최종 승률에는 10~90% 제한이 적용됩니다.</p>}
                   {p.stageEffects.some(effect => effect.hasEffect) && <p className="rel-detail-note">훈련 효과는 능력치 증가량에 배율을 적용한 뒤 반올림합니다. 작은 증가량은 보정 전후가 같을 수 있습니다.</p>}
                   <p className="rel-detail-note">대화·데이트 이벤트는 활동·점수·학년·컨디션·쿨다운 등 별도 조건으로 발생하며, 단계 달성만으로 보장되지 않습니다.</p>

@@ -1,3 +1,5 @@
+import { initializeRival } from '../../data/rival';
+import { INITIAL_RELATIONSHIPS } from '../../types/bondScores';
 import { AppearanceEditor } from '../../components/PlayerAppearance';
 import { DEFAULT_APPEARANCE, normalizeAppearance, normalizePlayer, overallRating } from '../../data/playerDevelopment';
 import { useState, useEffect, useRef } from 'react';
@@ -133,10 +135,7 @@ export default function PlayerCreation() {
       
       condition: 100,
       academics: 50,
-      relationshipFamily: 20,
-      relationshipFriends: 15,
-      relationshipTeam: 10,
-      relationshipCoach: 10,
+      relationships: {...INITIAL_RELATIONSHIPS},
       money: 50000,
       inventory: [],
       equippedItems: {},
@@ -146,6 +145,7 @@ export default function PlayerCreation() {
 
     const normalized = normalizePlayer(newPlayer);
     normalized.overall=overallRating(normalized);
+    normalized.rivalProgress = initializeRival(normalized,{year:2026,month:3});
     const id = await db.players.add(normalized);
     navigate(`/development/interview/${id}`);
   };
@@ -502,7 +502,7 @@ export default function PlayerCreation() {
                   <button className={`select-btn ${gender === 'female' ? 'active' : ''}`} onClick={() => setGender('female')}>여자 선수</button>
                 </div>
                 <small style={{ color: 'var(--text-muted)' }}>
-                  여자 선수는 희소한 도전 경로로 시작 능력치가 조금 낮지만, 동일한 훈련·대회·진출 기회를 가지며 전용 인연·로맨스 스토리가 열립니다.
+                  여자 선수는 희소한 도전 경로로 시작 능력치가 조금 낮지만, 동일한 훈련·대회·진출 기회를 가지며 성별에 관계없이 같은 로맨스 대상을 만날 수 있습니다.
                 </small>
               </div>
               <div className="form-group">

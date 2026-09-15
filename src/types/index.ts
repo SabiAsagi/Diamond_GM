@@ -87,10 +87,9 @@ export interface Player {
   // Development Event Stats
   condition: number; // 0-100 (멘탈/컨디션)
   academics: number; // 0-100 (학업 성취도)
-  relationshipFamily: number;
-  relationshipFriends: number;
-  relationshipTeam: number;
-  relationshipCoach: number;
+  rivalProgress?: import('../data/rival').RivalProgress;
+  pendingRivalReport?: import('../data/rival').RivalReport;
+  relationships: Partial<import('./bondScores').BondScores>; // 인물별 영구 저장 점수
 
   // Career Story & Progression
   traits?: string[]; // 획득한 고유 특성 (예: '파이어볼러', '거포 본능' 등)

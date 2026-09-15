@@ -14,9 +14,8 @@ export function resolveAcademicEvent(
   switch (event.type) {
     case 'entrance_ceremony': {
       return {
+        relationshipTargets: { peer: 5, deskmate: 5 },
         statChanges: {
-          relationshipTeam: 5,
-          relationshipFriends: 5,
           condition: 15,
         },
         staminaDelta: -5,
@@ -59,10 +58,9 @@ export function resolveAcademicEvent(
 
     case 'sports_day': {
       return {
+        relationshipTargets: { deskmate: 8, pe: 5 },
         statChanges: {
           speed: 1,
-          relationshipFriends: 8,
-          relationshipTeam: 5,
           condition: 15,
         },
         staminaDelta: -15,
@@ -73,9 +71,8 @@ export function resolveAcademicEvent(
 
     case 'field_trip': {
       return {
+        relationshipTargets: { deskmate: 10, peer: 6 },
         statChanges: {
-          relationshipFriends: 10,
-          relationshipTeam: 6,
           condition: 25,
         },
         staminaDelta: 10,
@@ -106,3 +103,4 @@ export function resolveAcademicEvent(
     }
   }
 }
+

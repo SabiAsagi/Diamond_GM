@@ -1,3 +1,4 @@
+import { normalizeRelationships } from '../types/bondScores';
 import type { Player } from '../types';
 import { getEffectiveStat } from '../types/equipment';
 
@@ -40,7 +41,7 @@ export const EXTRA_RATINGS = {
 } as const;
 export type ExtraRating = keyof typeof EXTRA_RATINGS;
 export function normalizePlayer(p: Player): Player {
- return { ...p, gapPower:p.gapPower ?? p.power, avoidK:p.avoidK ?? p.contact, movement:p.movement ?? p.stuff, holdRunners:p.holdRunners ?? p.control, stealing:p.stealing ?? p.speed, baserunning:p.baserunning ?? p.speed, fieldingRange:p.fieldingRange ?? p.defense, fieldingError:p.fieldingError ?? p.defense, arm:p.arm ?? p.defense, velocity:p.velocity ?? 125, appearance:normalizeAppearance(p.appearance as Appearance,p.gender), pitches:p.pitches ?? (p.position === 'P' || p.position === 'TwoWay' ? [{type:'fastball',rating:p.stuff,potential:p.potential,xp:0},{type:'slider',rating:Math.max(10,p.stuff-5),potential:p.potential,xp:0}] : []) };
+ return { ...normalizeRelationships(p), gapPower:p.gapPower ?? p.power, avoidK:p.avoidK ?? p.contact, movement:p.movement ?? p.stuff, holdRunners:p.holdRunners ?? p.control, stealing:p.stealing ?? p.speed, baserunning:p.baserunning ?? p.speed, fieldingRange:p.fieldingRange ?? p.defense, fieldingError:p.fieldingError ?? p.defense, arm:p.arm ?? p.defense, velocity:p.velocity ?? 125, appearance:normalizeAppearance(p.appearance as Appearance,p.gender), pitches:p.pitches ?? (p.position === 'P' || p.position === 'TwoWay' ? [{type:'fastball',rating:p.stuff,potential:p.potential,xp:0},{type:'slider',rating:Math.max(10,p.stuff-5),potential:p.potential,xp:0}] : []) };
 }
 export function pitchingRating(p: Player) {
  const n=normalizePlayer(p);
@@ -77,3 +78,4 @@ export function trainPitch(p: Player, type: PitchType, xp: number): PitchRating[
  if(pitch.rating>=pitch.potential) pitch.xp=0;
  return pitches;
 }
+

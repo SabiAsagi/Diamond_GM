@@ -1,3 +1,4 @@
+import { GAME_VERSION } from '../version';
 import { Trophy, Shield, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../index.css';
@@ -10,6 +11,7 @@ export default function TitleScreen() {
       <div className="title-content animate-fade-in">
         <Trophy size={64} color="var(--accent)" className="title-icon" />
         <h1 className="title-text">Diamond GM</h1>
+        <p>버전 {GAME_VERSION}</p>
         <p className="title-subtitle">하나의 세계관, 두 가지의 전설</p>
 
         <div className="mode-selection-container">
@@ -37,3 +39,4 @@ export default function TitleScreen() {
     </div>
   );
 }
+

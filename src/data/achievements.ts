@@ -1,3 +1,4 @@
+import { getBondScore, getHighestBondScore, FRIEND_BOND_IDS } from '../types/bondScores';
 import type { Player } from '../types';
 import { scoreToStage } from '../types/relationship';
 import { MAJOR_TOURNAMENT_TEMPLATES } from '../types/tournament';
@@ -16,9 +17,9 @@ export function buildAchievements(p: Player): Achievement[] {
     ['national_prospect', '전국구 유망주', '인지도 70 이상', (p.fame ?? 0) >= 70, '👑'],
     ['academic_excellence', '학업 우수상', '학업 90 이상', p.academics >= 90, '🎓'],
     ['scholar_athlete', '문무겸비', '학업 80과 종합 60 동시 달성', p.academics >= 80 && p.overall >= 60, '🏅'],
-    ['coach_trust', '감독의 신임', '감독 인연 5단계', scoreToStage(p.relationshipCoach ?? 0) === 5, '🧢'],
-    ['popular', '인기만점', '친구 인연 5단계', scoreToStage(p.relationshipFriends ?? 0) === 5, '🤝'],
-    ['team_bond', '팀의 중심', '팀 인연 5단계', scoreToStage(p.relationshipTeam ?? 0) === 5, '🫂'],
+    ['coach_trust', '감독의 신임', '감독 인연 5단계', scoreToStage(getBondScore(p,'coach')) === 5, '🧢'],
+    ['popular', '인기만점', '친구·담임 중 한 명과 인연 5단계', scoreToStage(getHighestBondScore(p,FRIEND_BOND_IDS)) === 5, '🤝'],
+    ['team_bond', '동료의 신뢰', '동기 이도현 인연 5단계', scoreToStage(getBondScore(p,'peer')) === 5, '🫂'],
     ['potential', '잠재력 만개', '종합이 잠재력의 90% 이상', p.potential > 0 && p.overall >= p.potential * .9, '✨'],
     ['pitch_master', '구종 마스터', '구종 하나가 해당 구종의 잠재력 상한에 도달', pitcher && !!p.pitches?.some(x => x.potential > 0 && x.rating >= x.potential), '🎯'],
     ['pitch_repertoire', '다채로운 레퍼토리', '숙련도 1 이상 구종 3개 보유', pitcher && (p.pitches?.filter(x => x.rating > 0).length ?? 0) >= 3, '🌀'],
