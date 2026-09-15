@@ -4,7 +4,7 @@ import type { ScheduledMatch } from '../types/tournament';
 import type { Player } from '../types';
 import type { HighSchoolData } from '../types/highSchool';
 import type { ActivityResult } from '../types/activity';
-import { scoreToStage } from '../types/relationship';
+import { getCoachWinProbabilityBonus } from '../types/relationship';
 
 /**
  * 경기 세부 시뮬레이션(타석/투구 확률 계산) 이전 단계의 임시 더미 경기 결과 생성 엔진.
@@ -22,8 +22,7 @@ export function resolveMatchPlaceholder(
   player=normalizePlayer(player);
   const baseSkill=isPitcher?pitchingRating(player):isTwoWay?(pitchingRating(player)+battingRating(player))/2:battingRating(player);
 
-  const coachStage = scoreToStage(player.relationshipCoach || 0);
-  const coachTrustBonus = coachStage >= 4 ? 0.04 : 0;
+  const coachTrustBonus = getCoachWinProbabilityBonus(player);
   const isWin = Math.random() < Math.min(.9,Math.max(.1,0.5 + (baseSkill - 20) * 0.005 + coachTrustBonus));
 
   let myScore: number;
@@ -72,7 +71,7 @@ export function resolveMatchPlaceholder(
     eyeGain = 1;
   }
 
-  const trustText = coachTrustBonus ? ' · 감독 신뢰로 선발 기회 우대' : '';
+  const trustText = coachTrustBonus ? ` · 감독 신뢰로 승리 확률 보정 +${Math.round(coachTrustBonus * 100)}%p` : '';
   const logMessage = `🏆 [${match.tournamentName} ${match.round}] ${scoreText} (${winStatus})\n⚾ ${personalPerformance} | 인지도 +${fameGain}, 실전 감각 대폭 상승!${trustText}`;
 
   return {

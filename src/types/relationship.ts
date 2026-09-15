@@ -5,15 +5,78 @@ export const STAGE_LABELS = ['', '아는 사이', '친한 사이', '가까운 �
 export const scoreToStage = (score: number): RelationshipStage =>
   score >= 90 ? 5 : score >= 75 ? 4 : score >= 55 ? 3 : score >= 35 ? 2 : 1;
 
-export function getTrainingEfficiencyMultiplier(player: Player): number {
-  const coachStage = scoreToStage(player.relationshipCoach || 0);
-  const teamStage = scoreToStage(player.relationshipTeam || 0);
-  let multiplier = 1;
-  if (coachStage >= 2) multiplier += 0.03;
-  if (coachStage >= 5) multiplier += 0.05;
-  if (teamStage >= 5) multiplier += 0.10;
-  return Math.round(multiplier * 100) / 100;
+export type RelationshipScoreKey = 'relationshipCoach' | 'relationshipTeam' | 'relationshipFriends' | 'relationshipFamily';
+export const RELATIONSHIP_GROUP_LABELS: Record<RelationshipScoreKey, string> = {
+  relationshipCoach: '감독 인연', relationshipTeam: '팀 인연',
+  relationshipFriends: '친구 인연', relationshipFamily: '가족 인연',
+};
+
+interface BondEffectRule {
+  stage: RelationshipStage;
+  kind: 'training' | 'winProbability';
+  amount: number;
 }
+
+// 배율/단계를 조정할 때는 이 정의를 수정한다. 계산과 stageEffects 문구가 함께 갱신된다.
+// 팀 효과는 인물별로 합산하지 않고 공유 relationshipTeam에 대해 한 번만 적용한다.
+const BOND_EFFECT_RULES: Record<'coach' | 'team', readonly BondEffectRule[]> = {
+  coach: [
+    { stage: 2, kind: 'training', amount: 0.03 },
+    { stage: 4, kind: 'winProbability', amount: 0.04 },
+    { stage: 5, kind: 'training', amount: 0.05 },
+  ],
+  team: [{ stage: 5, kind: 'training', amount: 0.10 }],
+};
+
+export interface StageEffect {
+  stage: RelationshipStage;
+  description: string;
+  hasEffect: boolean;
+}
+
+function effectTotal(group: 'coach' | 'team', kind: BondEffectRule['kind'], score: number): number {
+  const stage = scoreToStage(score);
+  return BOND_EFFECT_RULES[group]
+    .filter(effect => effect.kind === kind && effect.stage <= stage)
+    .reduce((total, effect) => total + effect.amount, 0);
+}
+
+export function getTrainingEfficiencyMultiplier(player: Player): number {
+  const bonus = effectTotal('coach', 'training', player.relationshipCoach ?? 0)
+    + effectTotal('team', 'training', player.relationshipTeam ?? 0);
+  return Math.round((1 + bonus) * 100) / 100;
+}
+
+export function getCoachWinProbabilityBonus(player: Player): number {
+  return effectTotal('coach', 'winProbability', player.relationshipCoach ?? 0);
+}
+
+function buildStageEffects(group?: 'coach' | 'team'): StageEffect[] {
+  const rules = group ? BOND_EFFECT_RULES[group] : [];
+  let trainingTotal = 0;
+  return ([1, 2, 3, 4, 5] as const).map(stage => {
+    const effects = rules.filter(effect => effect.stage === stage);
+    const descriptions = effects.map(effect => {
+      const percent = Math.round(effect.amount * 100);
+      if (effect.kind === 'winProbability') return `경기 승리 확률 보정 +${percent}%p`;
+      const previous = trainingTotal;
+      trainingTotal += effect.amount;
+      return previous > 0
+        ? `훈련 효율 추가 +${percent}% (누적 +${Math.round(trainingTotal * 100)}%)`
+        : `훈련 효율 +${percent}%${group === 'team' ? ' (팀 공통 · 1회 적용)' : ''}`;
+    });
+    return { stage, description: descriptions.join(' · ') || '효과 없음', hasEffect: effects.length > 0 };
+  });
+}
+
+const PROFILE_SCORE_KEYS: Record<string, RelationshipScoreKey> = {
+  coach: 'relationshipCoach', coach2: 'relationshipCoach',
+  pe: 'relationshipTeam', senior: 'relationshipTeam', peer: 'relationshipTeam',
+  rival: 'relationshipTeam', junior: 'relationshipTeam',
+  teacher: 'relationshipFriends', childhood: 'relationshipFriends',
+  neighbor: 'relationshipFriends', deskmate: 'relationshipFriends',
+  mother: 'relationshipFamily', father: 'relationshipFamily',
+};
 
 export interface BondProfile {
   id: string;
@@ -22,19 +85,24 @@ export interface BondProfile {
   score: number;
   icon: string;
   note: string;
+  stageEffects: StageEffect[];
+  scoreKey: RelationshipScoreKey;
+  sharedScore: number;
+  scoreAdjustmentNote?: string;
   stageLabels: [string, string, string, string, string];
   romanceable?: boolean;
 }
 
 export function buildBondProfiles(player: Player): BondProfile[] {
-  const team = player.relationshipTeam || 10;
-  const friends = player.relationshipFriends || 15;
-  const coach = player.relationshipCoach || 10;
-  const family = player.relationshipFamily || 20;
+  const team = player.relationshipTeam ?? 0;
+  const friends = player.relationshipFriends ?? 0;
+  const coach = player.relationshipCoach ?? 0;
+  const family = player.relationshipFamily ?? 0;
   const grade = player.grade || 1;
   const isFemale = player.gender === 'female';
 
-  return [
+  // note는 기존 참조와의 호환을 위해 보존한다. 실제 효과 표시는 stageEffects를 사용한다.
+  const profiles: Omit<BondProfile, 'stageEffects' | 'scoreKey' | 'sharedScore'>[] = [
     {
       id: 'coach',
       name: '야구부 감독',
@@ -98,7 +166,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
                   '존경과 각별한 유대',
                   '평생의 멘토이자 벗',
                 ],
-          } as BondProfile,
+          } as Omit<BondProfile, 'stageEffects' | 'scoreKey' | 'sharedScore'>,
         ]
       : []),
     {
@@ -146,7 +214,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
             icon: '🌱',
             note: '조언과 멘토링 이벤트가 열립니다.',
             stageLabels: ['어려워하는 선배', '따르고 싶은 선배', '닮고 싶은 롤모델', '각별한 선후배', '동경의 대상'],
-          } as BondProfile,
+          } as Omit<BondProfile, 'stageEffects' | 'scoreKey' | 'sharedScore'>,
         ]
       : []),
     {
@@ -229,4 +297,19 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       stageLabels: ['무뚝뚝한 아빠', '관심을 보이는 아빠', '현실적 조언자', '선수로서 인정한 아빠', '가장 든든한 버팀목'],
     },
   ];
+  return profiles.map(profile => {
+    const scoreKey = PROFILE_SCORE_KEYS[profile.id];
+    const group = profile.id === 'coach' ? 'coach' : scoreKey === 'relationshipTeam' ? 'team' : undefined;
+    return {
+      ...profile,
+      scoreKey,
+      sharedScore: player[scoreKey] ?? 0,
+      stageEffects: buildStageEffects(group),
+      scoreAdjustmentNote: profile.id === 'rival'
+        ? '인물 표시 점수는 팀 인연에서 5점 차감한 값입니다(최소 5점). 효과 달성은 공유 팀 인연을 기준으로 합니다.'
+        : profile.id === 'coach2'
+          ? '인물 표시 점수는 감독 인연에 2점을 더한 값입니다(최대 100점). 기술 코치의 별도 단계 효과는 없습니다.'
+          : undefined,
+    };
+  });
 }

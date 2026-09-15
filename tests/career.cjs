@@ -47,6 +47,75 @@ test('store saves pitch growth, rejects wrong slots, resumes draws and pending e
 });
 process.on('exit',()=>fs.rmSync(dir,{recursive:true,force:true}));
 
+test('인연 단계 경계에서 기존 훈련 배율과 경기 보정이 유지된다', () => {
+  const {scoreToStage,getTrainingEfficiencyMultiplier,getCoachWinProbabilityBonus}=require(path.join(dir,'types/relationship.js'));
+  const p=player(); p.relationshipTeam=0;
+  for (const [score,stage,multiplier,winBonus] of [
+    [0,1,1,0],[34,1,1,0],[35,2,1.03,0],[54,2,1.03,0],
+    [55,3,1.03,0],[74,3,1.03,0],[75,4,1.03,.04],
+    [89,4,1.03,.04],[90,5,1.08,.04],[100,5,1.08,.04],
+  ]) {
+    p.relationshipCoach=score;
+    assert.equal(scoreToStage(score),stage);
+    assert.equal(getTrainingEfficiencyMultiplier(p),multiplier);
+    assert.equal(getCoachWinProbabilityBonus(p),winBonus);
+  }
+  p.relationshipCoach=90; p.relationshipTeam=89;
+  assert.equal(getTrainingEfficiencyMultiplier(p),1.08);
+  p.relationshipTeam=90;
+  assert.equal(getTrainingEfficiencyMultiplier(p),1.18);
+});
+
+test('모든 인물의 5단계 효과와 공유 점수·표시 보정·기존 로맨스 대상이 정확하다', () => {
+  const {buildBondProfiles,scoreToStage,getTrainingEfficiencyMultiplier}=require(path.join(dir,'types/relationship.js'));
+  const p={...player(),grade:2,relationshipCoach:90,relationshipTeam:90,relationshipFriends:100,relationshipFamily:100};
+  const profiles=buildBondProfiles(p);
+  assert.equal(profiles.length,13);
+  for(const profile of profiles) assert.deepEqual(profile.stageEffects.map(e=>e.stage),[1,2,3,4,5]);
+  assert.deepEqual(profiles.find(p=>p.id==='coach').stageEffects.map(e=>e.description),[
+    '효과 없음','훈련 효율 +3%','효과 없음','경기 승리 확률 보정 +4%p','훈련 효율 추가 +5% (누적 +8%)',
+  ]);
+  for(const id of ['coach2','teacher','childhood','neighbor','deskmate','mother','father']) {
+    assert.ok(profiles.find(p=>p.id===id).stageEffects.every(e=>!e.hasEffect&&e.description==='효과 없음'),id);
+  }
+  for(const id of ['pe','senior','peer','rival','junior']) {
+    const bond=profiles.find(p=>p.id===id);
+    assert.equal(bond.scoreKey,'relationshipTeam');
+    assert.equal(bond.sharedScore,90);
+    assert.deepEqual(bond.stageEffects.filter(e=>e.hasEffect).map(e=>e.description),['훈련 효율 +10% (팀 공통 · 1회 적용)']);
+  }
+  const rival=profiles.find(p=>p.id==='rival');
+  assert.equal(scoreToStage(rival.score),4);
+  assert.equal(scoreToStage(rival.sharedScore),5);
+  assert.equal(getTrainingEfficiencyMultiplier(p),1.18); // 5명에 대해 중복 가산하지 않는다.
+  for(const gender of ['male','female']) {
+    const bonds=buildBondProfiles({...p,gender});
+    assert.deepEqual(bonds.filter(b=>b.romanceable).map(b=>b.id).sort(),gender==='male'?['childhood','deskmate']:['peer','senior']);
+  }
+  const zero=buildBondProfiles({...p,relationshipCoach:0,relationshipTeam:0,relationshipFriends:0,relationshipFamily:0});
+  assert.ok(zero.every(b=>b.sharedScore===0));
+  assert.equal(zero.find(b=>b.id==='coach').score,0);
+  assert.equal(zero.find(b=>b.id==='rival').score,5);
+  assert.ok(buildBondProfiles({...p,grade:1}).every(b=>b.id!=='junior'));
+  assert.ok(buildBondProfiles({...p,grade:3}).every(b=>b.id!=='senior'));
+});
+
+test('실제 경기 판정은 감독 인연 75점부터 표시된 4%p 보정을 사용한다', () => {
+  const {resolveMatchPlaceholder}=require(path.join(dir,'store/matchResolver.js'));
+  const {battingRating}=require(path.join(dir,'data/playerDevelopment.js'));
+  const p={...player(),position:'SS',relationshipCoach:74};
+  const match=generateSeasonMatches(2026,school,HIGH_SCHOOLS_DATA).find(m=>m.isPlayerTeamMatch);
+  const sample=.5+(battingRating(p)-20)*.005+.02;
+  const originalRandom=Math.random;
+  try {
+    Math.random=()=>sample;
+    assert.equal(resolveMatchPlaceholder(match,p,school).matchOutcome.won,false);
+    const result=resolveMatchPlaceholder(match,{...p,relationshipCoach:75},school);
+    assert.equal(result.matchOutcome.won,true);
+    assert.match(result.logMessage,/승리 확률 보정 \+4%p/);
+  } finally { Math.random=originalRandom; }
+});
+
 
 test('v4 awards use real records and stages, and remain earned after reload or season rollover', async () => {
   const {buildAchievements,buildTournamentTrophies,captureAchievements}=require(path.join(dir,'data/achievements.js'));
