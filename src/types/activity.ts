@@ -398,7 +398,7 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
     {id:'rel_deskmate_notes',label:'짝과 필기 공유',category:'relationship',icon:'📝',description:'윤하린과 서로의 필기를 비교하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:3,statChanges:{academics:1},relationshipTargets:{deskmate:4},targetPosition:'ALL',allowedSlots:['morning']},
     {id:'rel_neighbor_hangout',label:'동네 친구와 놀기',category:'relationship',icon:'🎮',description:'최민재와 오랜만에 만나 편하게 시간을 보냅니다.',staminaDelta:3,mentalDelta:6,statChanges:{condition:4},relationshipTargets:{neighbor:4},targetPosition:'ALL',allowedSlots:['night']},
     ...(Object.keys(BOND_NAMES) as BondId[]).map((id): ActivityOption => ({
-      id: `bond_talk_${id}`, label: `${BOND_NAMES[id]}와 대화`, category: 'relationship', weight: 2,
+      id: `bond_talk_${id}`, label: `${BOND_NAMES[id]} · 대화`, category: 'relationship', weight: 2,
       description: `${BOND_NAMES[id]}의 근황과 고민을 듣고 서로의 이야기를 나눕니다.`, icon: '💬',
       staminaDelta: -3, mentalDelta: 5, statChanges: {}, relationshipTargets: {[id]:6},
       targetPosition: 'ALL', minGrade: id === 'junior' ? 2 : undefined,

@@ -16,7 +16,7 @@ export const PORTRAIT_PRESETS = {
  female: [
   {id:'female_short',label:'스포티 숏',src:'assets/portraits/female-short.png'},
   {id:'female_bob',label:'보브 단발',src:'assets/portraits/female-bob.png'},
-  {id:'female_long',label:'레이어드 롱',src:'assets/portraits/female-long.png'},
+  {id:'female_long',label:'레이어드 롱',src:'assets/portraits/female-long-v17.webp'},
   {id:'female_ponytail',label:'하이 포니테일',src:'assets/portraits/female-ponytail.png'},
  ],
 } as const;

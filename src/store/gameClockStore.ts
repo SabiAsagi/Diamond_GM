@@ -1,5 +1,6 @@
+import { getBallparkVisit } from '../data/proSchedule';
 import { initializeRival, updateMonthlyRival } from '../data/rival';
-import { applyBondChanges, formatBondChanges, actualBondChanges, type RelationshipTargets } from '../types/bondScores';
+import { applyBondChanges, formatBondChanges, actualBondChanges } from '../types/bondScores';
 import { captureAchievements } from '../data/achievements';
 import { normalizePlayer, EXTRA_RATINGS, trainPitch, overallRating } from '../data/playerDevelopment';
 import { create } from 'zustand';
@@ -51,8 +52,7 @@ export interface GameClockState {
   clearLastActionResult: () => void;
   dismissRivalReport: () => Promise<void>;
   activeCutscene: EventCutscene | null;
-  clearActiveCutscene: () => void;
-  resolveCutscene: (choice: 'learn' | 'reflect') => Promise<void>;
+  resolveCutscene: (choice: string) => Promise<void>;
   saveAppearance: (appearance: NonNullable<Player['appearance']>) => Promise<void>;
   revealTournament: (id: string) => Promise<void>;
   cutsceneHistory: CutsceneTriggerHistory;
@@ -100,7 +100,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     finally {set({isLoading:false});}
   },
   activeCutscene: null,
-  clearActiveCutscene: () => { void get().resolveCutscene('reflect'); },
   cutsceneHistory: {},
 
   initClock: async (player: Player) => {
@@ -448,7 +447,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const {player,activeCutscene,isLoading}=get(); if(!player||!activeCutscene||isLoading)return;
     set({isLoading:true});
     try {
-      const effect: {statChanges: Partial<Player>; relationshipTargets?: RelationshipTargets; logMessage:string}=choice==='learn'?activeCutscene.effect(player):{statChanges:{condition:Math.min(100,player.condition+8)},logMessage:'서두르지 않고 마음을 정리했습니다. 컨디션 +8'};
+      const selected = activeCutscene.choices?.find(option => option.id === choice);
+      if (activeCutscene.choices?.length && !selected) throw new Error('유효하지 않은 이벤트 선택');
+      if (!activeCutscene.choices?.length && choice !== 'learn') throw new Error('대화를 끝까지 진행해 주세요');
+      const effect = (selected?.effect ?? activeCutscene.effect)(player);
       const updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
       const relationshipTargets = actualBondChanges(player,updated);
       if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
@@ -457,7 +459,8 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       }
       updated.overall=overallRating(updated);
       captureAchievements(updated); await db.players.put(updated);
-      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:{},relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
+      const changes = Object.fromEntries(Object.keys(effect.statChanges).filter(key=>typeof player[key as keyof Player]==='number' && typeof updated[key as keyof Player]==='number').map(key=>[key,Number(updated[key as keyof Player])-Number(player[key as keyof Player])]));
+      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:changes,relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
     }finally{set({isLoading:false});}
   },
   saveAppearance: async (appearance) => {
@@ -506,6 +509,8 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   visitOutdoorLocation: async (location) => {
     const { player, clock } = get();
     if (!player || (player.money || 0) < location.cost) return false;
+    const game = getBallparkVisit(location.id,clock.date,clock.currentSlot);
+    if (game && !game.available) return false;
     if (isSchoolDay(clock.date) && clock.currentSlot !== 'night') return false;
     const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
     if (player.lastOutdoorVisitDate === todayDateStr) return false;

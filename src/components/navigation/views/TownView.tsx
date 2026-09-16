@@ -1,3 +1,4 @@
+import { getBallparkVisit } from '../../../data/proSchedule';
 import { useState } from 'react';
 import type { Player } from '../../../types';
 import {
@@ -29,6 +30,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
   const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
   const isVisitedToday = player.lastOutdoorVisitDate === todayDateStr;
   const outingAllowedNow = !isSchoolDay(clock.date) || clock.currentSlot === 'night';
+  const ballpark = selectedLocation ? getBallparkVisit(selectedLocation.id,clock.date,clock.currentSlot) : null;
   const relevantSlots = getRelevantSlots(player.position);
   const activeCategory = relevantSlots.includes(shopCategory) ? shopCategory : relevantSlots[0];
   const tierConfig = SHOP_TIERS.find(s => s.id === shopTier)!;
@@ -63,7 +65,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
               <path d="M0 82 Q28 75 55 88 T100 78" fill="none" stroke="#256b86" strokeWidth="7" opacity=".8"/>
             </svg>
             {locations.map(loc => <button key={loc.id} className={`map-building ${selectedLocation?.id===loc.id?'active':''}`} style={{left:`${loc.mapX}%`,top:`${loc.mapY}%`}} onClick={()=>setSelectedLocation(loc)} aria-label={loc.name}><span>{loc.icon}</span><small>{loc.name.split(' ')[0]}</small></button>)}
-            {selectedLocation && <div className="map-location-card glass-panel"><button className="map-card-close" onClick={()=>setSelectedLocation(null)}>×</button><strong>{selectedLocation.icon} {selectedLocation.name}</strong><p>{selectedLocation.description}</p><button className="btn btn-primary btn-sm" disabled={selectedLocation.id!=='goods'&&(!outingAllowedNow||isVisitedToday)} onClick={()=>selectedLocation.id==='goods'?setTab('shop'):act(()=>onVisit(selectedLocation),`${selectedLocation.name} 활동을 마쳤습니다.`)}>{selectedLocation.id==='goods'?'상점 둘러보기':selectedLocation.cost?`${selectedLocation.cost.toLocaleString()}원 · 방문`:'방문'}</button></div>}
+            {selectedLocation && <div className="map-location-card glass-panel"><button className="map-card-close" onClick={()=>setSelectedLocation(null)}>×</button><strong>{selectedLocation.icon} {selectedLocation.name}</strong><p>{selectedLocation.description}</p>{ballpark && <div className="ballpark-schedule"><strong>{ballpark.reason}</strong><p>{ballpark.nextText}</p><small>{ballpark.source}</small></div>}<button className="btn btn-primary btn-sm" disabled={selectedLocation.id!=='goods'&&(!outingAllowedNow||isVisitedToday||(ballpark!==null&&!ballpark.available))} onClick={()=>selectedLocation.id==='goods'?setTab('shop'):act(()=>onVisit(selectedLocation),`${selectedLocation.name} 활동을 마쳤습니다.`)}>{selectedLocation.id==='goods'?'상점 둘러보기':selectedLocation.cost?`${selectedLocation.cost.toLocaleString()}원 · 방문`:'방문'}</button></div>}
           </div>
         ) : (
           <div className="equipment-shop">
@@ -79,3 +81,4 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
     </div>
   );
 }
+

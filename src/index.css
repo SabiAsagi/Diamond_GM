@@ -4713,3 +4713,64 @@ details.rel-card { display: block; min-width: 0; }
 .people-unified-wrapper > .btn {
   flex-shrink: 0;
 }
+
+/* 1.7: mobile-first home. The four choices and action remain in one viewport. */
+.position-choice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.position-choice-grid .select-btn{min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;padding:12px 4px;white-space:nowrap;text-align:center}
+.position-choice-grid small{font-size:11px;opacity:.65}
+.onepage-main-stage{margin-bottom:0}
+.onepage-viewport-container>div:has(>.app-main-nav){flex:none}
+.onepage-viewport-container .app-main-nav{position:static;transform:none;width:100%;max-width:none;margin:6px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:4px 0 max(4px,env(safe-area-inset-bottom));min-height:50px;border-radius:12px 12px 0 0}
+.home-next-event{display:flex;align-items:center;gap:8px;padding:10px;font-size:12px;min-width:0}
+.home-next-event>span{color:#94a3b8;flex:none}.home-next-event strong{flex:1;min-width:0}.home-next-event b{color:#7dd3fc;white-space:nowrap}
+.home-center-stage>.free-slot-panel{flex:1;min-height:0;display:flex;flex-direction:column;padding:14px;margin:0;overflow:visible;gap:10px}
+.free-slot-panel>.slot-panel-header,.free-slot-panel>.category-selection-row,.free-slot-panel>.training-focus,.free-slot-panel>.slot-action-footer{margin:0;flex:none}
+.free-slot-panel>.sub-activities-grid{flex:1;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;align-content:stretch;overflow:visible;padding:0;margin:0;gap:10px;scrollbar-gutter:auto}
+.free-slot-panel .sub-activity-card{font-family:inherit;text-align:left;min-width:0;min-height:0;color:inherit;padding:12px;gap:8px;justify-content:center}
+.free-slot-panel .card-desc{flex:none}.free-slot-panel .preview-summary-text{display:none}
+.free-slot-panel .slot-panel-subtitle{display:none}.free-slot-panel .advance-slot-btn{width:100%;min-height:44px;padding:9px}
+.free-slot-panel .slot-action-footer{padding-top:8px}.free-slot-panel .training-focus{font-size:12px;gap:8px;flex-wrap:nowrap}.training-focus select{min-width:0;flex:1;padding:6px}
+@media(max-width:768px){
+ .onepage-viewport-container{padding:6px 8px 0;height:100dvh;max-height:100dvh}
+ .onepage-viewport-container .daily-top-bar{padding:7px 9px;margin-bottom:6px;display:flex;flex-direction:column;gap:5px}
+ .daily-profile-cluster{width:100%;gap:7px}.daily-profile-cluster>.school-emblem{display:none}.daily-player-meta{min-width:0;flex:1}
+ .daily-player-row{gap:5px;flex-wrap:wrap}.player-name-bold{font-size:16px}.player-school-chip,.player-pos-chip,.player-num-chip{font-size:10px;padding:2px 4px}
+ .daily-player-sub{font-size:10px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ .daily-status-line{gap:5px;flex-wrap:nowrap;width:100%;justify-content:space-between}
+ .daily-status-line>div{padding:3px 4px;font-size:10px;gap:3px;white-space:nowrap}.daily-status-line svg{display:none}.daily-draft-dday-pill:has(.text-accent){display:none}
+ .home-dashboard-layout{flex-direction:column;gap:6px;overflow:visible;height:auto;min-height:0}
+ .home-left-rail{width:100%;max-width:none;flex:none;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:5px;overflow:visible}
+ .home-left-rail>.btn{grid-column:2;grid-row:1;margin:0;padding:6px;font-size:11px;min-height:44px}
+ .compact-gauges-row{grid-column:1;grid-row:1;padding:5px 7px;gap:8px;border-radius:10px}
+ .cg-label{font-size:9px}.cg-big-num{font-size:16px;line-height:1}.cg-sub{font-size:9px}.cg-num-row{gap:3px;margin:3px 0}.cg-header-line{gap:3px}.cg-header-line svg{display:none}.cg-track{height:3px}
+ .home-next-event{grid-column:1/-1;padding:5px 8px;font-size:10px;min-height:26px;line-height:1.2}.home-next-event strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .home-center-stage{overflow:visible;flex:1;min-height:0}
+ .home-center-stage>.free-slot-panel{padding:8px;gap:6px;border-radius:12px}
+ .slot-panel-header{display:flex;align-items:center;gap:4px}.slot-turn-title{font-size:12px}.slot-turn-title svg{width:14px}.stamina-warning-pill{font-size:9px;padding:2px 4px}
+ .category-selection-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.category-chip-btn{min-height:38px;padding:4px 2px;gap:2px;font-size:11px;justify-content:center;flex-direction:column}.cat-icon{font-size:13px}.cat-label{white-space:nowrap}
+ .free-slot-panel>.sub-activities-grid{grid-template-columns:minmax(0,1fr);gap:5px}
+ .free-slot-panel .sub-activity-card{padding:6px 8px;gap:3px;border-radius:8px;position:relative;overflow:hidden}
+ .sub-activity-card:hover{transform:none}.card-top{gap:5px}.card-title{font-size:12px;line-height:1.3}.card-icon{font-size:15px}.check-icon{width:14px;height:14px}
+ .free-slot-panel .card-desc{display:none}.card-meta-chips{gap:3px;line-height:1.2}.card-meta-chips>span{font-size:9px;padding:1px 3px}.gate-notice-chip{font-size:9px;padding:1px 3px}
+ .free-slot-panel .training-focus{font-size:10px}.training-focus select{font-size:11px;height:28px;padding:3px}
+ .free-slot-panel .slot-action-footer{padding-top:4px}.free-slot-panel .advance-slot-btn{font-size:12px}
+ .onepage-viewport-container .nav-tab-button{padding:4px;gap:3px;min-width:0;min-height:42px}.nav-tab-label{font-size:10px}.nav-tab-icon svg{width:17px;height:17px}
+ .forced-slot-panel{margin:0;flex:1;padding:16px}.forced-content-box{padding:12px;gap:8px}.forced-icon-large{font-size:38px}.forced-title{font-size:18px}.forced-desc{font-size:12px}.forced-action-footer{gap:8px}
+}
+/* Zoomed text and very short landscape screens retain a reachable fallback. */
+@media(max-height:560px){.home-center-stage{overflow:auto}.home-center-stage>.free-slot-panel{min-height:330px}.onepage-viewport-container .daily-player-sub{display:none}}
+
+.story-dialog{inset:0;margin:auto;width:min(680px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;animation:story-arrive .35s ease-out}
+.story-dialog::backdrop{animation:story-backdrop .35s ease-out;background:#030912b8;backdrop-filter:blur(4px)}
+.story-heading{padding:16px 20px 0;text-align:center}.story-heading small{font-size:11px;color:#94a3b8}.story-heading h2{font-size:18px;margin:5px 0}
+.story-cast{display:flex;align-items:flex-end;justify-content:space-around;height:240px;overflow:hidden;background:radial-gradient(ellipse at bottom,#244b46,transparent 70%);padding:0 18px;gap:24px}
+.cast-person{width:43%;max-width:190px;height:235px;opacity:.45;filter:saturate(.6);transition:opacity .25s,filter .25s;overflow:hidden}.cast-person.speaking{opacity:1;filter:none}.cast-person>img{width:100%;height:100%;object-fit:cover;object-position:top}.cast-person .player-portrait-preset{background:transparent;border-radius:0}.cast-person .portrait-stadium-bg{display:none}
+.story-dialogue{padding:18px 22px;border-top:1px solid #608cb266;background:#0e1d30;position:relative}.story-speaker{display:inline-block;background:#294c70;border:1px solid #648baa;border-radius:6px;padding:5px 12px;font-size:13px;margin-top:-32px;position:relative}.story-dialogue .story-line{font-size:15px;line-height:1.7;min-height:76px;margin:12px 0;animation:story-arrive .18s ease-out}.story-dialogue>.btn{width:100%;min-height:44px}.story-choices{gap:7px}.story-choices .btn{padding:10px 12px;min-height:48px;font-size:13px}.story-page{display:block;text-align:right;color:#94a3b8;font-size:10px;margin-top:8px}
+@keyframes story-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes story-backdrop{from{background:#03091200}to{background:#030912b8}}
+@media(max-width:600px){.story-heading{padding:12px 12px 0}.story-heading h2{font-size:16px}.story-cast{height:190px;padding:0 8px;gap:12px}.cast-person{height:185px;width:46%}.story-dialogue{padding:14px}.story-dialogue .story-line{font-size:14px;min-height:80px}.story-choices .btn{font-size:12px}.story-choices small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.story-dialog,.story-dialog::backdrop,.story-line{animation:none!important}.cast-person{transition:none}}
+/* One shared coordinate system keeps accessories fixed to each portrait. */
+.player-portrait-preset .portrait-composite{display:block;position:relative;width:100%;height:100%;z-index:1}
+.profile-portrait .player-portrait-preset{height:60px;width:40px!important;aspect-ratio:2/3!important}.profile-portrait .portrait-composite{width:100%;height:100%}
+.ballpark-schedule{padding:10px 0;font-size:12px;border-top:1px solid #ffffff22}.ballpark-schedule strong{color:#93c5fd}.ballpark-schedule p{margin:6px 0}.ballpark-schedule small{color:#94a3b8}

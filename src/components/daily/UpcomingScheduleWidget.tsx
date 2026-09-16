@@ -5,6 +5,7 @@ import type { AcademicEvent } from '../../types/academicCalendar';
 import { CalendarDays, Clock } from 'lucide-react';
 
 interface UpcomingScheduleWidgetProps {
+  compact?: boolean;
   currentDate: GameDate;
   matches: ScheduledMatch[];
   academicEvents: AcademicEvent[];
@@ -21,6 +22,7 @@ interface UpcomingItem {
 }
 
 export function UpcomingScheduleWidget({
+  compact = false,
   currentDate,
   matches,
   academicEvents,
@@ -95,6 +97,8 @@ export function UpcomingScheduleWidget({
     return items.slice(0, 4);
   }, [currentDate, matches, academicEvents]);
 
+  if (compact) return <div className="home-next-event glass-panel"><span>다음 일정</span><strong>{upcomingItems[0] ? `${upcomingItems[0].icon} ${upcomingItems[0].title}` : '자율 훈련 기간'}</strong><b>{upcomingItems[0]?.dDayStr}</b></div>;
+
   return (
     <div className="upcoming-schedule-card glass-panel animate-fade-in">
       <div className="schedule-header">
@@ -139,3 +143,4 @@ export function UpcomingScheduleWidget({
     </div>
   );
 }
+

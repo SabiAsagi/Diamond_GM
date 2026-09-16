@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');const os=require('node:os');const ts=require('typescript');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'diamond-tests-'));
 function compile(folder){for(const item of fs.readdirSync(folder,{withFileTypes:true})){const file=path.join(folder,item.name);if(item.isDirectory())compile(file);else if(file.endsWith('.ts')){const target=path.join(dir,path.relative(path.resolve('src'),file).replace(/\.ts$/,'.js'));fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText);}}}
-compile(path.resolve('src'));fs.symlinkSync(path.resolve('node_modules'),path.join(dir,'node_modules'),process.platform === 'win32' ? 'junction' : 'dir');
+compile(path.resolve('src'));fs.copyFileSync('src/data/kbo2026.json',path.join(dir,'data/kbo2026.json'));fs.symlinkSync(path.resolve('node_modules'),path.join(dir,'node_modules'),process.platform === 'win32' ? 'junction' : 'dir');
 let saved;
 require.cache[path.join(dir,'db.js')]={id:path.join(dir,'db.js'),filename:path.join(dir,'db.js'),loaded:true,exports:{db:{players:{put:async p=>{saved=structuredClone(p);}}}}};
 const {HIGH_SCHOOLS_DATA}=require(path.join(dir,'data/highSchools.js'));
@@ -38,7 +38,7 @@ test('store saves pitch growth, rejects wrong slots, resumes draws and pending e
  const store=useGameClockStore;await store.getState().initClock(player());const original=structuredClone(store.getState().seasonMatches);
  await store.getState().selectActivity('night','training','pitch_curve');assert.equal(store.getState().player.pitches.some(x=>x.type==='curve'),false);
  await store.getState().selectActivity('afternoon','training','pitch_curve');assert.equal(saved.pitches.find(x=>x.type==='curve').xp,40);assert.equal(saved.currentSlot,'night');
- if(store.getState().activeCutscene)await store.getState().resolveCutscene('reflect');
+ if(store.getState().activeCutscene)await store.getState().resolveCutscene('learn');
  const p=structuredClone(saved);await store.getState().initClock(p);assert.deepEqual(store.getState().seasonMatches,original);
  await store.getState().revealTournament('emart_spring');assert.ok(saved.savedMatches.filter(m=>m.tournamentId==='emart_spring').every(m=>m.drawn));
  await store.getState().initClock({...saved,pendingEventId:'pitch_grip_discovery'});const movement=store.getState().player.movement;
@@ -269,4 +269,36 @@ test('월말 어떤 활동에도 리포트를 저장하고 한 달 전체 성장
   await store.getState().dismissRivalReport();assert.equal(saved.pendingRivalReport,undefined);
   await store.getState().initClock(saved);assert.equal(saved.pendingRivalReport,undefined);assert.deepEqual(saved.rivalProgress,rival);
  }
+});
+
+test('공식 홈경기·취소·시간대·월요일 예외가 관람 가능 여부에 반영된다',async()=>{
+ const {getBallparkVisit}=require(path.join(dir,'data/proSchedule.js'));
+ const at=(month,day)=>({year:2026,month,day,weekday:new Date(2026,month-1,day).getDay(),grade:1});
+ assert.equal(getBallparkVisit('jamsil',at(3,28),'afternoon').available,true);
+ assert.equal(getBallparkVisit('jamsil',at(3,28),'morning').available,false);
+ assert.equal(getBallparkVisit('jamsil',at(3,30),'night').available,false);
+ assert.equal(getBallparkVisit('changwon',at(9,3),'night').available,false);
+ assert.equal(getBallparkVisit('jamsil',at(10,5),'afternoon').available,true);
+ const {getOutdoorLocations}=require(path.join(dir,'types/outdoorMap.js'));
+ const p={...player(),currentSlot:'night',money:50000};await useGameClockStore.getState().initClock(p);
+ assert.equal(await useGameClockStore.getState().visitOutdoorLocation(getOutdoorLocations('서울').find(l=>l.id==='jamsil')),false);
+ assert.equal(useGameClockStore.getState().player.money,50000);
+});
+test('미발표 연도 가상 시즌은 팀별 144경기·홈 72경기이고 잠실 중복과 월요일 경기가 없다',()=>{
+ const {simulatedProSeason,PRO_TEAMS}=require(path.join(dir,'data/proSchedule.js'));
+ for(const year of [2027,2028]){
+  const games=simulatedProSeason(year);assert.equal(games.length,720);
+  for(const team of PRO_TEAMS){assert.equal(games.filter(g=>g.home===team).length,72);assert.equal(games.filter(g=>g.home===team||g.away===team).length,144);}
+  const slots=new Set();for(const g of games){assert.notEqual(new Date(g.date+'T12:00:00Z').getUTCDay(),1);const key=g.date+g.venue;assert.ok(!slots.has(key));slots.add(key);}
+ }
+});
+test('이벤트마다 고유 분기와 선형 대화가 있으며 잘못된 선택은 보상을 지급하지 않는다',async()=>{
+ const {CUTSCENE_EVENTS_POOL:events}=require(path.join(dir,'data/cutsceneEvents.js'));
+ assert.ok(events.some(e=>!e.choices));
+ for(const e of events){assert.ok(e.dialogueLines.some(l=>l.speaker==='player'));assert.ok(e.portrait);if(e.choices){assert.equal(new Set(e.choices.map(c=>c.label)).size,e.choices.length);const rewards=e.choices.map(c=>JSON.stringify(c.effect(player())));assert.equal(new Set(rewards).size,rewards.length);}}
+ const p={...player(),condition:20,pendingEventId:'homeroom_checkin'};await useGameClockStore.getState().initClock(p);
+ await assert.rejects(()=>useGameClockStore.getState().resolveCutscene('invalid'));
+ assert.equal(useGameClockStore.getState().player.academics,p.academics);
+ await useGameClockStore.getState().resolveCutscene('notes');assert.equal(saved.academics,p.academics+1);assert.equal(saved.condition,26);
+ const once=structuredClone(saved);await useGameClockStore.getState().resolveCutscene('notes');assert.deepEqual(saved,once);
 });

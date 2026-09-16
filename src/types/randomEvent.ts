@@ -2,7 +2,16 @@ import { getBondScore, type RelationshipTargets } from './bondScores';
 import type { GameDate } from './calendar';
 import type { Player } from './index';
 
+export interface EventChoice {
+  id: string;
+  label: string;
+  response: string;
+  effect: EventCutscene['effect'];
+}
 export interface EventCutscene {
+  portrait?: string;
+  dialogueLines?: { speaker: 'npc' | 'player'; text: string }[];
+  choices?: EventChoice[];
   categories?: import('./dailySchedule').DailyActivityCategory[];
   id: string;
   title: string;

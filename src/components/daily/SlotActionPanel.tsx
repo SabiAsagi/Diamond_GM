@@ -47,6 +47,7 @@ export function SlotActionPanel({
   const schoolDay = isSchoolDay(date);
   const availableCategories = getActivityCategories(currentSlot, schoolDay);
 
+  const categoryLabels: Partial<Record<DailyActivityCategory,string>> = {training:'훈련',study:'학업',rest:'휴식',relationship:'인연',special:'특별'};
   const defaultCat = assignment.category !== 'exam' && assignment.category !== 'match' && assignment.category !== 'event'
     ? assignment.category
     : availableCategories[0]?.category || 'rest';
@@ -191,7 +192,7 @@ export function SlotActionPanel({
               onClick={() => handleCategorySelect(cat.category)}
             >
               <span className="cat-icon">{cat.icon}</span>
-              <span className="cat-label">{cat.label}</span>
+              <span className="cat-label">{categoryLabels[cat.category] ?? cat.label}</span>
             </button>
           );
         })}
@@ -210,7 +211,9 @@ export function SlotActionPanel({
           const isRestOpt = opt.category === 'rest' || opt.category === 'relationship';
 
           return (
-            <div
+            <button
+              type="button"
+              aria-pressed={isSelected}
               key={opt.id}
               className={`sub-activity-card ${isSelected ? 'card-selected' : ''}`}
               onClick={() => setSelectedSubId(opt.id)}
@@ -262,7 +265,7 @@ export function SlotActionPanel({
                   ✨ 멘탈 케어: 회복량 +30% 증폭
                 </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>

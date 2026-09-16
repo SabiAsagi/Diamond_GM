@@ -52,7 +52,7 @@ export default function PlayerCreation() {
   const [handedness, setHandedness] = useState<Handedness>('R/R');
   
   const [roleType, setRoleType] = useState<'Pitcher' | 'Batter' | 'TwoWay'>('Batter');
-  const [position, setPosition] = useState<Position>('SS');
+  const [position, setPosition] = useState<Position>('C');
   const [pitchingForm, setPitchingForm] = useState<PitchingForm>('None');
   const [pitcherRole, setPitcherRole] = useState<PitcherRole>('None');
   const [battingForm, setBattingForm] = useState<BattingForm>('None');
@@ -415,14 +415,14 @@ export default function PlayerCreation() {
                   {/* 수비 포지션 */}
                   <div className="form-group">
                     <label>수비 포지션</label>
-                    <div className="responsive-btn-grid cols-4">
+                    <div className="position-choice-grid">
                       {(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'] as Position[]).map(pos => (
                         <button 
                           key={pos} 
                           className={`select-btn ${position === pos ? 'active' : ''}`}
                           onClick={() => setPosition(pos)}
                         >
-                          {POSITION_LABELS[pos]} ({pos})
+                          <span>{POSITION_LABELS[pos]}</span><small>{pos}</small>
                         </button>
                       ))}
                     </div>

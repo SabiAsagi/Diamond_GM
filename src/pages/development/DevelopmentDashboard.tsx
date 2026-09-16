@@ -18,7 +18,7 @@ import { SettingsView } from '../../components/navigation/views/SettingsView';
 import { TownView } from '../../components/navigation/views/TownView';
 
 import { TournamentBracket } from '../../components/navigation/views/TournamentBracket';
-import { Heart, Star, Sparkles, Trophy } from 'lucide-react';
+import { Heart, Star, Trophy } from 'lucide-react';
 import '../../index.css';
 
 export default function DevelopmentDashboard() {
@@ -171,19 +171,9 @@ export default function DevelopmentDashboard() {
                 </div>
               </div>
 
-              {/* 보유 특성 칩 바 */}
-              {player.traits && player.traits.length > 0 && (
-                <div className="home-traits-strip glass-panel">
-                  {player.traits.map(t => (
-                    <span key={t} className="home-trait-tag">
-                      <Sparkles size={11} /> #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               {/* 다가오는 30일 주요 일정 요약 (컴팩트) */}
               <UpcomingScheduleWidget
+                compact
                 currentDate={clock.date}
                 matches={seasonMatches}
                 academicEvents={academicEvents}
@@ -239,13 +229,13 @@ export default function DevelopmentDashboard() {
       <div inert={!!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
-      {lastActionResult && !activeCutscene && (
+      {lastActionResult && (
         <SlotResultModal result={lastActionResult} onClose={clearLastActionResult} />
       )}
 
       {/* 5. 확률적 이벤트 컷신 모달 */}
-      {activeCutscene && (
-        <EventCutsceneModal key={activeCutscene.id} cutscene={activeCutscene} onChoose={resolveCutscene} />
+      {activeCutscene && !lastActionResult && (
+        <EventCutsceneModal key={activeCutscene.id} cutscene={activeCutscene} player={player} onChoose={resolveCutscene} />
       )}
 
       {showRivalReport && player.pendingRivalReport && <RivalReportModal report={player.pendingRivalReport} onClose={() => { void dismissRivalReport(); }} />}

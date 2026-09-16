@@ -228,7 +228,7 @@ const landmarks: Record<string, OutdoorLocation[]> = {
   대전: [
     {
       id: 'daejeonpark',
-      name: '대전 한화생명 이글스파크',
+      name: '대전 한화생명 볼파크',
       icon: '🏟️',
       description: '포기하지 않는 열정과 승부처에서의 끈질긴 풀카운트 승부를 배웁니다.',
       cost: 15000,

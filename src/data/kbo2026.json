@@ -1,0 +1,6263 @@
+{
+  "source": "https://eng.koreabaseball.com/Schedule/DailySchedule.aspx",
+  "asOf": "2026-09-16",
+  "year": 2026,
+  "games": [
+    {
+      "date": "2026-03-28",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-28",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-28",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-28",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-28",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-29",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-29",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-29",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-29",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-29",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-31",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-31",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-31",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-31",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-03-31",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-01",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-01",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-01",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-01",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-01",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-02",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-02",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-02",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-02",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-02",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-03",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-03",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-03",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-03",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-03",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-04",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-04",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-04",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-04",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-04",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-05",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-05",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-05",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-05",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-05",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-07",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-07",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-07",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-07",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-07",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-08",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-08",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-08",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-08",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-08",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-09",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-09",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-09",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-09",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-09",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-10",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-10",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-10",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-10",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-10",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-11",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-11",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-11",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-11",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-11",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-12",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-12",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-12",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-12",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-12",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-14",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-14",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-14",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-14",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-14",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-15",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-15",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-15",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-15",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-15",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-16",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-16",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-16",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-16",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-16",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-17",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-17",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-17",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-17",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-17",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-04-18",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-18",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-18",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-18",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-18",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-19",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-19",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-19",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-19",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-19",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-21",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-21",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-21",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-21",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-21",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-22",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-22",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-22",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-22",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-22",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-23",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-23",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-23",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-23",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-23",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-24",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-24",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-24",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-24",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-24",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-25",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-25",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-25",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-25",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-25",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-26",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-26",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-26",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-26",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-26",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-28",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-28",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-28",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-28",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-28",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-29",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-29",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-29",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-29",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-29",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-30",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-30",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-30",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-30",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-04-30",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-01",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-01",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-01",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-01",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-01",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-02",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-02",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-02",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-02",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-02",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-03",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-03",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-03",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-03",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-03",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-05",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-05",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-05",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-05",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-05",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-06",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-06",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-06",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-06",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-06",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-07",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-07",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-07",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-07",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-07",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-08",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-08",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-08",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-08",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-08",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-09",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-09",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-09",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-09",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-09",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-10",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-10",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-10",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-10",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-10",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-12",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-12",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-12",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-12",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-12",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-13",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-13",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-13",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-13",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-13",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-14",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-14",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-14",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-14",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-14",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-15",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-15",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-15",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-15",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-15",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-16",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-16",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-16",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-16",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-16",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-17",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-17",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-17",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-17",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-17",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-19",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-19",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-19",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-19",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-19",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "POHANG",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-20",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-20",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-20",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-20",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-20",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "POHANG",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-21",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-21",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-21",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-21",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-21",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "POHANG",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-22",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-22",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-22",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-22",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-22",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-23",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-23",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-23",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-23",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-23",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-24",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-24",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-24",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-24",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-24",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-26",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-26",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-26",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-26",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-26",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-05-27",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-27",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-27",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-27",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-27",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-28",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-28",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-28",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-28",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-28",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-29",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-29",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-29",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-29",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-29",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-30",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-30",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-30",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-30",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-30",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-31",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-31",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-31",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-31",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-05-31",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-02",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-02",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-02",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-02",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-02",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-03",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-03",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-03",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-03",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-03",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-04",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-04",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-04",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-04",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-04",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-05",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-05",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-05",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-05",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-05",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-06",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-06",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-06",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-06",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-06",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-07",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-07",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-07",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-07",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-07",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-09",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-09",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-09",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-09",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-09",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-10",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-10",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-10",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-10",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-10",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-11",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-11",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-11",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-11",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-11",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-12",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-12",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-12",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-12",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-12",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-13",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-13",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-13",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-13",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-13",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-14",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-14",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-14",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-06-14",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-14",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-16",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-16",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-16",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-16",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-16",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-17",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-17",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-17",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-17",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-17",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-18",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-18",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-18",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-18",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-18",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-19",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-19",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-19",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-19",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-19",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-20",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-20",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-20",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-20",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-20",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-21",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-21",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-21",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-21",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-21",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-23",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-23",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-23",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-23",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-23",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-24",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-24",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-24",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-24",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-24",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-25",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-25",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-25",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-25",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-25",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-26",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-26",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-26",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-26",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-26",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-27",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-27",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-27",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-27",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-27",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-28",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-28",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-28",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-28",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-28",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-30",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-30",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-06-30",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-30",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-06-30",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-01",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-01",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-01",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-01",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-01",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-02",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-02",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-02",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-02",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-02",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-03",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-03",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-03",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-03",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-03",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-04",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-04",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-04",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-04",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-04",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-05",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-05",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-05",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-05",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-05",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-07",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-07",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-07",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-07",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-07",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-08",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-08",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-08",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-08",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-08",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-09",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-09",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-09",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-09",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-09",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-16",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-16",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-16",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-16",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-16",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-17",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-17",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-17",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-17",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-17",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-18",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-18",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-18",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-18",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-18",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-19",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-19",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-19",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-19",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-19",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-21",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-21",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-21",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-21",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-21",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-22",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-22",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-22",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-22",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-22",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-23",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-23",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-23",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-07-23",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-23",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-24",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-24",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-24",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-24",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-24",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-25",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-25",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-25",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-25",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-25",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-26",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-26",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-26",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-26",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-26",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-28",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-28",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-28",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-28",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-28",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-29",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-29",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-29",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-29",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-29",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-30",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-30",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-30",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-30",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-30",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-31",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-31",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-31",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-31",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-07-31",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-01",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-01",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-01",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-01",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-01",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-02",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-02",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-02",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-02",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-02",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-04",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-04",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-04",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-04",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-04",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-05",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-05",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-05",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-05",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-05",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-06",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-06",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-06",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-06",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-06",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-07",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-07",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-07",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-07",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-07",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-08",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-08",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-08",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-08",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-08",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-09",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-09",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-09",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-09",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-09",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-11",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-11",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-11",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-11",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-11",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-12",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-12",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-12",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-12",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-12",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-13",
+      "away": "HANWHA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-13",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-13",
+      "away": "LG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-13",
+      "away": "KT",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-13",
+      "away": "LOTTE",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-14",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-14",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-14",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-14",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-14",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-15",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-15",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-15",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-15",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-15",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-16",
+      "away": "DOOSAN",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-16",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-16",
+      "away": "SSG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-16",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-16",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-18",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-18",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-18",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-18",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-18",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-19",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-19",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-19",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-19",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-19",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-20",
+      "away": "KIA",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-20",
+      "away": "KT",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-20",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-20",
+      "away": "DOOSAN",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-20",
+      "away": "SSG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-21",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-21",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-21",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-21",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-21",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-22",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-22",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-22",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-22",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-22",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-23",
+      "away": "KIA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-23",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-23",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-23",
+      "away": "SAMSUNG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-23",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "19:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-25",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-25",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-25",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-25",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-25",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-26",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-26",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-26",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-26",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-26",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-27",
+      "away": "LOTTE",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-27",
+      "away": "SAMSUNG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-27",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-27",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-27",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-28",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-28",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-28",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-28",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-28",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-29",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-29",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-29",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-29",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-29",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-30",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-30",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-08-30",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-30",
+      "away": "LG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-08-30",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:00",
+      "cancelled": true
+    },
+    {
+      "date": "2026-09-01",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-01",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-01",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-01",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-01",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-02",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-02",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-02",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-02",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-02",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-03",
+      "away": "LG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-03",
+      "away": "SSG",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-03",
+      "away": "HANWHA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-03",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": true
+    },
+    {
+      "date": "2026-09-03",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-04",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-04",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-04",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-04",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-04",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-05",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-05",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-05",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-05",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-05",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-06",
+      "away": "NC",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-06",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-06",
+      "away": "SAMSUNG",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-06",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-06",
+      "away": "DOOSAN",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-08",
+      "away": "DOOSAN",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-08",
+      "away": "SSG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-08",
+      "away": "KIWOOM",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-08",
+      "away": "LOTTE",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-08",
+      "away": "KIA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-09",
+      "away": "SSG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-09",
+      "away": "LG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-09",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-09",
+      "away": "KT",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-10",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-10",
+      "away": "NC",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-10",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-10",
+      "away": "HANWHA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-11",
+      "away": "NC",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-11",
+      "away": "SSG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-11",
+      "away": "KT",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-11",
+      "away": "KIWOOM",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-12",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-12",
+      "away": "LOTTE",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-12",
+      "away": "KIA",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-12",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-13",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-13",
+      "away": "HANWHA",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-13",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-13",
+      "away": "LG",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-15",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-15",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-15",
+      "away": "LOTTE",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-15",
+      "away": "KIA",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-16",
+      "away": "SAMSUNG",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-16",
+      "away": "KT",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-16",
+      "away": "SSG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-16",
+      "away": "LG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-17",
+      "away": "KIWOOM",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-17",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-18",
+      "away": "KIWOOM",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-18",
+      "away": "SAMSUNG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-18",
+      "away": "LG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-18",
+      "away": "NC",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-19",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-19",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-19",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-19",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-20",
+      "away": "DOOSAN",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-20",
+      "away": "HANWHA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-20",
+      "away": "SAMSUNG",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-20",
+      "away": "KIA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-20",
+      "away": "KIWOOM",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-22",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-22",
+      "away": "DOOSAN",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-22",
+      "away": "NC",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-22",
+      "away": "KT",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-23",
+      "away": "KIA",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-23",
+      "away": "LOTTE",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-23",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-24",
+      "away": "NC",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-24",
+      "away": "LOTTE",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-24",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-25",
+      "away": "LOTTE",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-25",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-25",
+      "away": "SAMSUNG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-26",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-26",
+      "away": "KIWOOM",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-26",
+      "away": "HANWHA",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-27",
+      "away": "KT",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-27",
+      "away": "LG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-27",
+      "away": "HANWHA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-27",
+      "away": "KIWOOM",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-29",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-29",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-29",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-29",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-29",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-30",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-30",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-30",
+      "away": "KIWOOM",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-30",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-09-30",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-01",
+      "away": "NC",
+      "home": "DOOSAN",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-01",
+      "away": "KT",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-01",
+      "away": "HANWHA",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-01",
+      "away": "LG",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-03",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-03",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-03",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-03",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-03",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-04",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-04",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-04",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-04",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-04",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "17:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-05",
+      "away": "KIWOOM",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-05",
+      "away": "LOTTE",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-05",
+      "away": "KIA",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-05",
+      "away": "SSG",
+      "home": "NC",
+      "venue": "CHANGWON",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-05",
+      "away": "DOOSAN",
+      "home": "SAMSUNG",
+      "venue": "DAEGU",
+      "time": "14:00",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-06",
+      "away": "SSG",
+      "home": "HANWHA",
+      "venue": "DAEJEON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-06",
+      "away": "SAMSUNG",
+      "home": "KIA",
+      "venue": "GWANGJU",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-06",
+      "away": "KT",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-06",
+      "away": "NC",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-06",
+      "away": "DOOSAN",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-07",
+      "away": "HANWHA",
+      "home": "KIWOOM",
+      "venue": "GOCHEOKSKY",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-07",
+      "away": "SAMSUNG",
+      "home": "KT",
+      "venue": "SUWON",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-07",
+      "away": "DOOSAN",
+      "home": "LG",
+      "venue": "JAMSIL",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-07",
+      "away": "KIA",
+      "home": "LOTTE",
+      "venue": "SAJIK",
+      "time": "18:30",
+      "cancelled": false
+    },
+    {
+      "date": "2026-10-07",
+      "away": "NC",
+      "home": "SSG",
+      "venue": "MUNHAK",
+      "time": "18:30",
+      "cancelled": false
+    }
+  ]
+}
