@@ -20,10 +20,10 @@ export function PlayerPortrait({ appearance = DEFAULT_APPEARANCE, number = 1, ge
   const maskId = useId().replace(/:/g, '');
   // Coordinates measured against each original 200 × 300 portrait canvas.
   const anchors: Record<string, {eyeY:number;eyeX:number;eyeWidth:number;neck:number;hem:number;shoulder:number}> = {
-    male_spiky:{eyeY:79,eyeX:82,eyeWidth:35,neck:140,hem:300,shoulder:158},
-    male_buzz:{eyeY:65,eyeX:85,eyeWidth:29,neck:116,hem:284,shoulder:138},
-    male_parted:{eyeY:68,eyeX:85,eyeWidth:28,neck:118,hem:280,shoulder:140},
-    male_wavy:{eyeY:69,eyeX:86,eyeWidth:27,neck:119,hem:278,shoulder:142},
+    male_spiky:{eyeY:75,eyeX:82,eyeWidth:30,neck:128,hem:300,shoulder:151},
+    male_buzz:{eyeY:60,eyeX:85,eyeWidth:26,neck:105,hem:272,shoulder:126},
+    male_parted:{eyeY:63,eyeX:84,eyeWidth:27,neck:109,hem:270,shoulder:131},
+    male_wavy:{eyeY:63,eyeX:82,eyeWidth:26,neck:111,hem:269,shoulder:134},
     female_short:{eyeY:67,eyeX:83,eyeWidth:30,neck:111,hem:260,shoulder:130},
     female_bob:{eyeY:67,eyeX:84,eyeWidth:30,neck:112,hem:263,shoulder:131},
     female_long:{eyeY:73,eyeX:84,eyeWidth:32,neck:128,hem:279,shoulder:151},

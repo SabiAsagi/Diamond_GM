@@ -314,5 +314,5 @@ test('인연 전원과 대화 화자는 존재하는 전용 초상화를 사용�
  const expected={pe_recovery:'pe',pitch_grip_discovery:'coach2',two_strike_lesson:'coach2',scout_secret_visit:'scout',homeroom_checkin:'teacher',childhood_date:'childhood',junior_advice:'junior',graduated_senior_call:'senior',senior_secret_pep_talk:'senior',rival_school_provocation:'rival',coach_one_point_lesson:'coach'};
  for(const [eventId,character] of Object.entries(expected))assert.equal(CUTSCENE_EVENTS_POOL.find(e=>e.id===eventId).portrait,CHARACTER_PORTRAITS[character],eventId);
  const {getPortraitPresets}=require(path.join(dir,'data/playerDevelopment.js'));
- for(const preset of getPortraitPresets('female'))assert.ok(fs.existsSync(path.join('public',preset.src)),preset.id);
+ for(const preset of [...getPortraitPresets('male'),...getPortraitPresets('female')])assert.ok(fs.existsSync(path.join('public',preset.src)),preset.id);
 });
