@@ -8,10 +8,10 @@ export interface PitchRating { type: PitchType; rating: number; potential: numbe
 export interface Appearance { hairStyleId: string; accessoryId?: string }
 export const PORTRAIT_PRESETS = {
  male: [
-  {id:'male_spiky',label:'스파이키 숏',src:'assets/portraits/male-spiky.png'},
-  {id:'male_buzz',label:'스포츠 버즈',src:'assets/portraits/male-buzz.png'},
-  {id:'male_parted',label:'내추럴 가르마',src:'assets/portraits/male-parted.png'},
-  {id:'male_wavy',label:'웨이브 미디엄',src:'assets/portraits/male-wavy.png'},
+  {id:'male_spiky',label:'스파이키 숏',src:'assets/portraits/male-spiky-v19.webp'},
+  {id:'male_buzz',label:'스포츠 버즈',src:'assets/portraits/male-buzz-v19.webp'},
+  {id:'male_parted',label:'내추럴 가르마',src:'assets/portraits/male-parted-v19.webp'},
+  {id:'male_wavy',label:'웨이브 미디엄',src:'assets/portraits/male-wavy-v19.webp'},
  ],
  female: [
   {id:'female_short',label:'스포티 숏',src:'assets/portraits/female-short-v18.webp'},

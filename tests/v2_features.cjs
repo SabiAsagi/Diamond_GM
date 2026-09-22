@@ -33,16 +33,17 @@ const { EQUIPMENT_CATALOG, getEffectiveStat, getRelevantSlots, getRelevantGloveC
 const { normalizePlayer, overallRating } = require(path.join(dir, 'data/playerDevelopment.js'));
 const { buildBondProfiles, scoreToStage, getTrainingEfficiencyMultiplier } = require(path.join(dir, 'types/relationship.js'));
 const { getOutdoorLocations } = require(path.join(dir, 'types/outdoorMap.js'));
+const { INITIAL_RELATIONSHIPS } = require(path.join(dir, 'types/bondScores.js'));
 const { POSITION_LABELS } = require(path.join(dir, 'types/index.js'));
 
-test('Position labels mapping is complete and Koreanized', () => {
+test('주요 포지션 이름을 한글로 표시한다', () => {
   assert.equal(POSITION_LABELS.P, '투수');
   assert.equal(POSITION_LABELS.TwoWay, '투타겸업');
   assert.equal(POSITION_LABELS.C, '포수');
   assert.equal(POSITION_LABELS.SS, '유격수');
 });
 
-test('Equipment catalog contains all 7 slots and bonuses affect getEffectiveStat and overallRating', () => {
+test('장비 8개 슬롯이 존재하고 장착 보너스가 능력치와 종합에 반영된다', () => {
   const slots = new Set(EQUIPMENT_CATALOG.map(e => e.slot));
   assert.ok(slots.has('bat'));
   assert.ok(slots.has('glove'));
@@ -51,6 +52,8 @@ test('Equipment catalog contains all 7 slots and bonuses affect getEffectiveStat
   assert.ok(slots.has('trainingGear'));
   assert.ok(slots.has('protectiveGear'));
   assert.ok(slots.has('accessory'));
+  assert.ok(slots.has('baseRunningGloves'));
+  assert.equal(slots.size, 8);
 
   // Base player with power 20
   const basePlayer = normalizePlayer({
@@ -77,10 +80,7 @@ test('Equipment catalog contains all 7 slots and bonuses affect getEffectiveStat
     stamina: 20,
     condition: 100,
     academics: 50,
-    relationshipFamily: 20,
-    relationshipFriends: 15,
-    relationshipTeam: 10,
-    relationshipCoach: 10,
+    relationships: { ...INITIAL_RELATIONSHIPS },
     equippedItems: {},
   });
 
@@ -98,10 +98,10 @@ test('Equipment catalog contains all 7 slots and bonuses affect getEffectiveStat
 
   const effectivePower = getEffectiveStat(equippedPlayer, 'power');
   assert.equal(effectivePower, 20 + proBat.bonuses.power);
-  assert.ok(overallRating(equippedPlayer) >= baseOvr);
+  assert.ok(overallRating(equippedPlayer) > baseOvr);
 });
 
-test('Equipment shops, Korean labels, position slots and glove categories are enforced', () => {
+test('상점 등급·장비 한글명·포지션별 슬롯과 글러브 제한을 유지한다', () => {
   assert.deepEqual(SHOP_TIERS.map(s => s.id), ['basic', 'premium']);
   assert.equal(EQUIPMENT_STAT_LABELS.contact, '컨택');
   assert.equal(EQUIPMENT_STAT_LABELS.control, '제구');
@@ -117,56 +117,38 @@ test('Equipment shops, Korean labels, position slots and glove categories are en
   assert.ok(!isEquipmentRelevant({ position: 'SS' }, pitcherGlove));
 });
 
-test('Relationship stages change the actual training multiplier', () => {
-  assert.equal(getTrainingEfficiencyMultiplier({ relationshipCoach: 10, relationshipTeam: 10 }), 1);
-  assert.equal(getTrainingEfficiencyMultiplier({ relationshipCoach: 90, relationshipTeam: 90 }), 1.18);
+test('개별 감독·동기 인연 단계에 따라 훈련 배율이 합산된다', () => {
+  const multiplier = (coach, peer, other = 10) => getTrainingEfficiencyMultiplier({
+    relationships: { ...INITIAL_RELATIONSHIPS, coach, peer, senior: other, coach2: other },
+  });
+  assert.equal(multiplier(10, 10), 1);
+  assert.equal(multiplier(34, 89), 1);
+  assert.equal(multiplier(35, 89), 1.03);
+  assert.equal(multiplier(89, 89), 1.03);
+  assert.equal(multiplier(90, 10), 1.08);
+  assert.equal(multiplier(10, 90), 1.10);
+  assert.equal(multiplier(90, 90), 1.18);
+  assert.equal(multiplier(10, 10, 100), 1, '선배·기술 코치 점수는 감독·동기 배율에 섞이지 않는다');
 });
 
-test('Relationship system starts at Stage 1 (<35) and branches romance targets by gender', () => {
-  const malePlayer = {
-    gender: 'male',
-    grade: 1,
-    relationshipFamily: 20,
-    relationshipFriends: 15,
-    relationshipTeam: 10,
-    relationshipCoach: 10,
-  };
-  const femalePlayer = {
-    gender: 'female',
-    grade: 1,
-    relationshipFamily: 20,
-    relationshipFriends: 15,
-    relationshipTeam: 10,
-    relationshipCoach: 10,
-  };
-
-  const maleBonds = buildBondProfiles(malePlayer);
-  const femaleBonds = buildBondProfiles(femalePlayer);
-
-  // Verify all bonds start at Stage 1
-  for (const b of maleBonds) {
-    assert.equal(scoreToStage(b.score), 1, `Male bond ${b.name} should start at stage 1`);
-    assert.equal(b.stageLabels.length, 5, `${b.name} must have 5 custom stage labels`);
+test('초기 인연은 1단계이고 네 로맨스 대상은 선수 성별과 무관하다', () => {
+  const expectedRomance = ['childhood', 'deskmate', 'peer', 'senior'];
+  for (const gender of ['male', 'female']) {
+    const bonds = buildBondProfiles({ gender, grade: 1, relationships: { ...INITIAL_RELATIONSHIPS } });
+    for (const bond of bonds) {
+      assert.equal(bond.score, INITIAL_RELATIONSHIPS[bond.id], `${gender}: ${bond.id} 개별 초기 점수`);
+      assert.equal(scoreToStage(bond.score), 1, `${gender}: ${bond.id} 초기 단계`);
+      assert.equal(bond.stageLabels.length, 5);
+    }
+    assert.deepEqual(bonds.filter(b => b.romanceable).map(b => b.id).sort(), expectedRomance);
+    assert.ok(!bonds.some(b => b.id === 'junior'), '1학년에게는 후배가 노출되지 않는다');
+    const laterBonds = buildBondProfiles({ gender, grade: 2, relationships: { ...INITIAL_RELATIONSHIPS } });
+    assert.equal(laterBonds.length, 13);
+    assert.ok(laterBonds.some(b => b.id === 'junior'));
   }
-
-  // Male player romance targets: 한서윤 & 윤하린
-  const seoyoonMale = maleBonds.find(b => b.id === 'childhood');
-  const harinMale = maleBonds.find(b => b.id === 'deskmate');
-  const dohyunMale = maleBonds.find(b => b.id === 'peer');
-  assert.equal(seoyoonMale.romanceable, true);
-  assert.equal(harinMale.romanceable, true);
-  assert.equal(dohyunMale.romanceable, false);
-
-  // Female player romance targets: 이도현 & 강민준
-  const dohyunFemale = femaleBonds.find(b => b.id === 'peer');
-  const minjunFemale = femaleBonds.find(b => b.id === 'senior');
-  const seoyoonFemale = femaleBonds.find(b => b.id === 'childhood');
-  assert.equal(dohyunFemale.romanceable, true);
-  assert.equal(minjunFemale.romanceable, true);
-  assert.equal(seoyoonFemale.romanceable, false);
 });
 
-test('Outdoor locations provide rich landmarks for regions and fallbacks', () => {
+test('지역별 외출 명소와 미등록 지역 대체 장소를 제공한다', () => {
   const seoulLocs = getOutdoorLocations('서울');
   assert.ok(seoulLocs.length >= 7);
   assert.ok(seoulLocs.some(l => l.id === 'jamsil'));
