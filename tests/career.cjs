@@ -302,3 +302,17 @@ test('이벤트마다 고유 분기와 선형 대화가 있으며 잘못된 선�
  await useGameClockStore.getState().resolveCutscene('notes');assert.equal(saved.academics,p.academics+1);assert.equal(saved.condition,26);
  const once=structuredClone(saved);await useGameClockStore.getState().resolveCutscene('notes');assert.deepEqual(saved,once);
 });
+
+test('인연 전원과 대화 화자는 존재하는 전용 초상화를 사용한다',()=>{
+ const {BOND_NAMES}=require(path.join(dir,'types/bondScores.js'));
+ const {CHARACTER_PORTRAITS}=require(path.join(dir,'data/characterPortraits.js'));
+ const {CUTSCENE_EVENTS_POOL}=require(path.join(dir,'data/cutsceneEvents.js'));
+ const portraits=Object.keys(BOND_NAMES).map(id=>CHARACTER_PORTRAITS[id]);
+ assert.equal(new Set(portraits).size,13,'인연끼리 초상화를 돌려쓰지 않는다');
+ for(const src of Object.values(CHARACTER_PORTRAITS))assert.ok(fs.existsSync(path.join('public',src)),src);
+ for(const event of CUTSCENE_EVENTS_POOL)assert.ok(fs.existsSync(path.join('public',event.portrait)),event.id);
+ const expected={pe_recovery:'pe',pitch_grip_discovery:'coach2',two_strike_lesson:'coach2',scout_secret_visit:'scout',homeroom_checkin:'teacher',childhood_date:'childhood',junior_advice:'junior',graduated_senior_call:'senior',senior_secret_pep_talk:'senior',rival_school_provocation:'rival',coach_one_point_lesson:'coach'};
+ for(const [eventId,character] of Object.entries(expected))assert.equal(CUTSCENE_EVENTS_POOL.find(e=>e.id===eventId).portrait,CHARACTER_PORTRAITS[character],eventId);
+ const {getPortraitPresets}=require(path.join(dir,'data/playerDevelopment.js'));
+ for(const preset of getPortraitPresets('female'))assert.ok(fs.existsSync(path.join('public',preset.src)),preset.id);
+});

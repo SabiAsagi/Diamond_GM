@@ -1,6 +1,7 @@
 import type { Player } from '../../../types';
 import { buildBondProfiles, scoreToStage } from '../../../types/relationship';
 import { Users, Heart, ChevronDown } from 'lucide-react';
+import { CHARACTER_PORTRAITS } from '../../../data/characterPortraits';
 
 export function RelationshipsView({ player }: { player: Player; onClose: () => void }) {
   const profiles = buildBondProfiles(player);
@@ -30,7 +31,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
               <details className="rel-card glass-panel" key={p.id}>
                 <summary className="rel-summary" aria-label={`${p.name} 단계별 효과`}>
                 <div className="rel-card-top">
-                  <span className="rel-icon">{p.icon}</span>
+                  <img className="rel-character-portrait" src={CHARACTER_PORTRAITS[p.id]} alt="" loading="lazy" width="64" height="80" />
                   <div className="rel-info">
                     <strong className="rel-name">{p.name}</strong>
                     <span className="rel-role">{p.role}</span>
