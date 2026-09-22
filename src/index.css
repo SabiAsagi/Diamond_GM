@@ -4774,3 +4774,8 @@ details.rel-card { display: block; min-width: 0; }
 .player-portrait-preset .portrait-composite{display:block;position:relative;width:100%;height:100%;z-index:1}
 .profile-portrait .player-portrait-preset{height:60px;width:40px!important;aspect-ratio:2/3!important}.profile-portrait .portrait-composite{width:100%;height:100%}
 .ballpark-schedule{padding:10px 0;font-size:12px;border-top:1px solid #ffffff22}.ballpark-schedule strong{color:#93c5fd}.ballpark-schedule p{margin:6px 0}.ballpark-schedule small{color:#94a3b8}
+
+/* 인물 전용 초상: 얼굴 비율을 유지하고 카드 안에서 축소한다. */
+.rel-character-portrait{width:64px;height:80px;flex:0 0 64px;object-fit:cover;object-position:center top;border-radius:10px;background:#12243b;border:1px solid #40556d}
+.rel-card-top .rel-info{min-width:0}
+@media(max-width:400px){.rel-character-portrait{width:48px;height:64px;flex-basis:48px}}

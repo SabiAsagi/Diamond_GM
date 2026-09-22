@@ -1,3 +1,4 @@
+import { CHARACTER_PORTRAITS, type PortraitCharacterId } from './characterPortraits';
 import { getBondScore } from '../types/bondScores';
 import type { EventCutscene } from '../types/randomEvent';
 
@@ -97,18 +98,18 @@ const EVENTS: EventCutscene[] = [
 
 
 // Each scene owns its dialogue, branches and rewards. No global consolation reward.
-const story: Record<string, { portrait: string; reply: string; ending: string; first?: string; alternative?: [string, string, string, Partial<Record<'academics' | 'condition' | 'eye' | 'defense' | 'control' | 'stamina', number>>] }> = {
- homeroom_checkin: {portrait:'female-bob',reply:'원정이 겹치면 수업을 따라가기 어려워요.',ending:'그래서 같이 계획을 세우려는 거야. 어떤 도움이 필요하니?',first:'보충 공부 계획을 세운다',alternative:['notes','수업 필기부터 정리한다','필기를 나누니 빠뜨린 부분이 보이기 시작했다.',{academics:1,condition:6}]},
- pe_recovery: {portrait:'male-buzz',reply:'요즘은 자고 일어나도 몸이 무거워요.',ending:'몸이 보내는 신호를 무시하지 마. 오늘은 회복 방법부터 고르자.',first:'스트레칭 루틴을 배운다',alternative:['breathing','호흡과 가벼운 산책을 한다','호흡을 고르며 긴장을 풀었다.',{condition:18}]},
- childhood_date: {portrait:'female-long',reply:'좋아. 오늘은 훈련 이야기를 잠깐 내려놓을게.',ending:'그럼 어디부터 가 볼까? 너랑 같이 고르고 싶어.',first:'공원을 걸으며 속마음을 이야기한다',alternative:['cafe','카페에서 다음 시험을 함께 준비한다','서로 문제를 내 주다 보니 어느새 웃음이 났다.',{academics:3,condition:4}]},
- junior_advice: {portrait:'male-spiky',reply:'나도 떨려. 실수를 숨기기보다 다음 공에 집중하려고 해.',ending:'그럼 선배는 긴장될 때 구체적으로 뭘 하세요?',first:'실수했던 경험을 솔직하게 들려준다',alternative:['catch','캐치볼로 기본 자세를 함께 점검한다','차근차근 공을 주고받으며 서로의 자세를 점검했다.',{defense:2}]},
- graduated_senior_call: {portrait:'male-parted',reply:'선배도 진로를 정할 때 많이 고민했어요?',ending:'물론이지. 남들과 속도가 달라도 괜찮아. 네가 쌓은 시간은 사라지지 않으니까.'},
- scout_secret_visit: {portrait:'male-wavy',reply:'백스톱 뒤에 처음 보는 사람이 있네. 평소처럼 집중하자.',ending:'기록만이 아니라 다음 플레이를 준비하는 자세까지 보고 있다네.'},
- coach_one_point_lesson: {portrait:'male-buzz',reply:'힘을 주려고 하면 오히려 동작이 흔들려요.',ending:'힘보다 타이밍이 먼저야. 직접 몸으로 익혀도 좋고, 영상으로 비교해 봐도 좋다.',first:'동작을 천천히 반복하며 교정한다',alternative:['video','좋았던 동작과 영상을 비교한다','좋은 동작의 차이를 눈으로 익혔다.',{eye:2}]},
- senior_secret_pep_talk: {portrait:'male-parted',reply:'큰 경기에서는 첫 실수가 자꾸 머리에 남아요.',ending:'그럴수록 할 일을 하나로 줄여 봐. 네가 준비한 걸 믿어.',first:'선배의 경험을 끝까지 듣는다',alternative:['routine','경기 전 루틴을 함께 연습한다','짧은 준비 루틴을 반복하며 몸의 균형을 잡았다.',{stamina:2,condition:3}]},
- rival_school_provocation: {portrait:'male-spiky',reply:'나도 기다리고 있어. 지난번과는 다를 거야.',ending:'좋아. 서로 제대로 준비해서 만나자.',first:'다음 맞대결을 약속한다',alternative:['observe','상대의 준비 동작을 눈여겨본다','말보다 움직임에 집중해 상대의 습관을 기억했다.',{eye:2}]},
- pitch_grip_discovery: {portrait:'male-buzz',reply:'손끝에 걸리는 느낌을 다시 확인하고 싶어요.',ending:'좋아. 그립과 릴리스 중 어디부터 살펴볼까?',first:'새로운 그립을 복기한다',alternative:['release','릴리스 위치를 일정하게 맞춘다','릴리스 위치를 맞추며 제구 감각을 다듬었다.',{control:2}]},
- two_strike_lesson: {portrait:'male-wavy',reply:'놓치면 안 된다는 생각에 너무 일찍 배트가 나가요.',ending:'한 공을 더 보는 것도 선택이야. 오늘은 어떤 접근을 연습해 볼까?',first:'짧은 스윙으로 공을 맞히는 연습을 한다',alternative:['watch','스트라이크와 볼을 끝까지 구별한다','공을 오래 보며 존을 구별하는 감각을 익혔다.',{eye:3}]},
+const story: Record<string, { portrait: PortraitCharacterId; reply: string; ending: string; first?: string; alternative?: [string, string, string, Partial<Record<'academics' | 'condition' | 'eye' | 'defense' | 'control' | 'stamina', number>>] }> = {
+ homeroom_checkin: {portrait:'teacher',reply:'원정이 겹치면 수업을 따라가기 어려워요.',ending:'그래서 같이 계획을 세우려는 거야. 어떤 도움이 필요하니?',first:'보충 공부 계획을 세운다',alternative:['notes','수업 필기부터 정리한다','필기를 나누니 빠뜨린 부분이 보이기 시작했다.',{academics:1,condition:6}]},
+ pe_recovery: {portrait:'pe',reply:'요즘은 자고 일어나도 몸이 무거워요.',ending:'몸이 보내는 신호를 무시하지 마. 오늘은 회복 방법부터 고르자.',first:'스트레칭 루틴을 배운다',alternative:['breathing','호흡과 가벼운 산책을 한다','호흡을 고르며 긴장을 풀었다.',{condition:18}]},
+ childhood_date: {portrait:'childhood',reply:'좋아. 오늘은 훈련 이야기를 잠깐 내려놓을게.',ending:'그럼 어디부터 가 볼까? 너랑 같이 고르고 싶어.',first:'공원을 걸으며 속마음을 이야기한다',alternative:['cafe','카페에서 다음 시험을 함께 준비한다','서로 문제를 내 주다 보니 어느새 웃음이 났다.',{academics:3,condition:4}]},
+ junior_advice: {portrait:'junior',reply:'나도 떨려. 실수를 숨기기보다 다음 공에 집중하려고 해.',ending:'그럼 선배는 긴장될 때 구체적으로 뭘 하세요?',first:'실수했던 경험을 솔직하게 들려준다',alternative:['catch','캐치볼로 기본 자세를 함께 점검한다','차근차근 공을 주고받으며 서로의 자세를 점검했다.',{defense:2}]},
+ graduated_senior_call: {portrait:'senior',reply:'선배도 진로를 정할 때 많이 고민했어요?',ending:'물론이지. 남들과 속도가 달라도 괜찮아. 네가 쌓은 시간은 사라지지 않으니까.'},
+ scout_secret_visit: {portrait:'scout',reply:'백스톱 뒤에 처음 보는 사람이 있네. 평소처럼 집중하자.',ending:'기록만이 아니라 다음 플레이를 준비하는 자세까지 보고 있다네.'},
+ coach_one_point_lesson: {portrait:'coach',reply:'힘을 주려고 하면 오히려 동작이 흔들려요.',ending:'힘보다 타이밍이 먼저야. 직접 몸으로 익혀도 좋고, 영상으로 비교해 봐도 좋다.',first:'동작을 천천히 반복하며 교정한다',alternative:['video','좋았던 동작과 영상을 비교한다','좋은 동작의 차이를 눈으로 익혔다.',{eye:2}]},
+ senior_secret_pep_talk: {portrait:'senior',reply:'큰 경기에서는 첫 실수가 자꾸 머리에 남아요.',ending:'그럴수록 할 일을 하나로 줄여 봐. 네가 준비한 걸 믿어.',first:'선배의 경험을 끝까지 듣는다',alternative:['routine','경기 전 루틴을 함께 연습한다','짧은 준비 루틴을 반복하며 몸의 균형을 잡았다.',{stamina:2,condition:3}]},
+ rival_school_provocation: {portrait:'rival',reply:'나도 기다리고 있어. 지난번과는 다를 거야.',ending:'좋아. 서로 제대로 준비해서 만나자.',first:'다음 맞대결을 약속한다',alternative:['observe','상대의 준비 동작을 눈여겨본다','말보다 움직임에 집중해 상대의 습관을 기억했다.',{eye:2}]},
+ pitch_grip_discovery: {portrait:'coach2',reply:'손끝에 걸리는 느낌을 다시 확인하고 싶어요.',ending:'좋아. 그립과 릴리스 중 어디부터 살펴볼까?',first:'새로운 그립을 복기한다',alternative:['release','릴리스 위치를 일정하게 맞춘다','릴리스 위치를 맞추며 제구 감각을 다듬었다.',{control:2}]},
+ two_strike_lesson: {portrait:'coach2',reply:'놓치면 안 된다는 생각에 너무 일찍 배트가 나가요.',ending:'한 공을 더 보는 것도 선택이야. 오늘은 어떤 접근을 연습해 볼까?',first:'짧은 스윙으로 공을 맞히는 연습을 한다',alternative:['watch','스트라이크와 볼을 끝까지 구별한다','공을 오래 보며 존을 구별하는 감각을 익혔다.',{eye:3}]},
 };
 export const CUTSCENE_EVENTS_POOL: EventCutscene[] = EVENTS.map(event => {
  const scene = story[event.id];
@@ -120,5 +121,5 @@ export const CUTSCENE_EVENTS_POOL: EventCutscene[] = EVENTS.map(event => {
    logMessage:alternative[2],
  })});
  if(event.id==='homeroom_checkin' && choices)choices.push({id:'consult',label:'진로 고민을 털어놓는다',response:'네가 고민하는 걸 알려줘서 고맙다. 진로는 함께 천천히 알아보자.',effect:p=>({statChanges:{condition:Math.min(100,p.condition+8)},relationshipTargets:{teacher:4},logMessage:'담임 선생님에게 진로 고민을 이야기했습니다.'})});
- return {...event,portrait:event.id==='homeroom_checkin'?'assets/characters/teacher.webp':['pe_recovery','coach_one_point_lesson','pitch_grip_discovery','two_strike_lesson','scout_secret_visit'].includes(event.id)?'assets/characters/coach.webp':scene.portrait === 'female-long' ? 'assets/portraits/female-long-v17.webp' : `assets/portraits/${scene.portrait}.png`,dialogueLines:[{speaker:'npc',text:event.dialogue},{speaker:'player',text:scene.reply},{speaker:'npc',text:scene.ending}],choices};
+ return {...event,portrait:CHARACTER_PORTRAITS[scene.portrait],dialogueLines:[{speaker:'npc',text:event.dialogue},{speaker:'player',text:scene.reply},{speaker:'npc',text:scene.ending}],choices};
 });

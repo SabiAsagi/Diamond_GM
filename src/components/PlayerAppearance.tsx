@@ -24,13 +24,19 @@ export function PlayerPortrait({ appearance = DEFAULT_APPEARANCE, number = 1, ge
     male_buzz:{eyeY:65,eyeX:85,eyeWidth:29,neck:116,hem:284,shoulder:138},
     male_parted:{eyeY:68,eyeX:85,eyeWidth:28,neck:118,hem:280,shoulder:140},
     male_wavy:{eyeY:69,eyeX:86,eyeWidth:27,neck:119,hem:278,shoulder:142},
-    female_short:{eyeY:74,eyeX:84,eyeWidth:31,neck:119,hem:278,shoulder:139},
-    female_bob:{eyeY:74,eyeX:83,eyeWidth:33,neck:128,hem:276,shoulder:149},
-    female_long:{eyeY:73,eyeX:82,eyeWidth:34,neck:128,hem:275,shoulder:151},
-    female_ponytail:{eyeY:84,eyeX:78,eyeWidth:33,neck:132,hem:283,shoulder:151},
+    female_short:{eyeY:67,eyeX:83,eyeWidth:30,neck:111,hem:260,shoulder:130},
+    female_bob:{eyeY:67,eyeX:84,eyeWidth:30,neck:112,hem:263,shoulder:131},
+    female_long:{eyeY:73,eyeX:84,eyeWidth:32,neck:128,hem:279,shoulder:151},
+    female_ponytail:{eyeY:77,eyeX:81,eyeWidth:27,neck:120,hem:275,shoulder:142},
   };
   const a=anchors[preset.id];
-  const jersey=`M0 ${a.shoulder+35} Q8 ${a.shoulder} 30 ${a.shoulder-6} L74 ${a.neck} Q72 ${a.neck+19} 100 ${a.neck+31} Q128 ${a.neck+16} 126 ${a.neck} L172 ${a.shoulder-5} Q193 ${a.shoulder} 200 ${a.shoulder+35} L200 ${a.hem-52} L160 ${a.hem-44} L163 ${a.hem-5} Q105 ${a.hem+6} 39 ${a.hem-5} L41 ${a.hem-44} L0 ${a.hem-52} Z`;
+  const femaleJerseys: Record<string, string> = {
+    female_short: 'M1 199 Q8 148 29 135 L73 117 Q70 134 102 144 Q128 130 127 115 L169 132 Q188 139 197 200 L165 217 L155 199 L148 229 Q151 251 149 258 Q103 267 53 259 L41 242 L43 210 L34 213 Z',
+    female_bob: 'M1 200 Q7 145 28 135 L74 118 Q77 132 105 145 Q130 129 129 116 L170 133 Q189 140 199 200 L169 219 L158 205 L149 247 L151 260 Q109 268 59 259 L43 246 L43 211 L32 220 Z',
+    female_long: 'M1 224 Q8 166 25 151 L76 136 Q78 148 103 158 Q131 143 130 131 L162 141 Q187 151 199 224 L168 238 L160 213 L151 251 L154 272 Q105 287 49 269 L41 250 L42 234 L32 240 Z',
+    female_ponytail: 'M1 208 Q11 153 26 145 L71 125 Q72 137 96 151 Q122 138 121 124 L160 141 Q177 148 195 205 L158 222 L151 207 L146 251 L151 268 Q102 280 49 269 L39 259 L44 223 L36 222 Z',
+  };
+  const jersey=femaleJerseys[preset.id] ?? `M0 ${a.shoulder+35} Q8 ${a.shoulder} 30 ${a.shoulder-6} L74 ${a.neck} Q72 ${a.neck+19} 100 ${a.neck+31} Q128 ${a.neck+16} 126 ${a.neck} L172 ${a.shoulder-5} Q193 ${a.shoulder} 200 ${a.shoulder+35} L200 ${a.hem-52} L160 ${a.hem-44} L163 ${a.hem-5} Q105 ${a.hem+6} 39 ${a.hem-5} L41 ${a.hem-44} L0 ${a.hem-52} Z`;
   const shortSchoolName = (school?.name || schoolName || '고교').replace(/등학교$/, '').slice(0, 5);
 
   return (

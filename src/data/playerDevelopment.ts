@@ -14,10 +14,10 @@ export const PORTRAIT_PRESETS = {
   {id:'male_wavy',label:'웨이브 미디엄',src:'assets/portraits/male-wavy.png'},
  ],
  female: [
-  {id:'female_short',label:'스포티 숏',src:'assets/portraits/female-short.png'},
-  {id:'female_bob',label:'보브 단발',src:'assets/portraits/female-bob.png'},
-  {id:'female_long',label:'레이어드 롱',src:'assets/portraits/female-long-v17.webp'},
-  {id:'female_ponytail',label:'하이 포니테일',src:'assets/portraits/female-ponytail.png'},
+  {id:'female_short',label:'스포티 숏',src:'assets/portraits/female-short-v18.webp'},
+  {id:'female_bob',label:'보브 단발',src:'assets/portraits/female-bob-v18.webp'},
+  {id:'female_long',label:'레이어드 롱',src:'assets/portraits/female-long-v18.webp'},
+  {id:'female_ponytail',label:'하이 포니테일',src:'assets/portraits/female-ponytail-v18.webp'},
  ],
 } as const;
 export const DEFAULT_APPEARANCE: Appearance = {hairStyleId:'male_spiky'};
