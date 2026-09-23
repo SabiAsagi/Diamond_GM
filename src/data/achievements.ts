@@ -7,10 +7,11 @@ export interface Achievement { id: string; title: string; desc: string; unlocked
 export interface TournamentTrophy { id: string; name: string; subtitle: string; unlocked: boolean; icon: string }
 
 export function buildAchievements(p: Player): Achievement[] {
+  const officialAppearances=(p.matchRecords??[]).filter(r=>!['scrimmage','practice'].includes(r.kind??'')&&(!r.performance||!['bench','outside'].includes(r.performance.role))).length;
   const pitcher = p.position === 'P' || p.position === 'TwoWay';
   const rows: Array<[string, string, string, boolean, string]> = [
     ['entrance', '고교 야구부 입학', '감독 면담 완료', !!p.interviewCompleted, '🌸'],
-    ['first_match', '첫 공식전 출전', '저장된 공식 경기 기록 1개 이상', (p.matchRecords?.length ?? 0) >= 1, '⚾'],
+    ['first_match', '첫 공식전 출전', '저장된 공식 경기 기록 1개 이상', officialAppearances >= 1, '⚾'],
     ['pro_interest', '스카우트 레이더망 포착', '인지도 30 이상', (p.fame ?? 0) >= 30, '📋'],
     ['ace', pitcher ? '탈삼진 머신' : '거포의 탄생', pitcher ? '구위 30 이상' : '파워 30 이상', pitcher ? p.stuff >= 30 : p.power >= 30, '🔥'],
     ['academics', '성실한 학생 선수', '학업 70 이상', p.academics >= 70, '📜'],
@@ -24,7 +25,7 @@ export function buildAchievements(p: Player): Achievement[] {
     ['pitch_master', '구종 마스터', '구종 하나가 해당 구종의 잠재력 상한에 도달', pitcher && !!p.pitches?.some(x => x.potential > 0 && x.rating >= x.potential), '🎯'],
     ['pitch_repertoire', '다채로운 레퍼토리', '숙련도 1 이상 구종 3개 보유', pitcher && (p.pitches?.filter(x => x.rating > 0).length ?? 0) >= 3, '🌀'],
     ['equipment', '나만의 장비', '장비 3개 이상 보유', new Set(p.inventory ?? []).size >= 3, '🧤'],
-    ['veteran', '그라운드의 경험', '공식 경기 기록 20개 이상', (p.matchRecords?.length ?? 0) >= 20, '💪'],
+    ['veteran', '그라운드의 경험', '공식 경기 기록 20개 이상', officialAppearances >= 20, '💪'],
   ];
   return rows.map(([id, title, desc, unlocked, icon]) => ({ id: `ach_${id}`, title, desc, unlocked: unlocked || !!p.earnedAchievementIds?.includes(`ach_${id}`), icon }));
 }

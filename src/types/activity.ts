@@ -40,6 +40,8 @@ export interface ActivityOption {
 }
 
 export interface ActivityResult {
+  matchPerformance?: import('../data/teamCompetition').MatchPerformance;
+  competitionInterview?: { choice: 'chance' | 'position' | 'accept'; position?: Position };
   pitchTraining?: PitchType;
   pitchXp?: number;
   activityCategory?: DailyActivityCategory;

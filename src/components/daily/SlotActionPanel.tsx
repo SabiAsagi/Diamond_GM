@@ -1,3 +1,5 @@
+import { MatchSelectionCard } from './TeamCompetitionPanel';
+import { trainingRecommendation } from '../../data/teamCompetition';
 import { BOND_NAMES, type BondId } from '../../types/bondScores';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useState } from 'react';
@@ -117,7 +119,7 @@ export function SlotActionPanel({
       <div className="slot-action-panel glass-panel forced-slot-panel animate-fade-in">
         <div className="forced-badge-row">
           <span className={`forced-status-pill ${isMatch ? 'match-pill' : 'academic-pill'}`}>
-            {isMatch ? '🏆 공식 대회 일정' : isExam ? '📝 정규 지필 평가' : '🌸 학교 공식 행사'}
+            {isMatch ? '⚾ 야구부 경기 일정' : isExam ? '📝 정규 지필 평가' : '🌸 학교 공식 행사'}
           </span>
           <span className="slot-badge-indicator">
             {TIME_SLOT_LABELS[currentSlot]} 슬롯 강제 지정
@@ -134,10 +136,11 @@ export function SlotActionPanel({
           </div>
         </div>
 
+        {isMatch && assignment.sourceEventId && <MatchSelectionCard player={player} matchId={assignment.sourceEventId} />}
         <div className="forced-action-footer">
           <div className="forced-notice-text">
             {isMatch
-              ? '※ 공식 경기 결과에 따라 스카우트 인지도 및 실전 경기 감각이 변동됩니다.'
+              ? '※ 발표된 역할로 경기를 진행합니다. 벤치 대기는 교체 없이 끝날 수도 있습니다.'
               : '※ 학업 성취도(Academics)와 멘탈 컨디션이 결과에 영향을 줍니다.'}
           </div>
           <button
@@ -150,7 +153,7 @@ export function SlotActionPanel({
             ) : (
               <>
                 <CalendarCheck size={18} />
-                <span>{isMatch ? '경기 시작하기 (결과 확인)' : '학사 일정 진행하기'}</span>
+                <span>{isMatch ? '경기 진행 · 출전 결과 확인' : '학사 일정 진행하기'}</span>
                 <ArrowRight size={18} />
               </>
             )}
@@ -181,6 +184,7 @@ export function SlotActionPanel({
         )}
       </div>
 
+      {player.teamCompetition?.lastFeedback && <p className="team-training-tip">경기 후 코치 조언 · {trainingRecommendation(player)}</p>}
       {/* 1단계: 1차 카테고리 선택 버튼 바 */}
       <div className="category-selection-row">
         {availableCategories.map(cat => {

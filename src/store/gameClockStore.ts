@@ -1,3 +1,4 @@
+import { prepareTeamContext, updateCompetitionAfterAction, TEAM_ROLE_LABELS, dateNumber, refreshTeamEvaluation } from '../data/teamCompetition';
 import { getBallparkVisit } from '../data/proSchedule';
 import { initializeRival, updateMonthlyRival } from '../data/rival';
 import { applyBondChanges, formatBondChanges, actualBondChanges } from '../types/bondScores';
@@ -12,7 +13,7 @@ import { buildDailyPlan } from '../types/dailySchedule';
 import type { AcademicEvent } from '../types/academicCalendar';
 import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent, isSchoolDay } from '../types/academicCalendar';
 import type { ScheduledMatch } from '../types/tournament';
-import { generateSeasonMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
+import { generateSeasonMatches, addClubMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
 import { SUB_ACTIVITY_POOL, evaluateActivityWithGating, isActivityAvailable } from '../types/activity';
 import { resolveMatchPlaceholder } from './matchResolver';
@@ -57,6 +58,7 @@ export interface GameClockState {
   revealTournament: (id: string) => Promise<void>;
   cutsceneHistory: CutsceneTriggerHistory;
 
+  coachMeeting: (choice: 'chance' | 'position' | 'accept', position?: Player['position']) => Promise<void>;
   // Actions
   initClock: (player: Player) => Promise<void>;
   advanceSlot: (result: ActivityResult) => Promise<void>;
@@ -120,7 +122,8 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const initialSlot: TimeSlot = player.currentSlot || 'morning';
 
     // 시즌 대회 대진표 생성
-    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? player.savedMatches : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    player=prepareTeamContext(player,school,initialDate,initialSlot,seasonMatches);
     captureAchievements(player);
     player.savedMatches=seasonMatches;
     player.savedSeasonYear=initialDate.year;
@@ -156,10 +159,25 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
   advanceSlot: async (result: ActivityResult) => {
     const state = get();
-    const { player, clock, school, seasonMatches, academicEvents, todayLogs, cutsceneHistory } = state;
+    const { player, clock, school, seasonMatches: originalMatches, academicEvents, todayLogs, cutsceneHistory } = state;
     if (!player || state.isLoading || state.activeCutscene || state.isCareerEnded) return;
+    if(result.matchOutcome && player.matchRecords?.some(r=>r.matchId===result.matchOutcome!.matchId&&r.year===clock.date.year))return;
+    const seasonMatches=result.matchOutcome&&school?progressTournament(originalMatches,result.matchOutcome,school,HIGH_SCHOOLS_DATA):originalMatches;
+    const actionDate=`${clock.date.year}-${clock.date.month}-${clock.date.day}`;
+    const actionLogs=player.dailyActionLogs?.date===actionDate?player.dailyActionLogs.logs:{};
     set({isLoading:true});
     try {
+    const finalizeTeam = (p:Player, date:GameDate, slot:TimeSlot, matches:ScheduledMatch[]) => {
+      let updated=updateCompetitionAfterAction(player,p,result,clock.date);
+      if(result.matchOutcome && updated.teamCompetition?.lastFeedback){
+        const f=updated.teamCompetition.lastFeedback;
+        result={...result,logMessage:result.logMessage+`\n감독 평가 ${updated.teamCompetition.coachEvaluation.toFixed(1)} (${f.coachDelta>=0?'+':''}${f.coachDelta}) · 코치 평가 ${updated.teamCompetition.technicalEvaluation.toFixed(1)}\n팀 내 위치: ${TEAM_ROLE_LABELS[f.before]} → ${TEAM_ROLE_LABELS[f.after]}\n${f.summary}\n${f.recommendation}`};
+        updated.matchRecords=[...(player.matchRecords??[]),{matchId:result.matchOutcome!.matchId,year:clock.date.year,log:result.logMessage,performance:result.matchPerformance,kind:originalMatches.find(m=>m.id===result.matchOutcome!.matchId)?.kind??(result.matchOutcome!.tournamentId==='weekend_league'?'weekend':'national')}];
+      }
+      updated.dailyActionLogs={date:actionDate,logs:{...actionLogs,[clock.currentSlot]:result.logMessage}};
+      if(school)updated=prepareTeamContext(updated,school,date,slot,matches);
+      return updated;
+    };
     // 1. 스탯 변동 반영
     let newStuff = player.stuff;
     let newControl = player.control;
@@ -186,7 +204,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if(result.pitchTraining) extra.pitches=trainPitch(extra,result.pitchTraining,result.pitchXp??0);
     extra.savedMatches=seasonMatches;
     extra.savedSeasonYear=clock.date.year;
-    if(result.matchOutcome) extra.matchRecords=[...(player.matchRecords??[]),{matchId:result.matchOutcome.matchId,year:clock.date.year,log:result.logMessage}];
     if (sc.stuff) newStuff = Math.min(100, newStuff + sc.stuff);
     if (sc.control) newControl = Math.min(100, newControl + sc.control);
     if (sc.stamina) newStaminaRating = Math.min(100, newStaminaRating + sc.stamina);
@@ -215,7 +232,6 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       newOverall = Math.round((newContact + newPower + newEye + newSpeed + newDefense) / 5);
     }
 
-    const newLogs = [...todayLogs, result.logMessage];
 
     // 2. 슬롯 전진 또는 일자 롤오버 판정
     const currentSlot = clock.currentSlot;
@@ -247,9 +263,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       historyLogs = [
         {
           date: clock.date,
-          morningLog: todayLogs[0],
-          afternoonLog: todayLogs[1],
-          nightLog: todayLogs[2],
+          morningLog: actionLogs.morning,
+          afternoonLog: actionLogs.afternoon,
+          nightLog: result.logMessage,
         },
         ...historyLogs.slice(0, 30),
       ];
@@ -283,6 +299,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         currentSlot: nextSlot,
       };
 
+      updatedPlayer=finalizeTeam(updatedPlayer,nextDate,nextSlot,updatedMatches);
       updatedPlayer.overall=overallRating(updatedPlayer);
       if(advanceRes.isMonthChanged) updatedPlayer=updateMonthlyRival(updatedPlayer,nextDate);
 
@@ -325,7 +342,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     }
 
     // 중간 슬롯 진행 (morning -> afternoon 또는 afternoon -> night)
-    const updatedPlayer: Player = {
+    let updatedPlayer: Player = {
       ...extra,
       stuff: newStuff,
       control: newControl,
@@ -344,6 +361,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       currentSlot: nextSlot,
     };
 
+    updatedPlayer=finalizeTeam(updatedPlayer,clock.date,nextSlot,seasonMatches);
     // 중간 슬롯에서도 확률적 컷신 체크
     let triggeredCutscene: EventCutscene | null = null;
     const nextHistory = { ...cutsceneHistory };
@@ -370,7 +388,8 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     set({
       player: updatedPlayer,
       clock: { date: clock.date, currentSlot: nextSlot },
-      todayLogs: newLogs,
+      todayLogs: [...todayLogs, result.logMessage],
+      seasonMatches,
       lastActionResult: result,
       activeCutscene: triggeredCutscene,
       cutsceneHistory: nextHistory,
@@ -378,6 +397,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     } finally { set({isLoading:false}); }
   },
 
+  coachMeeting: async (choice, position) => {
+    const {player,clock,dailyPlan,isLoading,activeCutscene,isCareerEnded}=get();
+    if(!player||isLoading||activeCutscene||isCareerEnded||clock.currentSlot!=='afternoon'||dailyPlan.slots.afternoon.forced)return;
+    if(dateNumber(clock.date)-(player.teamCompetition?.lastInterviewDay??-Infinity)<7)return;
+    if(!['chance','position','accept'].includes(choice))return;
+    if(choice==='position'&&(!position||position===player.position||!['P','C','1B','2B','3B','SS','LF','CF','RF','TwoWay'].includes(position)))return;
+    await get().advanceSlot({activityCategory:'relationship',competitionInterview:{choice,position},statChanges:{},staminaDelta:0,mentalDelta:choice==='accept'?6:2,relationshipTargets:choice==='accept'?{coach:3,peer:1}:{coach:1},logMessage:choice==='chance'?'감독 면담: “기회를 주세요.” 다음 엔트리 포함 경기 2회에서 교체 기회를 우선 검토하고, 평가전에서는 선발 기회를 줍니다. 컨디션과 엔트리 기준은 충족해야 합니다.':choice==='position'?'감독 면담: 포지션 변경을 승인받았습니다. 새 포지션에서 다시 경쟁합니다. 이미 발표된 대회 엔트리는 유지됩니다.':'감독 면담: 현재 역할을 수용하고 준비를 이어가기로 했습니다. 신뢰와 멘탈을 회복했습니다.'});
+  },
   selectActivity: async (_slot: TimeSlot, category: DailyActivityCategory, subActivityId: string) => {
     const { player } = get();
     if (!player || get().isLoading || get().activeCutscene || _slot!==get().clock.currentSlot || get().dailyPlan.slots[_slot].forced) return;
@@ -418,7 +445,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       const match = getPlayerMatchForDate(clock.date, seasonMatches);
       if (match) {
         result = resolveMatchPlaceholder(match, player, school);
-        if (result.matchOutcome) set({ seasonMatches: progressTournament(seasonMatches, result.matchOutcome, school, HIGH_SCHOOLS_DATA) });
+
       } else {
         result = {
           statChanges: { fame: 2, condition: -15 },
@@ -451,12 +478,13 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if (activeCutscene.choices?.length && !selected) throw new Error('유효하지 않은 이벤트 선택');
       if (!activeCutscene.choices?.length && choice !== 'learn') throw new Error('대화를 끝까지 진행해 주세요');
       const effect = (selected?.effect ?? activeCutscene.effect)(player);
-      const updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
+      let updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
       const relationshipTargets = actualBondChanges(player,updated);
       if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
       for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics',...Object.keys(EXTRA_RATINGS)]){
         const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
       }
+      updated=refreshTeamEvaluation(updated);
       updated.overall=overallRating(updated);
       captureAchievements(updated); await db.players.put(updated);
       const changes = Object.fromEntries(Object.keys(effect.statChanges).filter(key=>typeof player[key as keyof Player]==='number' && typeof updated[key as keyof Player]==='number').map(key=>[key,Number(updated[key as keyof Player])-Number(player[key as keyof Player])]));
@@ -501,7 +529,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if (!item || item.slot !== slot || !isEquipmentRelevant(player, item)) return;
       nextEquipped[slot] = itemId;
     }
-    const updated = { ...player, equippedItems: nextEquipped };
+    const updated = refreshTeamEvaluation({ ...player, equippedItems: nextEquipped });
     updated.overall = overallRating(updated);
     captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });
@@ -515,7 +543,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
     if (player.lastOutdoorVisitDate === todayDateStr) return false;
 
-    const updated: Player = {
+    let updated: Player = {
       ...applyBondChanges(player,location.effects.relationshipTargets),
       money: (player.money || 0) - location.cost + (location.effects.money || 0),
       condition: Math.max(5, Math.min(100, player.condition + location.effects.condition)),
@@ -525,6 +553,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       const stat = key as keyof Player;
       if (typeof updated[stat] === 'number' && typeof value === 'number') (updated as unknown as Record<string, number>)[key] = Math.max(0, Math.min(100, (updated[stat] as number) + value));
     }
+    updated=refreshTeamEvaluation(updated);
     updated.overall = overallRating(updated);
     captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });

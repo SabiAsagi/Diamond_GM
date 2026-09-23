@@ -49,7 +49,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
 
                 {p.id === 'rival' && player.rivalProgress && <p className="rel-effect-desc">현재 종합 {player.rivalProgress.overall} · {player.overall === player.rivalProgress.overall ? '당신과 동률' : player.overall > player.rivalProgress.overall ? `당신이 ${player.overall-player.rivalProgress.overall} 앞섬` : `당신이 ${player.rivalProgress.overall-player.overall} 뒤짐`}</p>}
                 <span className="rel-detail-prompt">
-                  {p.stageEffects.some(effect => effect.hasEffect) ? '단계별 효과 보기' : '효과 없음 · 단계별 상세 보기'}
+                  {p.stageEffects.some(effect => effect.hasEffect) || p.id === 'senior' ? '효과·인연 상세 보기' : '단계별 상세 보기'}
                   <ChevronDown size={16} aria-hidden="true" />
                 </span>
 
@@ -62,6 +62,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
 
                 <div className="rel-stage-details">
                   <h4>단계별 추가 효과</h4>
+                  {['coach','senior'].includes(p.id) && <p className="rel-detail-note">{p.note}</p>}
                   <p className="rel-detail-note">달성 여부는 이 인물의 인연 점수 기준입니다. 이전 단계의 효과는 계속 유지됩니다.</p>
                   <ol className="rel-stage-list">
                     {p.stageEffects.map(effect => {

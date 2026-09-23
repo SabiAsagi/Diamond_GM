@@ -1,8 +1,9 @@
+import { getMatchKind } from '../../../types/tournament';
 import { useState } from 'react';
 import type { ScheduledMatch } from '../../../types/tournament';
 import { useGameClockStore } from '../../../store/gameClockStore';
 export function TournamentBracket({matches}:{matches:ScheduledMatch[]}){
- const tours=[...new Map(matches.filter(m=>m.tournamentId!=='weekend_league').map(m=>[m.tournamentId,m.tournamentName])).entries()];
+ const tours=[...new Map(matches.filter(m=>getMatchKind(m)==='national').map(m=>[m.tournamentId,m.tournamentName])).entries()];
  const [selected,setSelected]=useState(tours[0]?.[0]??'');const [busy,setBusy]=useState(false);const [revealed,setRevealed]=useState(0);
  const reveal=useGameClockStore(s=>s.revealTournament);const player=useGameClockStore(s=>s.player);
  const games=matches.filter(m=>m.tournamentId===selected);const rounds=[...new Set(games.map(m=>m.round))];const first=games.filter(m=>m.round===rounds[0]);

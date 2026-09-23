@@ -14,6 +14,11 @@ interface MatchesViewProps {
 }
 
 export function MatchesView({ player, matches, historyLogs, showBracket = true }: MatchesViewProps) {
+  const records=(player.matchRecords??[]).filter(r=>r.year===(player.gameDate?.year??2026));
+  const played=records.filter(r=>r.performance&&!['bench','outside'].includes(r.performance.role));
+  const atBats=played.reduce((sum,r)=>sum+r.performance!.atBats,0);
+  const hits=played.reduce((sum,r)=>sum+r.performance!.hits,0);
+  const innings=played.reduce((sum,r)=>sum+r.performance!.innings,0);
   const [activeTab, setActiveTab] = useState<'schedule' | 'stats' | 'logs' | 'bracket'>('schedule');
 
 
@@ -24,8 +29,8 @@ export function MatchesView({ player, matches, historyLogs, showBracket = true }
         <div className="menu-view-title-group">
           <Trophy size={22} className="text-accent" />
           <div>
-            <h3 className="menu-view-title">공식 경기 & 대회 기록실</h3>
-            <p className="menu-view-sub">주말리그 및 메이저 전국대회 전적과 개인 기록을 확인합니다.</p>
+            <h3 className="menu-view-title">야구부 경기 기록실</h3>
+            <p className="menu-view-sub">청백전·연습경기·주말리그·전국대회의 출전 형태와 경기 후 평가를 확인합니다.</p>
           </div>
         </div>
 
@@ -59,7 +64,7 @@ export function MatchesView({ player, matches, historyLogs, showBracket = true }
             <div className="record-summary-banner glass-panel">
               <div className="school-record-stat">
                 <Shield size={20} className="text-primary" />
-                <span>{player.highSchool} 야구부 {player.gameDate?.year??2026} 시즌 공식 경기 현황</span>
+                <span>{player.highSchool} 야구부 {player.gameDate?.year??2026} 시즌 경기 현황</span>
               </div>
               <span className="record-badge">우리 학교 {matches.filter(m=>m.isPlayerTeamMatch).length}경기 편성</span>
             </div>
@@ -87,6 +92,7 @@ export function MatchesView({ player, matches, historyLogs, showBracket = true }
         {/* 2. 개인 시즌 성적 */}
         {activeTab === 'stats' && (
           <div className="player-season-records">
+            <p className="team-help">평가전 포함 · 실제 출전 {played.length}경기 · {atBats}타수 {hits}안타 · 타율 {atBats?(hits/atBats).toFixed(3):'—'} · {innings}이닝 투구. 이전 버전의 텍스트 기록은 아래에서 확인할 수 있습니다.</p>
             <h4>개인 경기 기록 · {player.position==='TwoWay'?'투구 / 타격':player.position==='P'?'투구':'타격'}</h4>
             {(player.matchRecords??[]).filter(r=>r.year===(player.gameDate?.year??2026)).length===0?<p>아직 경기 기록이 없습니다. 첫 경기를 치르면 실제 결과가 쌓입니다.</p>:(player.matchRecords??[]).filter(r=>r.year===(player.gameDate?.year??2026)).map(r=><p key={r.matchId} style={{whiteSpace:'pre-line'}}>{r.log}</p>)}
 

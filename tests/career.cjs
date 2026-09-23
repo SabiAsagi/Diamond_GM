@@ -89,10 +89,9 @@ test('개별 점수·5단계 효과·성별 무관 로맨스와 졸업 인연이
 
 test('실제 경기 판정은 감독 인연 75점부터 표시된 4%p 보정을 사용한다', () => {
   const {resolveMatchPlaceholder}=require(path.join(dir,'store/matchResolver.js'));
-  const {battingRating}=require(path.join(dir,'data/playerDevelopment.js'));
-  const p={...player(),position:'SS'};p.relationships.coach=74;
+  const p={...player(),position:'SS',condition:20};p.relationships.coach=74;
   const match=generateSeasonMatches(2026,school,HIGH_SCHOOLS_DATA).find(m=>m.isPlayerTeamMatch);
-  const sample=.5+(battingRating(p)-20)*.005+.02;
+  const sample=.5+((20+school.prestige*.3)-40)*.004+.02;
   const originalRandom=Math.random;
   try {
     Math.random=()=>sample;
@@ -315,4 +314,214 @@ test('인연 전원과 대화 화자는 존재하는 전용 초상화를 사용�
  for(const [eventId,character] of Object.entries(expected))assert.equal(CUTSCENE_EVENTS_POOL.find(e=>e.id===eventId).portrait,CHARACTER_PORTRAITS[character],eventId);
  const {getPortraitPresets}=require(path.join(dir,'data/playerDevelopment.js'));
  for(const preset of [...getPortraitPresets('male'),...getPortraitPresets('female')])assert.ok(fs.existsSync(path.join('public',preset.src)),preset.id);
+});
+
+const competition=require(path.join(dir,'data/teamCompetition.js'));
+const {getMatchKind,addClubMatches}=require(path.join(dir,'types/tournament.js'));
+const {resolveMatchPlaceholder}=require(path.join(dir,'store/matchResolver.js'));
+const {buildAchievements}=require(path.join(dir,'data/achievements.js'));
+function teamPlayer(overrides={}) {
+ const p={...player(),position:'SS',grade:1,...overrides};
+ return competition.ensureTeamCompetition(p,school,p.gameDate);
+}
+function fixtureMatch(kind='weekend',id='team-match') {
+ return {id,year:2026,kind,date:{month:3,day:3},tournamentId:kind==='national'?'test-national':kind==='weekend'?'weekend_league':`${kind}_test`,tournamentName:'검증 경기',round:'평가전',homeSchoolId:school.id,homeSchoolName:school.name,awaySchoolId:'opponent',awaySchoolName:'상대고',drawn:true,isPlayerTeamMatch:true};
+}
+function withRandom(n,run) {const old=Math.random;try{Math.random=()=>n;return run();}finally{Math.random=old;}}
+function performance(role='starter',rating=20) {return {role,rating,atBats:role==='starter'?4:0,hits:0,homeRuns:0,rbi:0,innings:0,strikeouts:0,runsAllowed:0,stolenBases:0,errors:0};}
+
+test('주전 경쟁: 구 저장에 결정적 로스터를 추가하고 재접속·포지션 변경에도 경쟁자를 유지한다',()=>{
+ const p=teamPlayer();const again=competition.ensureTeamCompetition(structuredClone(p),school,p.gameDate);
+ assert.deepEqual(again,p);assert.equal(new Set(p.teamCompetition.roster.map(n=>n.id)).size,p.teamCompetition.roster.length);
+ assert.equal(p.teamCompetition.roster.length,Math.max(18,Math.min(60,school.rosterSize))-1);
+ for(const pos of competition.FIELD_POSITIONS)assert.ok(p.teamCompetition.roster.some(n=>n.position===pos));
+ assert.ok(competition.getStanding(p).rank>1,'신입은 무조건 주전이 아니다');
+ assert.equal(p.teamCompetition.roster.find(n=>n.id==='peer').position,'SS');
+ const changed=competition.ensureTeamCompetition({...p,position:'CF'},school,p.gameDate);
+ assert.deepEqual(changed.teamCompetition.roster,p.teamCompetition.roster);
+ assert.equal(changed.teamCompetition.roster.find(n=>n.id==='peer').position,'SS');
+});
+
+test('학교 경쟁도·훈련 성과·경기 실적·컨디션·감독 신뢰가 실제 서열에 반영된다',()=>{
+ const p=teamPlayer();const base=competition.coachScore(p);
+ for(const key of ['training','recentForm'])assert.ok(competition.coachScore({...p,teamCompetition:{...p.teamCompetition,[key]:90}})>base);
+ assert.ok(competition.coachScore({...p,condition:5})<base);
+ assert.ok(competition.coachScore({...p,relationships:{...p.relationships,coach:100}})>competition.coachScore({...p,relationships:{...p.relationships,coach:0}}));
+ const weak={...school,competition:{pitcher:1,catcher:1,infielder:1,outfielder:1}};
+ const strong={...school,competition:{pitcher:10,catcher:10,infielder:10,outfielder:10}};
+ const low=competition.ensureTeamCompetition({...p,teamCompetition:undefined},weak,p.gameDate);
+ const high=competition.ensureTeamCompetition({...p,teamCompetition:undefined},strong,p.gameDate);
+ assert.ok(high.teamCompetition.roster[0].ability>low.teamCompetition.roster[0].ability);
+ const trained=competition.updateCompetitionAfterAction(p,p,{activityCategory:'training',statChanges:{contact:3},staminaDelta:0,logMessage:'훈련'},p.gameDate);
+ assert.ok(trained.teamCompetition.training>p.teamCompetition.training);
+ assert.equal(p.teamCompetition.training,25,'이전 저장 상태를 직접 수정하지 않는다');
+});
+
+test('대회 엔트리는 개막 3일 전 고정되고 재접속·이후 성장으로 뒤집히지 않는다',()=>{
+ const m={...fixtureMatch('national'),date:{month:3,day:7}};const p=teamPlayer();
+ let prepared=competition.prepareTeamContext(p,school,p.gameDate,'morning',[m]);assert.equal(prepared.teamCompetition.entries.length,0);
+ prepared=competition.prepareTeamContext(prepared,school,{...p.gameDate,day:4},'morning',[m]);
+ const entry=structuredClone(prepared.teamCompetition.entries[0]);assert.equal(entry.memberIds.length,new Set(entry.memberIds).size);
+ assert.ok(entry.memberIds.length<=21);
+ const grown={...prepared,contact:100,power:100,teamCompetition:{...prepared.teamCompetition,training:100,recentForm:100}};
+ const again=competition.prepareTeamContext(grown,school,{...p.gameDate,day:7},'afternoon',[m]);
+ assert.deepEqual(again.teamCompetition.entries,[entry]);
+ const selection=again.teamCompetition.selection;
+ assert.equal(selection.role==='outside',!entry.included);
+ assert.deepEqual(competition.prepareTeamContext(structuredClone(again),school,{...p.gameDate,day:7},'afternoon',[m]).teamCompetition.selection,selection);
+ assert.equal(new Set(selection.lineup.map(n=>n.id)).size,9);
+});
+
+test('감독 신뢰는 기존 주전에게 두 경기 유예를 주지만 부진·피로·엔트리 제외를 무한히 덮지 않는다',()=>{
+ const p=teamPlayer({relationships:{...player().relationships,coach:100}});const t=p.teamCompetition;
+ const score=competition.coachScore(p);
+ t.roster=t.roster.map(n=>({...n,ability:0,form:0,condition:0,grade:1}));
+ const rival=t.roster.find(n=>n.position==='SS');rival.ability=(score+3)/.7;
+ assert.equal(competition.getStanding(p).rank,2);
+ t.role='starter';t.poorStarts=1;
+ assert.equal(competition.selectMatch(p,fixtureMatch(),p.gameDate).protected,true);
+ t.poorStarts=2;assert.equal(competition.selectMatch(p,fixtureMatch(),p.gameDate).role,'starter');
+ t.poorStarts=3;assert.equal(competition.selectMatch(p,fixtureMatch(),p.gameDate).role,'bench');
+ t.poorStarts=1;
+ assert.equal(competition.selectMatch({...p,condition:10},fixtureMatch(),p.gameDate).role,'bench');
+ assert.equal(competition.selectMatch({...p,relationships:{...p.relationships,coach:10}},fixtureMatch(),p.gameDate).protected,false);
+ t.entries=[{tournamentId:'test-national',year:2026,included:false,memberIds:t.roster.map(n=>n.id)}];
+ assert.equal(competition.selectMatch(p,fixtureMatch('national'),p.gameDate).role,'outside');
+});
+
+test('미출전·대타·대주자·수비교체·구원·투타겸업의 개인 기록과 보상을 구분한다',()=>{
+ for(const [role,pos] of [['bench','SS'],['outside','SS'],['pinchHit','SS'],['pinchRun','CF'],['defense','SS'],['relief','P'],['starter','TwoWay']]){
+   const p=teamPlayer({position:pos});const m=fixtureMatch();p.teamCompetition.selection={matchId:m.id,year:2026,role,reason:'검증',lineup:[],protected:false};
+   const result=withRandom(.99,()=>resolveMatchPlaceholder(m,p,school));const r=result.matchPerformance;
+   assert.equal(r.role,role);
+   if(['bench','outside'].includes(role)){assert.equal(r.atBats,0);assert.equal(r.innings,0);assert.deepEqual(result.statChanges,{});assert.equal(r.rating,undefined);assert.equal(result.relationshipTargets.coach,undefined);}
+   if(role==='pinchHit'){assert.equal(r.atBats,1);assert.equal(r.innings,0);}
+   if(role==='pinchRun'){assert.equal(r.atBats,0);assert.equal(result.statChanges.speed,.3);}
+   if(role==='defense'){assert.equal(r.atBats,0);assert.equal(result.statChanges.defense,.3);}
+   if(role==='relief'){assert.ok(r.innings<=2);assert.equal(r.atBats,0);}
+   if(pos==='TwoWay'){assert.equal(r.atBats,4);assert.ok(r.innings>=4);}
+ }
+});
+
+test('감독 신뢰와 기회 요청은 벤치 교체 가능성을 높이고 낮은 컨디션은 차단한다',()=>{
+ const m=fixtureMatch();const low=teamPlayer({relationships:{...player().relationships,coach:0}});
+ low.teamCompetition.selection={matchId:m.id,year:2026,role:'bench',reason:'검증',lineup:[],protected:false};
+ const high={...low,relationships:{...low.relationships,coach:100}};
+ assert.equal(withRandom(.4,()=>resolveMatchPlaceholder(m,low,school)).matchPerformance.role,'bench');
+ assert.equal(withRandom(.4,()=>resolveMatchPlaceholder(m,high,school)).matchPerformance.role,'pinchHit');
+ assert.equal(withRandom(.4,()=>resolveMatchPlaceholder(m,{...low,teamCompetition:{...low.teamCompetition,opportunityGames:2}},school)).matchPerformance.role,'pinchHit');
+ assert.equal(withRandom(.1,()=>resolveMatchPlaceholder(m,{...high,condition:20},school)).matchPerformance.role,'bench');
+});
+
+test('경기 평가가 다음 서열·훈련 조언·인연·멘탈에 돌아오며 벤치는 최근 실적을 잃지 않는다',()=>{
+ const p=teamPlayer();const good={activityCategory:'match',statChanges:{},staminaDelta:0,logMessage:'활약',matchPerformance:performance('starter',90),matchOutcome:{matchId:'x',tournamentId:'weekend_league',won:true}};
+ const updated=competition.updateCompetitionAfterAction(p,p,good,p.gameDate);
+ assert.ok(updated.teamCompetition.recentForm>p.teamCompetition.recentForm);
+ assert.ok(updated.teamCompetition.lastFeedback.coachDelta>0);
+ assert.match(updated.teamCompetition.lastFeedback.recommendation,/훈련/);
+ const bench=competition.updateCompetitionAfterAction(p,p,{...good,matchPerformance:performance('bench',undefined)},p.gameDate);
+ assert.equal(bench.teamCompetition.recentForm,p.teamCompetition.recentForm);
+ assert.match(competition.trainingRecommendation({...p,condition:20}),/휴식/);
+ const m=fixtureMatch();p.teamCompetition.selection={matchId:m.id,year:2026,role:'starter',lineup:[],reason:'검증',protected:false,advice:'강민준의 조언'};
+ p.relationships.peer=60;
+ const result=withRandom(.1,()=>resolveMatchPlaceholder(m,p,school));
+ assert.equal(result.relationshipTargets.senior,1);assert.equal(result.relationshipTargets.peer,1);assert.ok(result.mentalDelta>0);assert.ok(result.relationshipTargets.coach>0);
+});
+
+test('진급 시 졸업생을 신입생으로 교체하고 포지션·동기 정체성과 저장의 멱등성을 유지한다',()=>{
+ let p=teamPlayer();const peerPosition=p.teamCompetition.roster.find(n=>n.id==='peer').position;
+ for(const grade of [2,3]){
+   const date={...p.gameDate,year:2025+grade,grade};p=competition.ensureTeamCompetition({...p,grade,gameDate:date},school,date);
+   for(const pos of competition.FIELD_POSITIONS)assert.ok(p.teamCompetition.roster.some(n=>n.position===pos));
+   assert.ok(p.teamCompetition.roster.every(n=>n.grade<=3));assert.equal(p.teamCompetition.roster.find(n=>n.id==='peer').grade,grade);
+   assert.equal(p.teamCompetition.roster.find(n=>n.id==='peer').position,peerPosition);
+   assert.equal(new Set(p.teamCompetition.roster.map(n=>n.id)).size,p.teamCompetition.roster.length);
+   assert.deepEqual(competition.ensureTeamCompetition(structuredClone(p),school,date),p);
+ }
+ assert.ok(!p.teamCompetition.roster.some(n=>n.id==='senior'));
+});
+
+test('청백전·연습경기는 단판이며 주말리그·전국대회와 충돌하거나 재접속 때 중복되지 않는다',()=>{
+ let matches=generateSeasonMatches(2026,school,HIGH_SCHOOLS_DATA);
+ assert.equal(matches.filter(m=>getMatchKind(m)==='scrimmage').length,4);assert.equal(matches.filter(m=>getMatchKind(m)==='practice').length,4);
+ assert.deepEqual(addClubMatches(matches,2026,school,HIGH_SCHOOLS_DATA),matches);
+ const own=matches.filter(m=>m.isPlayerTeamMatch);assert.equal(new Set(own.map(m=>`${m.date.month}-${m.date.day}`)).size,own.length);
+ for(const kind of ['scrimmage','practice']){
+   const m=matches.find(m=>getMatchKind(m)===kind);const count=matches.length;
+   matches=progressTournament(matches,{matchId:m.id,tournamentId:m.tournamentId,won:true},school,[]);
+   assert.equal(matches.length,count);assert.ok(matches.find(n=>n.id===m.id).result);
+ }
+});
+
+test('면담은 자유 오후를 소비하며 7일 제한·포지션 재경쟁·재접속을 보존한다',async()=>{
+ const store=useGameClockStore;await store.getState().initClock(teamPlayer());
+ await store.getState().coachMeeting('chance');assert.equal(saved.currentSlot,'night');assert.equal(saved.teamCompetition.opportunityGames,2);
+ const interviewDay=saved.teamCompetition.lastInterviewDay;
+ await store.getState().initClock({...saved,currentSlot:'afternoon'});
+ await store.getState().coachMeeting('position','CF');assert.equal(saved.position,'SS');assert.equal(saved.currentSlot,'afternoon');
+ const next={...saved,currentSlot:'afternoon',gameDate:{...saved.gameDate,day:11},pendingEventId:undefined};
+ await store.getState().initClock(next);await store.getState().coachMeeting('position','CF');
+ assert.equal(saved.position,'CF');assert.equal(saved.teamCompetition.opportunityGames,0);assert.ok(saved.teamCompetition.lastInterviewDay>interviewDay);
+ assert.equal(saved.teamCompetition.roster.find(n=>n.id==='peer').position,'SS');
+ await store.getState().initClock(structuredClone(saved));assert.equal(store.getState().player.position,'CF');
+ await store.getState().coachMeeting('accept');assert.equal(saved.currentSlot,'night');
+});
+
+test('당일 명단→미출전→평가→밤 훈련→재접속이 저장되고 중복 경기를 차단한다',async()=>{
+ const store=useGameClockStore;const m=fixtureMatch();const p=teamPlayer({condition:20,savedMatches:[m],savedSeasonYear:2026});
+ await store.getState().initClock(p);assert.equal(store.getState().player.teamCompetition.selection.role,'bench');
+ await store.getState().executeForcedSlot('afternoon');
+ assert.equal(saved.currentSlot,'night');assert.equal(saved.matchRecords.at(-1).performance.role,'bench');
+ assert.equal(saved.savedMatches.find(n=>n.id===m.id).result,store.getState().seasonMatches.find(n=>n.id===m.id).result);
+ assert.match(saved.matchRecords.at(-1).log,/감독 평가/);assert.equal(saved.teamCompetition.recentForm,p.teamCompetition.recentForm);
+ const record=structuredClone(saved.matchRecords);const last=store.getState().lastActionResult;
+ await store.getState().advanceSlot(last);assert.deepEqual(saved.matchRecords,record);assert.equal(saved.currentSlot,'night');
+ await store.getState().initClock(structuredClone(saved));assert.deepEqual(store.getState().player.matchRecords,record);
+ await store.getState().advanceSlot({activityCategory:'training',statChanges:{contact:2},staminaDelta:0,logMessage:'야간 보완 훈련'});
+ assert.ok(saved.teamCompetition.training>p.teamCompetition.training);assert.equal(saved.gameDate.day,4);
+});
+
+test('경기 저장 실패 시 대진·평가·슬롯을 먼저 확정하지 않는다',async()=>{
+ const store=useGameClockStore;await store.getState().initClock(teamPlayer({savedMatches:[fixtureMatch()],savedSeasonYear:2026}));
+ const before=structuredClone(store.getState().player);const matches=structuredClone(store.getState().seasonMatches);
+ const table=require(path.join(dir,'db.js')).db.players;const put=table.put;
+ try {table.put=async()=>{throw Error('저장 실패');};await assert.rejects(store.getState().executeForcedSlot('afternoon'),/저장 실패/);}finally{table.put=put;}
+ assert.deepEqual(store.getState().player,before);assert.deepEqual(store.getState().seasonMatches,matches);assert.equal(store.getState().isLoading,false);
+});
+
+test('공식 출전 업적은 청백전과 벤치·엔트리 제외를 출전으로 세지 않는다',()=>{
+ const p=teamPlayer();p.matchRecords=[{matchId:'a',year:2026,log:'벤치',kind:'national',performance:performance('bench')},{matchId:'b',year:2026,log:'청백전',kind:'scrimmage',performance:performance('starter')}];
+ assert.equal(buildAchievements(p).find(a=>a.id==='ach_first_match').unlocked,false);
+ p.matchRecords.push({matchId:'c',year:2026,log:'대타',kind:'weekend',performance:performance('pinchHit')});
+ assert.equal(buildAchievements(p).find(a=>a.id==='ach_first_match').unlocked,true);
+});
+
+test('성장에 따라 벤치→백업→주전→핵심 선수로 오르고 부진하면 다시 밀린다',()=>{
+ const p=teamPlayer();const result={statChanges:{},staminaDelta:0,logMessage:'평가'};
+ const rivals=p.teamCompetition.roster.filter(n=>n.position==='SS');
+ assert.ok(rivals.length>=2);
+ p.teamCompetition.roster=p.teamCompetition.roster.map(n=>({...n,ability:65,form:50,condition:80,grade:1}));
+ assert.equal(competition.getStanding(p).role,'bench');
+ p.teamCompetition.roster.find(n=>n.id===rivals[0].id).ability=0;
+ if(rivals.length>2)for(const n of p.teamCompetition.roster.filter(n=>n.position==='SS').slice(2))n.ability=0;
+ assert.equal(competition.getStanding(p).role,'backup');
+ p.teamCompetition.roster.find(n=>n.id===rivals[1].id).ability=0;
+ assert.equal(competition.getStanding(p).role,'starter');
+ for(const key of ['contact','power','eye','speed','defense',...Object.keys(require(path.join(dir,'data/playerDevelopment.js')).EXTRA_RATINGS)])p[key]=90;
+ p.teamCompetition.training=90;p.teamCompetition.recentForm=90;
+ const core=competition.updateCompetitionAfterAction(p,p,result,p.gameDate);
+ assert.equal(core.teamCompetition.role,'core');
+ const fallen={...core,condition:10,relationships:{...core.relationships,coach:0},teamCompetition:{...core.teamCompetition,training:0,recentForm:0,roster:core.teamCompetition.roster.map(n=>({...n,ability:95,form:95}))}};
+ assert.equal(competition.refreshTeamEvaluation(fallen).teamCompetition.role,'bench');
+});
+
+test('경기 날 감독 면담으로 강제 경기를 건너뛸 수 없고 활동 일지가 재접속 후에도 슬롯에 맞는다',async()=>{
+ const store=useGameClockStore;const p=teamPlayer({currentSlot:'morning',savedMatches:[fixtureMatch()],savedSeasonYear:2026});
+ await store.getState().initClock(p);
+ await store.getState().advanceSlot({statChanges:{},staminaDelta:0,logMessage:'오전 수업'});
+ await store.getState().coachMeeting('chance');assert.equal(saved.currentSlot,'afternoon');assert.equal(saved.teamCompetition.opportunityGames,0);
+ await store.getState().executeForcedSlot('afternoon');const gameLog=saved.matchRecords.at(-1).log;
+ await store.getState().initClock(structuredClone(saved));
+ await store.getState().advanceSlot({statChanges:{},staminaDelta:0,logMessage:'야간 휴식'});
+ const day=store.getState().historyLogs[0];assert.equal(day.morningLog,'오전 수업');assert.equal(day.afternoonLog,gameLog);assert.equal(day.nightLog,'야간 휴식');
 });
