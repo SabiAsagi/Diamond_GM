@@ -1,0 +1,194 @@
+/* ==========================================================================
+   100dvh 원페이지 레이아웃 & 메인 네비게이션 & 모달 시스템
+   ========================================================================== */
+
+.onepage-viewport-container {
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px 0 16px;
+  box-sizing: border-box;
+  position: relative;
+  background-color: var(--bg-dark);
+}
+
+.onepage-viewport-container.loading-state {
+  align-items: center;
+  justify-content: center;
+}
+
+/* 상단바 슬림 컴팩트화 */
+.onepage-viewport-container .daily-top-bar {
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+
+/* 메인 무대 영역 */
+.onepage-main-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: 60px; /* 네비게이션 바 높이 확보 */
+}
+
+/* 홈 대시보드 레이아웃 */
+.home-dashboard-layout {
+  display: flex;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.home-left-rail {
+  width: 380px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.home-center-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* PC에서는 선택 카드만 스크롤하고 활동 완료 버튼은 화면 안에 유지한다.
+   아주 낮은 창에서는 기존 패널 전체 스크롤을 사용한다. */
+@media (min-width: 769px) and (min-height: 560px) {
+  .home-center-stage > .free-slot-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    margin-bottom: 0;
+    overflow-y: auto;
+  }
+
+  .free-slot-panel > .slot-panel-header,
+  .free-slot-panel > .category-selection-row,
+  .free-slot-panel > .training-focus,
+  .free-slot-panel > .slot-action-footer {
+    flex-shrink: 0;
+  }
+
+  .free-slot-panel > .sub-activities-grid {
+    flex: 1;
+    min-height: 80px; /* 카드 영역이 사라지지 않게 하고 부족하면 패널 전체가 스크롤된다. */
+    min-width: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    overflow-y: auto;
+    align-content: start;
+    padding: 4px;
+    margin-bottom: 12px;
+    scrollbar-gutter: stable;
+  }
+}
+
+@media (min-width: 769px) and (min-height: 560px) and (max-height: 700px) {
+  .home-center-stage > .free-slot-panel { padding: 16px; }
+  .free-slot-panel > .slot-panel-header,
+  .free-slot-panel > .category-selection-row { margin-bottom: 10px; }
+  .free-slot-panel > .training-focus { margin: 6px 0; }
+  .free-slot-panel > .slot-action-footer { gap: 8px; padding-top: 10px; }
+}
+
+/* 컴팩트 3대 게이지 */
+.compact-gauges-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.compact-gauge-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cg-header-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cg-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.cg-num-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.cg-big-num {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.cg-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.cg-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.cg-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width var(--transition-normal);
+}
+
+/* 보유 특성 스트립 */
+.home-traits-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  flex-wrap: wrap;
+}
+
+.home-trait-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}

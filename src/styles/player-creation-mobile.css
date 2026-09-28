@@ -1,0 +1,194 @@
+/* ==========================================
+   모바일 반응형 최적화 (@media max-width: 680px)
+   ========================================== */
+@media (max-width: 680px) {
+  /* 메인 타이틀 화면 모바일 최적화 (세로 늘어짐 방지) */
+  .title-screen-container {
+    padding: 24px 12px;
+    align-items: center;
+  }
+
+  .title-content {
+    padding: 12px 4px;
+    max-width: 100%;
+  }
+
+  .title-text {
+    font-size: 2.6rem;
+    letter-spacing: -0.5px;
+  }
+
+  .title-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+  }
+
+  .mode-selection-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mode-card {
+    padding: 20px 16px;
+    border-radius: 14px;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .mode-icon {
+    margin-bottom: 10px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .mode-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+
+  .mode-card p {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  /* 선수 생성 마법사 모바일 꽉 채우기 */
+  .creation-container {
+    padding: 10px 6px;
+    align-items: flex-start;
+  }
+
+  .wizard-panel {
+    padding: 16px 12px;
+    border-radius: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .wizard-header-sticky {
+    padding: 12px 10px 10px;
+    margin: -16px -12px 14px -12px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .wizard-top-step-row {
+    margin-bottom: 4px;
+  }
+
+  .step-indicator-large {
+    font-size: 0.78rem;
+    padding: 2px 10px;
+  }
+
+  .wizard-nav-main-row {
+    grid-template-columns: 80px 1fr 80px;
+  }
+
+  .wizard-main-title {
+    font-size: 1.05rem;
+    letter-spacing: -0.5px;
+  }
+
+  .nav-action-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    height: 32px;
+    min-width: 68px;
+  }
+
+  .school-selection-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .school-list-container {
+    max-height: 340px;
+  }
+
+  .school-detail-panel {
+    padding: 14px 10px;
+    gap: 12px;
+  }
+
+  .school-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .trophy-count {
+    align-self: flex-start;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+
+  .detail-title {
+    font-size: 1.2rem;
+  }
+
+  /* 탭 스위처 모바일 축소 */
+  .graph-tab-btn {
+    font-size: 0.76rem;
+    padding: 7px 6px;
+    gap: 4px;
+  }
+
+  .graph-tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .graph-card.full-wide {
+    padding: 12px 6px 10px;
+    min-height: 320px;
+  }
+
+  /* 세로 막대 모바일 최적화 */
+  .vertical-bar-container.wide {
+    height: 250px;
+    padding: 0 4px;
+  }
+
+  .columns-grid.wide {
+    gap: 8px;
+    padding-left: 36px;
+    padding-right: 6px;
+  }
+
+  .column-track.wide {
+    width: 24px;
+    border-radius: 12px;
+  }
+
+  .column-fill {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .column-val-badge.wide {
+    padding: 1px 6px;
+    height: 20px;
+  }
+
+  .val-text.wide {
+    font-size: 0.78rem;
+  }
+
+  .pos-name.wide {
+    font-size: 0.78rem;
+  }
+
+  .pos-sub.wide {
+    font-size: 0.65rem;
+  }
+
+  .grid-val.avg {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+  }
+
+  /* 대회별 우승 내역 모바일 2열 */
+  .titles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+}

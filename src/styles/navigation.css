@@ -1,0 +1,57 @@
+/* ==========================================================================
+   앱 메인 네비게이션 (모바일 하단 탭바 & 데스크톱 네비)
+   ========================================================================== */
+
+.app-main-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+  padding: 0 10px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-tab-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  min-height: 48px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  padding: 4px 0;
+}
+
+.nav-tab-button:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-tab-button.active {
+  color: #60a5fa;
+}
+
+.nav-tab-button.active .nav-tab-icon {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6));
+}
+
+.nav-tab-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+}

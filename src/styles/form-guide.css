@@ -1,0 +1,239 @@
+/* ==========================================
+   투구 폼 / 타격 폼 가이드 & 라이브 프리뷰 스타일
+   ========================================== */
+.form-guide-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.form-guide-link-btn:hover {
+  background: rgba(59, 130, 246, 0.28);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.selected-form-preview-card {
+  margin-top: 12px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.selected-form-preview-card:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.form-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.form-preview-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.form-preview-badge.batting {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+
+.form-preview-name {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.form-preview-eng {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.click-detail-hint {
+  font-size: 0.72rem;
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.form-preview-tagline {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.form-preview-action-cue,
+.form-preview-pros {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.form-preview-action-cue strong {
+  color: #38bdf8;
+}
+
+.form-preview-pros strong {
+  color: #34d399;
+}
+
+/* 폼 상세 가이드 팝업 모달 */
+.form-guide-modal-content {
+  position: relative !important;
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 18px !important;
+  width: 95vw !important;
+  max-width: 520px !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 18px 20px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.form-category-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.form-category-tag.pitching {
+  background: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.form-category-tag.batting {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.form-tagline-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.form-guide-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-section-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.visual-cue-box {
+  background: rgba(30, 41, 59, 0.8);
+  border-left: 3.5px solid var(--primary);
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.86rem;
+  color: #f8fafc;
+  line-height: 1.5;
+}
+
+.guide-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.84rem;
+  color: #cbd5e1;
+}
+
+.form-pros-cons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 500px) {
+  .form-pros-cons-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pros-box, .cons-box {
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.pros-box {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+.cons-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.box-label {
+  font-weight: 800;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+}
+
+.pros-box ul, .cons-box ul {
+  padding-left: 16px;
+  margin: 0;
+}
+
+.ideal-player-box {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  color: #fef08a;
+  line-height: 1.45;
+}

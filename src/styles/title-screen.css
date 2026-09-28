@@ -1,0 +1,96 @@
+/* Title Screen */
+.title-screen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px 16px;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 1)),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%230f172a"/><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.02)" stroke-width="2" fill="none"/></svg>');
+  background-size: cover;
+  background-position: center;
+  box-sizing: border-box;
+}
+
+.title-content {
+  text-align: center;
+  max-width: 960px;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.title-icon {
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.6));
+}
+
+.title-text {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.title-subtitle {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  margin-bottom: 48px;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.mode-selection-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 36px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.mode-card:hover::before {
+  opacity: 1;
+}
+
+.mode-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+}
+
+.mode-card:hover .mode-icon {
+  transform: scale(1.1);
+}
+
+.mode-icon {
+  margin-bottom: 20px;
+  transition: transform var(--transition-fast);
+}
