@@ -6,7 +6,11 @@ export type TournamentType =
   | 'spring_national'    // 이마트배 등 전국대회
   | 'summer_national'    // 황금사자기 / 청룡기 등
   | 'autumn_national'    // 봉황대기 등
+  | 'sports_festival'    // 전국체육대회 고등부 (시·도 대표전)
   | 'regional_qualifier'; // 지역 예선
+
+/** open: 전국 학교 추첨으로 64강 조 예선부터, provincial: 시·도별 대표 1개교씩 본선 토너먼트 */
+export type TournamentEntry = 'open' | 'provincial';
 
 export interface TournamentSchedule {
   id: string;
@@ -16,6 +20,7 @@ export interface TournamentSchedule {
   startDate: { month: number; day: number };
   roundIntervalDays: number;     // 라운드 간 간격 (토너먼트면 보통 2~3일)
   participatingTiers: SchoolTier[]; // 어떤 티어 학교가 출전 가능한지
+  entry?: TournamentEntry;       // 기본 open
   description?: string;
 }
 
@@ -83,7 +88,80 @@ export const MAJOR_TOURNAMENT_TEMPLATES: TournamentSchedule[] = [
     participatingTiers: ['S', 'A', 'B', 'C', 'D'],
     description: '초록 봉황을 향한 전국 모든 고교가 조건 없이 출전하는 토너먼트.',
   },
+  {
+    id: 'national_sports_festival',
+    type: 'sports_festival',
+    name: '전국체육대회 고등부 야구',
+    startDate: { month: 10, day: 17 },
+    roundIntervalDays: 3,
+    participatingTiers: ['S', 'A', 'B', 'C', 'D'],
+    entry: 'provincial',
+    description: '시·도를 대표하는 학교끼리 고향의 이름을 걸고 겨루는 종합 체육대회 고등부 종목.',
+  },
 ];
+
+/** 대진표 화면에 표시하는 대회 방식 안내 */
+export function getTournamentRuleText(tournamentId: string): string {
+  const tour = MAJOR_TOURNAMENT_TEMPLATES.find(t => t.id === tournamentId);
+  return tour?.entry === 'provincial'
+    ? '게임 대회 규칙: 시·도별 대표 1개교 출전 → 16강 → 8강 → 4강 → 결승 단판 토너먼트'
+    : '게임 대회 규칙: 4팀씩 조별 토너먼트 예선 → 조 우승팀 본선 16강 → 8강 → 4강 → 결승';
+}
+
+const TIER_ORDER: SchoolTier[] = ['S', 'A', 'B', 'C', 'D'];
+
+function shuffle<T>(items: T[]): T[] {
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
+}
+
+/** 플레이어 학교를 제외한 각 시·도에서 최상위 티어 학교 중 1개교를 대표로 뽑는다. */
+function pickProvincialRepresentatives(playerSchool: HighSchoolData, otherSchools: HighSchoolData[]): HighSchoolData[] {
+  const byRegion = new Map<string, HighSchoolData[]>();
+  for (const school of otherSchools) {
+    if (school.region === playerSchool.region) continue;
+    byRegion.set(school.region, [...(byRegion.get(school.region) ?? []), school]);
+  }
+  return [...byRegion.values()].map(schools => {
+    const bestTier = TIER_ORDER.find(tier => schools.some(s => s.tier === tier));
+    const top = schools.filter(s => s.tier === bestTier);
+    return top[Math.floor(Math.random() * top.length)];
+  });
+}
+
+/** 전국대회 1라운드(조 추첨 전) 대진을 만든다. open은 16개 조 4팀 예선 후 조 우승팀만 본선 16강, provincial은 시·도 대표 16강부터 (게임 규칙). */
+function buildNationalFirstRound(tour: TournamentSchedule, year: number, playerSchool: HighSchoolData, otherSchools: HighSchoolData[]): ScheduledMatch[] {
+  const provincial = tour.entry === 'provincial';
+  const entrants = shuffle(provincial ? pickProvincialRepresentatives(playerSchool, otherSchools) : otherSchools.slice());
+  const field = [playerSchool, ...entrants.slice(0, 63)];
+  const size = 2 ** Math.floor(Math.log2(field.length));
+  if (size < 2) return [];
+  field.length = size;
+  shuffle(field);
+  const matches: ScheduledMatch[] = [];
+  for (let i = 0; i < field.length; i += 2) {
+    const home = field[i], away = field[i + 1];
+    matches.push({id:`${tour.id}_r0_${i/2}`,year,date:{...tour.startDate},tournamentId:tour.id,tournamentName:tour.name,
+      round:size>32?'조 예선 1차전':size>16?'조 예선 결정전':`${size}강전`,group:`${Math.floor(i/4)+1}조`,drawn:false,
+      homeSchoolId:home.id,homeSchoolName:home.name,awaySchoolId:away.id,awaySchoolName:away.name,
+      isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,
+      description:provincial?`${home.region} 대표 ${home.name} vs ${away.region} 대표 ${away.name}`:'조 추첨 후 예선 상대 공개'});
+  }
+  return matches;
+}
+
+/** 이전 버전 저장본에 없는 전국대회 중 아직 개막 전인 대회의 대진을 추가한다. */
+export function addMissingNationals(matches: ScheduledMatch[], year: number, playerSchool: HighSchoolData, allSchools: HighSchoolData[], from: GameDate): ScheduledMatch[] {
+  const missing = MAJOR_TOURNAMENT_TEMPLATES.filter(t =>
+    !matches.some(m => m.tournamentId === t.id) && t.startDate.month * 32 + t.startDate.day >= from.month * 32 + from.day);
+  if (!missing.length) return matches;
+  const otherSchools = allSchools.filter(s => s.id !== playerSchool.id && s.name !== playerSchool.name);
+  const added = [...matches, ...missing.flatMap(t => buildNationalFirstRound(t, year, playerSchool, otherSchools))];
+  return settleScheduleConflicts(added, from);
+}
 
 /**
  * 특정 연도의 플레이어 소속 학교 시즌 전체 대진을 한 번에 사전 생성합니다.
@@ -142,23 +220,7 @@ export function generateSeasonMatches(
     }
   }
 
-  // 16개 조, 각 조 4팀 토너먼트 예선. 조 우승팀만 본선 16강 진출 (게임 규칙).
-  for (const tour of MAJOR_TOURNAMENT_TEMPLATES) {
-    const entrants = otherSchools.slice();
-    for(let i=entrants.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[entrants[i],entrants[j]]=[entrants[j],entrants[i]];}
-    const field=[playerSchool,...entrants.slice(0,63)];
-    const size=2 ** Math.floor(Math.log2(field.length));
-    if(size<2) continue;
-    field.length=size;
-    for(let i=field.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[field[i],field[j]]=[field[j],field[i]];}
-    for(let i=0;i<field.length;i+=2){
-      const home=field[i],away=field[i+1];
-      matches.push({id:`${tour.id}_r0_${i/2}`,year,date:{...tour.startDate},tournamentId:tour.id,tournamentName:tour.name,
-        round:size>32?'조 예선 1차전':size>16?'조 예선 결정전':`${size}강전`,group:`${Math.floor(i/4)+1}조`,drawn:false,
-        homeSchoolId:home.id,homeSchoolName:home.name,awaySchoolId:away.id,awaySchoolName:away.name,
-        isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,description:'조 추첨 후 예선 상대 공개'});
-    }
-  }
+  for (const tour of MAJOR_TOURNAMENT_TEMPLATES) matches.push(...buildNationalFirstRound(tour, year, playerSchool, otherSchools));
   // 일자 순서로 정렬
   matches.sort((a, b) => {
     if (a.date.month !== b.date.month) return a.date.month - b.date.month;

@@ -32,8 +32,8 @@ const { normalizePlayer } = require(path.join(dir, 'data/playerDevelopment.js'))
 const { INITIAL_RELATIONSHIPS } = require(path.join(dir, 'types/bondScores.js'));
 const { SUB_ACTIVITY_POOL, getActivityCategories, isActivityAvailable } = require(path.join(dir, 'types/activity.js'));
 const { isSchoolDay, isVacationPeriod } = require(path.join(dir, 'types/academicCalendar.js'));
-const { MAJOR_TOURNAMENT_TEMPLATES } = require(path.join(dir, 'types/tournament.js'));
-const existingNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn'];
+const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals } = require(path.join(dir, 'types/tournament.js'));
+const requiredNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn', 'national_sports_festival'];
 function seededRandom(seed) {
   let n = seed >>> 0;
   return () => { n = (Math.imul(n, 1664525) + 1013904223) >>> 0; return n / 4294967296; };
@@ -157,10 +157,10 @@ for (const scenario of [
       assert.equal(days.size, 364);
       assert.equal(months.size, 12);
       assert.deepEqual(store.getState().clock, { date: { year: 2027, month: 3, day: 1, weekday: 1, grade: 2 }, currentSlot: 'morning' });
-      for (const id of [...existingNationals, 'weekend_league']) assert.ok(coverage.get(id) >= 1, `필수 대회 일정 누락: ${id}`);
+      for (const id of [...requiredNationals, 'weekend_league']) assert.ok(coverage.get(id) >= 1, `필수 대회 일정 누락: ${id}`);
       for (const kind of ['scrimmage_', 'practice_']) assert.ok([...coverage.keys()].some(id => id.startsWith(kind)), `${kind} 미진행`);
       assert.ok(stats.summer > 0 && stats.winter > 0, '여름·겨울 방학 오전 자유활동 누락');
-      assert.ok(stats.events > 0 && stats.reports >= 12 && stats.draws >= 4 && stats.reloads >= 20);
+      assert.ok(stats.events > 0 && stats.reports >= 12 && stats.draws >= 5 && stats.reloads >= 20);
       assert.equal(saved.teamCompetition.grade, 2);
       assert.equal(saved.teamCompetition.roster.find(n => n.id === 'peer').grade, 2);
       assert.equal(saved.matchRecords.length, seenMatches.size, '저장된 연간 경기 기록 누락 또는 중복');
@@ -172,7 +172,31 @@ for (const scenario of [
   });
 }
 
-// 구현 전 요구사항을 실행 가능한 TODO로 드러낸다. v1.11에서 TODO를 제거하고 완주 coverage에도 추가한다.
-test('v1.11 합격 조건: 전국체전 대회가 존재한다', { todo: '전국체전은 다음 단계에서 추가; 현재 v2.0 완성 판정 불가' }, () => {
-  assert.ok(MAJOR_TOURNAMENT_TEMPLATES.some(t => t.id === 'national_sports_festival'), '전국체전 템플릿 미구현');
+test('전국체전: 시·도별 대표 1개교씩 16강 토너먼트로 10월에 열린다', () => {
+  const tour = MAJOR_TOURNAMENT_TEMPLATES.find(t => t.id === 'national_sports_festival');
+  assert.ok(tour, '전국체전 템플릿 누락');
+  assert.equal(tour.entry, 'provincial');
+  assert.equal(tour.startDate.month, 10);
+  for (const school of [HIGH_SCHOOLS_DATA.find(s => s.region === '서울'), HIGH_SCHOOLS_DATA.find(s => s.region === '제주')]) {
+    const first = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId === tour.id);
+    assert.equal(first.length, 8, '16개교 = 1라운드 8경기');
+    assert.ok(first.every(m => m.round === '16강전' && m.drawn === false && m.date.month === 10 && m.date.day === 17));
+    const teams = first.flatMap(m => [m.homeSchoolId, m.awaySchoolId]).map(id => HIGH_SCHOOLS_DATA.find(s => s.id === id));
+    assert.equal(new Set(teams.map(s => s.id)).size, 16, '중복 출전 학교');
+    assert.equal(new Set(teams.map(s => s.region)).size, 16, '시·도마다 1개교');
+    assert.ok(teams.some(s => s.id === school.id), '플레이어 학교는 소속 시·도 대표로 출전');
+    assert.equal(first.filter(m => m.isPlayerTeamMatch).length, 1);
+  }
+});
+
+test('전국체전: 이전 버전 저장본은 개막 전일 때만 대진을 보완한다', () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const legacy = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId !== 'national_sports_festival');
+  const september = { year: 2026, month: 9, day: 1, weekday: 2, grade: 1 };
+  const beforeFestival = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, september);
+  assert.equal(beforeFestival.filter(m => m.tournamentId === 'national_sports_festival').length, 8);
+  assert.equal(beforeFestival.filter(m => m.tournamentId !== 'national_sports_festival').length, legacy.length, '기존 경기 보존');
+  assert.equal(addMissingNationals(beforeFestival, 2026, school, HIGH_SCHOOLS_DATA, september), beforeFestival, '이미 있으면 변경 없음');
+  const afterOpening = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, { year: 2026, month: 10, day: 20, weekday: 2, grade: 1 });
+  assert.equal(afterOpening, legacy, '개막 이후에는 소급 추가하지 않음');
 });

@@ -13,7 +13,7 @@ import { buildDailyPlan } from '../types/dailySchedule';
 import type { AcademicEvent } from '../types/academicCalendar';
 import { ACADEMIC_CALENDAR_TEMPLATE, getActiveAcademicEvent, isSchoolDay } from '../types/academicCalendar';
 import type { ScheduledMatch } from '../types/tournament';
-import { generateSeasonMatches, addClubMatches, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
+import { generateSeasonMatches, addClubMatches, addMissingNationals, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
 import { SUB_ACTIVITY_POOL, evaluateActivityWithGating, isActivityAvailable } from '../types/activity';
 import { resolveMatchPlaceholder } from './matchResolver';
@@ -122,7 +122,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const initialSlot: TimeSlot = player.currentSlot || 'morning';
 
     // 시즌 대회 대진표 생성
-    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(addMissingNationals(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate), initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
     player=prepareTeamContext(player,school,initialDate,initialSlot,seasonMatches);
     captureAchievements(player);
     player.savedMatches=seasonMatches;
