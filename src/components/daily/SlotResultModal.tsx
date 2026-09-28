@@ -56,7 +56,7 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
           <h4 className="result-title">활동 완료</h4>
         </div>
 
-        <p className="result-log-preview">{result.logMessage.split('\n')[0]}</p>
+        <p className="result-log-preview">{result.logMessage}</p>
 
         {/* 스탯 및 체력 변화 그리드 */}
         <div className="result-deltas-grid">

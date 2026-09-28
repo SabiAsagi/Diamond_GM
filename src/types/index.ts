@@ -35,6 +35,8 @@ export type PitcherRole = 'Starter' | 'Reliever' | 'Closer' | 'None';
 export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 
 export interface Player {
+  dailyActionLogs?: { date: string; logs: Partial<Record<TimeSlot, string>> };
+  teamCompetition?: import('../data/teamCompetition').TeamCompetition;
   earnedAchievementIds?: string[];
   earnedTrophyIds?: string[];
   gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number;
@@ -46,7 +48,7 @@ export interface Player {
   savedSeasonYear?: number;
   eventHistory?: import('./randomEvent').CutsceneTriggerHistory;
   pendingEventId?: string;
-  matchRecords?: { matchId: string; year: number; log: string }[];
+  matchRecords?: { matchId: string; year: number; log: string; kind?: import('./tournament').MatchKind; performance?: import('../data/teamCompetition').MatchPerformance }[];
 
   id?: number; // Auto-incremented
   name: string;

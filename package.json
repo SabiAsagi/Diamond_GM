@@ -1,14 +1,15 @@
 {
   "name": "diamond-gm",
   "private": true,
-  "version": "1.9.0",
+  "version": "1.10.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --test tests/career.cjs tests/v2_features.cjs"
+    "test": "node --test tests/career.cjs tests/v2_features.cjs tests/freshman_year.cjs",
+    "test:freshman": "node --test tests/freshman_year.cjs"
   },
   "dependencies": {
     "dexie": "^4.4.5",

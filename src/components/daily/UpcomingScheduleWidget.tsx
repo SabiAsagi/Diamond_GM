@@ -1,3 +1,4 @@
+import { getMatchKind } from '../../types/tournament';
 import { useMemo } from 'react';
 import type { GameDate } from '../../types/calendar';
 import type { ScheduledMatch } from '../../types/tournament';
@@ -45,7 +46,7 @@ export function UpcomingScheduleWidget({
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays >= 0 && diffDays <= 30) {
-        const isMajor = m.tournamentId !== 'weekend_league';
+        const isMajor = getMatchKind(m) === 'national';
         items.push({
           id: m.id,
           title: `${m.tournamentName} ${m.round}`,

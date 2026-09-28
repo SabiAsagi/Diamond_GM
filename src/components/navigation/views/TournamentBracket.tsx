@@ -1,3 +1,4 @@
+import { getMatchKind } from '../../../types/tournament';
 import { useState } from 'react';
 import type { ScheduledMatch } from '../../../types/tournament';
 import { useGameClockStore } from '../../../store/gameClockStore';
@@ -5,7 +6,7 @@ export function TournamentBracket({ matches }: { matches: ScheduledMatch[] }) {
   const tours = [
     ...new Map(
       matches
-        .filter((m) => m.tournamentId !== 'weekend_league')
+        .filter((m) => getMatchKind(m) === 'national')
         .map((m) => [m.tournamentId, m.tournamentName]),
     ).entries(),
   ];

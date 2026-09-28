@@ -1,3 +1,5 @@
+import { TeamCompetitionPanel } from '../../components/daily/TeamCompetitionPanel';
+import { TEAM_ROLE_LABELS, getStanding } from '../../data/teamCompetition';
 import { RivalReportModal } from '../../components/daily/RivalReportModal';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -27,6 +29,7 @@ export default function DevelopmentDashboard() {
 
   const [activeNavTab, setActiveNavTab] = useState<MainNavTab>('home');
   const [outingOpen, setOutingOpen] = useState(false);
+  const [teamOpen, setTeamOpen] = useState(false);
   const [confirmedDraw, setConfirmedDraw] = useState<string | null>(null);
 
   const {
@@ -99,11 +102,13 @@ export default function DevelopmentDashboard() {
       {drawDue && confirmedDraw !== drawKey && !activeCutscene && !lastActionResult && <div className="cutscene-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draw-intro-title"><div className="cutscene-modal-card glass-panel"><span className="cutscene-top-tag">📢 대회 개막</span><h2 id="draw-intro-title">{drawDue.tournamentName} 조 추첨일</h2><p>전국 각지의 학교들이 대진 조 추첨을 위해 모였습니다. 우리 학교는 어떤 상대를 만나게 될까요?</p><button autoFocus className="btn btn-primary" onClick={() => setConfirmedDraw(drawKey)}>조 추첨 현장으로 이동</button></div></div>}
       <main className="onepage-main-stage" inert={showRivalReport || (!!drawDue && confirmedDraw !== drawKey)}>
         {drawDue && confirmedDraw === drawKey && <div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><div className="menu-view-body"><TournamentBracket key={drawKey} matches={seasonMatches.filter(m => m.tournamentId === drawDue.tournamentId)} /></div></div>}
-        {activeNavTab === 'home' && !outingOpen && !drawDue && (
+        {activeNavTab === 'home' && teamOpen && !drawDue && <TeamCompetitionPanel player={player} onClose={() => setTeamOpen(false)} />}
+        {activeNavTab === 'home' && !teamOpen && !outingOpen && !drawDue && (
           <div className="home-dashboard-layout animate-fade-in">
             {/* 좌측 패널 (데스크톱) 또는 상단 요약 (모바일) */}
             <section className="home-left-rail">
               <button className="btn btn-secondary" onClick={() => setOutingOpen(true)}>외출 · 상점</button>
+              <button className="btn btn-secondary team-home-button" onClick={() => setTeamOpen(true)}><span>주전 경쟁 · 감독 면담</span><strong>{TEAM_ROLE_LABELS[player.teamCompetition?.role ?? 'bench']} · 포지션 {getStanding(player).rank}위</strong>{player.teamCompetition?.entries.at(-1) && <small>최근 엔트리: {player.teamCompetition.entries.at(-1)!.included ? '합류' : '제외'} · 명단 확인</small>}</button>
               {/* 3대 핵심 게이지 요약 바 */}
               <div className="compact-gauges-row glass-panel">
                 {/* OVR */}
@@ -226,7 +231,7 @@ export default function DevelopmentDashboard() {
       </main>
 
       {/* 3. 앱 메인 네비게이션 (데스크톱 사이드 / 모바일 하단 탭바) */}
-      <div inert={!!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); }} /></div>
+      <div inert={!!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
       {lastActionResult && (

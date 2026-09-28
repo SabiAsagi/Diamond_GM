@@ -19,7 +19,12 @@ export interface TournamentSchedule {
   description?: string;
 }
 
+export type MatchKind = 'scrimmage' | 'practice' | 'weekend' | 'national';
+export function getMatchKind(match: ScheduledMatch): MatchKind {
+  return match.kind ?? (match.tournamentId === 'weekend_league' ? 'weekend' : match.tournamentId.startsWith('scrimmage_') ? 'scrimmage' : match.tournamentId.startsWith('practice_') ? 'practice' : 'national');
+}
 export interface ScheduledMatch {
+  kind?: MatchKind;
   year?: number;
   group?: string;
   drawn?: boolean;
@@ -160,7 +165,7 @@ export function generateSeasonMatches(
     return a.date.day - b.date.day;
   });
 
-  return matches;
+  return addClubMatches(matches, year, playerSchool, allSchools);
 }
 
 export function progressTournament(matches: ScheduledMatch[], outcome: { matchId: string; tournamentId: string; won: boolean }, playerSchool: HighSchoolData, _schools: HighSchoolData[]): ScheduledMatch[] {
@@ -168,7 +173,7 @@ export function progressTournament(matches: ScheduledMatch[], outcome: { matchId
  if(!current || current.result) return matches;
  const playerHome=current.homeSchoolId===playerSchool.id;
  const result: 'home'|'away' = outcome.won===playerHome?'home':'away';
- if(current.tournamentId==='weekend_league') return matches.map(m=>m.id===current.id?{...m,result}:m);
+ if(getMatchKind(current)!=='national') return matches.map(m=>m.id===current.id?{...m,result}:m);
  const peers=matches.filter(m=>m.tournamentId===current.tournamentId && m.round===current.round);
  const resolved=matches.map(m=>peers.includes(m)?{...m,drawn:true,result:m.id===current.id?result:m.result??(Math.random()<0.5?'home' as const:'away' as const)}:m);
  const winners=resolved.filter(m=>peers.some(p=>p.id===m.id)).map(m=>m.result==='home'?{id:m.homeSchoolId,name:m.homeSchoolName}:{id:m.awaySchoolId,name:m.awaySchoolName});
@@ -182,7 +187,7 @@ export function progressTournament(matches: ScheduledMatch[], outcome: { matchId
  isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,description:'이전 라운드 승리 학교끼리 대결'});
  }
 
- return resolved.sort((a,b)=>a.date.month-b.date.month||a.date.day-b.date.day);
+ return settleScheduleConflicts(resolved);
 }
 
 /**
@@ -193,7 +198,7 @@ export function getPlayerMatchForDate(
   matches: ScheduledMatch[]
 ): ScheduledMatch | null {
   return (
-    [...matches].sort((a,b)=>Number(a.tournamentId==='weekend_league')-Number(b.tournamentId==='weekend_league')).find(
+    [...matches].sort((a,b)=>Number(getMatchKind(a)!=='national')-Number(getMatchKind(b)!=='national')).find(
       m => m.date.month === date.month && m.date.day === date.day && m.isPlayerTeamMatch && !m.result
     ) || null
   );
@@ -203,9 +208,34 @@ export function getPlayerMatchForDate(
 export function advanceOtherTournamentMatches(matches: ScheduledMatch[], date: GameDate, playerSchool: HighSchoolData): ScheduledMatch[] {
  let updated=matches;
  for(let i=0;i<32;i++){
-  const due=updated.find(m=>m.tournamentId!=='weekend_league'&&!m.result&&!m.isPlayerTeamMatch&&m.date.month*32+m.date.day<=date.month*32+date.day&&!updated.some(p=>p.tournamentId===m.tournamentId&&p.round===m.round&&p.isPlayerTeamMatch&&!p.result));
+  const due=updated.find(m=>getMatchKind(m)==='national'&&!m.result&&!m.isPlayerTeamMatch&&m.date.month*32+m.date.day<=date.month*32+date.day&&!updated.some(p=>p.tournamentId===m.tournamentId&&p.round===m.round&&p.isPlayerTeamMatch&&!p.result));
   if(!due)break;
   updated=progressTournament(updated,{matchId:due.id,tournamentId:due.tournamentId,won:Math.random()<.5},playerSchool,[]);
  }
  return updated;
+}
+
+/** 실제 공식 일정이 아닌 육성 모드의 팀 평가 일정. */
+export function addClubMatches(matches: ScheduledMatch[], year: number, school: HighSchoolData, schools: HighSchoolData[], from?: GameDate): ScheduledMatch[] {
+  const added=[...matches];
+  const dates: {month:number;day:number;kind:'scrimmage'|'practice'}[]=[];
+  for(const month of [3,6,9,11]) {dates.push({month,day:7,kind:'scrimmage'},{month,day:21,kind:'practice'});}
+  for(const item of dates){
+    if(from&&item.month*32+item.day<from.month*32+from.day)continue;
+    const id=`${item.kind}_${year}_${item.month}`;if(added.some(m=>m.id===id))continue;
+    const opponent=schools.find(s=>s.id!==school.id&&s.region===school.region)??schools.find(s=>s.id!==school.id);
+    added.push({id,year,kind:item.kind,date:{month:item.month,day:item.day},tournamentId:id,tournamentName:item.kind==='scrimmage'?'야구부 청백전':'학교 간 연습경기',round:'주전 경쟁 평가전',drawn:true,homeSchoolId:school.id,homeSchoolName:school.name,awaySchoolId:item.kind==='scrimmage'?`${school.id}-white`:opponent?.id??'practice-away',awaySchoolName:item.kind==='scrimmage'?'교내 백팀':opponent?.name??'연습 상대교',isPlayerTeamMatch:true,description:'게임 내 평가 일정 · 선발과 교체 기회를 통해 팀 내 경쟁을 평가합니다.'});
+  }
+  return settleScheduleConflicts(added,from);
+}
+/** 한 오후에 두 경기를 치르지 않는다. 겹치는 비전국대회 경기는 다음 빈 날로 이월한다. */
+export function settleScheduleConflicts(matches: ScheduledMatch[], from?: GameDate): ScheduledMatch[] {
+  const used=new Set<string>();const updated=matches.map(m=>({...m,date:{...m.date}}));
+  const candidates=updated.filter(m=>m.isPlayerTeamMatch).sort((a,b)=>Number(!a.result)-Number(!b.result)||Number(getMatchKind(a)!=='national')-Number(getMatchKind(b)!=='national')||a.date.month-b.date.month||a.date.day-b.date.day);
+  for(const m of candidates){
+    if(from&&m.date.month*32+m.date.day<from.month*32+from.day)continue;
+    while(used.has(`${m.date.month}-${m.date.day}`)&&!m.result){const d=new Date(m.year??from?.year??2026,m.date.month-1,m.date.day+1);m.date={month:d.getMonth()+1,day:d.getDate()};}
+    used.add(`${m.date.month}-${m.date.day}`);
+  }
+  return updated.sort((a,b)=>a.date.month-b.date.month||a.date.day-b.date.day);
 }
