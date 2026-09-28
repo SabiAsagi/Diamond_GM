@@ -70,8 +70,8 @@ export default function DevelopmentDashboard() {
   }, [id, navigate, initClock]);
 
   const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
+  // 추첨마다 키가 달라서, 새 추첨이 오면 이전에 확인한 키와 자동으로 불일치한다.
   const drawKey = drawDue ? `${clock.date.year}:${drawDue.tournamentId}` : null;
-  useEffect(() => { setConfirmedDraw(null); }, [drawKey]);
 
   if (!player) {
     return (
