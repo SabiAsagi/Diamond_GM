@@ -32,11 +32,30 @@ const { normalizePlayer } = require(path.join(dir, 'data/playerDevelopment.js'))
 const { INITIAL_RELATIONSHIPS } = require(path.join(dir, 'types/bondScores.js'));
 const { SUB_ACTIVITY_POOL, getActivityCategories, isActivityAvailable } = require(path.join(dir, 'types/activity.js'));
 const { isSchoolDay, isVacationPeriod } = require(path.join(dir, 'types/academicCalendar.js'));
-const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals } = require(path.join(dir, 'types/tournament.js'));
-const requiredNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn', 'national_sports_festival'];
+const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } = require(path.join(dir, 'types/tournament.js'));
+const openNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn'];
 function seededRandom(seed) {
   let n = seed >>> 0;
   return () => { n = (Math.imul(n, 1664525) + 1013904223) >>> 0; return n / 4294967296; };
+}
+/** 11월 1일 기준: 선발전과 전국체전이 결승까지 끝나고, 선발전 우승 시에만 플레이어 학교가 전국체전에 출전했는지 확인한다. */
+function checkFestival(state, school, coverage) {
+  const matches = state.seasonMatches;
+  const regionSchools = HIGH_SCHOOLS_DATA.filter(s => s.region === school.region).length;
+  const winnerOf = m => m.result === 'home' ? m.homeSchoolId : m.awaySchoolId;
+  const qualifierFinal = matches.find(m => m.tournamentId === 'festival_qualifier' && m.round === '결승전');
+  if (regionSchools > 1) {
+    assert.ok(qualifierFinal?.result, '시·도 대표 선발전 미종료');
+    assert.ok(coverage.get('festival_qualifier') >= 1, '선발전 경기 미진행');
+  }
+  const representative = regionSchools > 1 ? winnerOf(qualifierFinal) : school.id;
+  const festival = matches.filter(m => m.tournamentId === 'national_sports_festival');
+  assert.equal(festival.length, 15, '전국체전 15경기 미편성');
+  assert.ok(festival.every(m => m.result), '전국체전 미종료 경기');
+  const qualified = representative === school.id;
+  assert.equal(festival.some(m => m.homeSchoolId === school.id || m.awaySchoolId === school.id), qualified);
+  if (qualified) assert.ok(coverage.get('national_sports_festival') >= 1, '대표로 뽑혔는데 전국체전 경기 미진행');
+  return { qualified, games: coverage.get('national_sports_festival') ?? 0 };
 }
 function key(clock) { const d = clock.date; return `${d.year}-${d.month}-${d.day}/${clock.currentSlot}/G${d.grade}`; }
 function starter(school, position, gender) {
@@ -70,8 +89,10 @@ for (const scenario of [
   { seed: 19, position: 'SS', gender: 'male', tier: 'S' },
   { seed: 110, position: 'P', gender: 'female', tier: 'D' },
   { seed: 2026, position: 'TwoWay', gender: 'male', tier: 'B' },
+  // 학교가 1개뿐인 시·도는 선발전 없이 대표가 되므로 전국체전 실제 출전 흐름을 완주 중에 검증한다.
+  { seed: 107, position: 'SS', gender: 'female', region: '제주' },
 ]) {
-  test(`1학년 완주: ${scenario.position}/${scenario.tier}학교/seed=${scenario.seed}`, { timeout: 60000 }, async t => {
+  test(`1학년 완주: ${scenario.position}/${scenario.region ?? `${scenario.tier}학교`}/seed=${scenario.seed}`, { timeout: 60000 }, async t => {
     const originalRandom = Math.random;
     Math.random = seededRandom(scenario.seed);
     const stats = { events: 0, reports: 0, draws: 0, reloads: 0, slots: 0, summer: 0, winter: 0 };
@@ -82,9 +103,10 @@ for (const scenario of [
     const recent = [];
     const months = new Set();
     let result;
+    let festival;
     try {
-      const school = HIGH_SCHOOLS_DATA.find(s => s.tier === scenario.tier);
-      assert.ok(school, `학교 티어 ${scenario.tier} 누락`);
+      const school = HIGH_SCHOOLS_DATA.find(s => scenario.region ? s.region === scenario.region : s.tier === scenario.tier);
+      assert.ok(school, `시나리오 학교 누락: ${scenario.region ?? scenario.tier}`);
       await store.getState().initClock(starter(school, scenario.position, scenario.gender));
       while (store.getState().clock.date.grade === 1 && stats.slots < 370 * 3) {
         await dismissInterruptions(stats);
@@ -95,6 +117,7 @@ for (const scenario of [
         seenSlots.add(slotKey);
         days.add(slotKey.split('/')[0]);
         months.add(`${clock.date.year}-${clock.date.month}`);
+        if (clock.date.month === 11 && clock.date.day === 1 && clock.currentSlot === 'morning') festival = checkFestival(before, school, coverage);
         const assignment = before.dailyPlan.slots[clock.currentSlot];
         recent.push(`${slotKey}: ${assignment.label}`); if (recent.length > 8) recent.shift();
         if (assignment.forced) {
@@ -157,14 +180,16 @@ for (const scenario of [
       assert.equal(days.size, 364);
       assert.equal(months.size, 12);
       assert.deepEqual(store.getState().clock, { date: { year: 2027, month: 3, day: 1, weekday: 1, grade: 2 }, currentSlot: 'morning' });
-      for (const id of [...requiredNationals, 'weekend_league']) assert.ok(coverage.get(id) >= 1, `필수 대회 일정 누락: ${id}`);
+      for (const id of [...openNationals, 'weekend_league']) assert.ok(coverage.get(id) >= 1, `필수 대회 일정 누락: ${id}`);
+      assert.ok(festival, '전국체전 진행 확인 누락');
+      if (scenario.region) assert.ok(festival.qualified && festival.games >= 1, '단독 시·도 대표의 전국체전 출전 누락');
       for (const kind of ['scrimmage_', 'practice_']) assert.ok([...coverage.keys()].some(id => id.startsWith(kind)), `${kind} 미진행`);
       assert.ok(stats.summer > 0 && stats.winter > 0, '여름·겨울 방학 오전 자유활동 누락');
-      assert.ok(stats.events > 0 && stats.reports >= 12 && stats.draws >= 5 && stats.reloads >= 20);
+      assert.ok(stats.events > 0 && stats.reports >= 12 && stats.draws >= 4 && stats.reloads >= 20);
       assert.equal(saved.teamCompetition.grade, 2);
       assert.equal(saved.teamCompetition.roster.find(n => n.id === 'peer').grade, 2);
       assert.equal(saved.matchRecords.length, seenMatches.size, '저장된 연간 경기 기록 누락 또는 중복');
-      t.diagnostic(JSON.stringify({ ...scenario, ...stats, days: days.size, matches: seenMatches.size, tournaments: Object.fromEntries(coverage) }));
+      t.diagnostic(JSON.stringify({ ...scenario, ...stats, festival, days: days.size, matches: seenMatches.size, tournaments: Object.fromEntries(coverage) }));
     } catch (error) {
       error.message += `\nseed=${scenario.seed}; slots=${stats.slots}\n최근 진행:\n${recent.join('\n')}`;
       throw error;
@@ -172,31 +197,111 @@ for (const scenario of [
   });
 }
 
-test('전국체전: 시·도별 대표 1개교씩 16강 토너먼트로 10월에 열린다', () => {
-  const tour = MAJOR_TOURNAMENT_TEMPLATES.find(t => t.id === 'national_sports_festival');
-  assert.ok(tour, '전국체전 템플릿 누락');
-  assert.equal(tour.entry, 'provincial');
-  assert.equal(tour.startDate.month, 10);
-  for (const school of [HIGH_SCHOOLS_DATA.find(s => s.region === '서울'), HIGH_SCHOOLS_DATA.find(s => s.region === '제주')]) {
-    const first = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId === tour.id);
-    assert.equal(first.length, 8, '16개교 = 1라운드 8경기');
-    assert.ok(first.every(m => m.round === '16강전' && m.drawn === false && m.date.month === 10 && m.date.day === 17));
-    const teams = first.flatMap(m => [m.homeSchoolId, m.awaySchoolId]).map(id => HIGH_SCHOOLS_DATA.find(s => s.id === id));
-    assert.equal(new Set(teams.map(s => s.id)).size, 16, '중복 출전 학교');
-    assert.equal(new Set(teams.map(s => s.region)).size, 16, '시·도마다 1개교');
-    assert.ok(teams.some(s => s.id === school.id), '플레이어 학교는 소속 시·도 대표로 출전');
-    assert.equal(first.filter(m => m.isPlayerTeamMatch).length, 1);
+const FESTIVAL = 'national_sports_festival';
+const QUALIFIER = 'festival_qualifier';
+const OFFICIAL_2026 = [
+  ['인천', '전남', 10, 18, '09:00'], ['전북', '강원', 10, 18, '11:30'], ['광주', '경북', 10, 17, '09:00'], ['부산', '대전', 10, 16, '09:00'],
+  ['경남', '경기', 10, 17, '11:30'], ['대구', '충남', 10, 17, '14:00'], ['충북', '울산', 10, 16, '11:30'], ['제주', '서울', 10, 16, '14:00'],
+];
+const regionOf = id => HIGH_SCHOOLS_DATA.find(s => s.id === id)?.region;
+
+/** 선발전·전국체전만 날짜순으로 진행한다. 플레이어 경기는 won 결과로, 다른 학교 경기는 경기일 밤에 처리한다. */
+function playFestivalSeason(school, won) {
+  let matches = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId === FESTIVAL || m.tournamentId === QUALIFIER);
+  for (let t = Date.UTC(2026, 5, 1); t <= Date.UTC(2026, 9, 31); t += 86400000) {
+    const d = new Date(t);
+    const date = { year: 2026, month: d.getUTCMonth() + 1, day: d.getUTCDate(), weekday: d.getUTCDay(), grade: 1 };
+    const mine = getPlayerMatchForDate(date, matches);
+    if (mine) {
+      if (mine.drawn === false) matches = matches.map(m => m.tournamentId === mine.tournamentId ? { ...m, drawn: true } : m);
+      matches = progressTournament(matches, { matchId: mine.id, tournamentId: mine.tournamentId, won }, school, HIGH_SCHOOLS_DATA);
+    }
+    matches = advanceOtherTournamentMatches(matches, date, school);
+    const early = matches.filter(m => m.result && m.awaySchoolId !== 'bye' && m.date.month * 32 + m.date.day > date.month * 32 + date.day);
+    assert.deepEqual(early.map(m => m.id), [], `경기일 전에 결과가 난 경기 (${date.month}/${date.day})`);
+  }
+  return matches;
+}
+
+test('전국체전: 2026 공식 일정의 16개 시·도 대진과 6월 시·도 대표 선발전', () => {
+  const tour = MAJOR_TOURNAMENT_TEMPLATES.find(t => t.id === FESTIVAL);
+  assert.equal(tour?.entry, 'provincial');
+  const seoul = HIGH_SCHOOLS_DATA.find(s => s.region === '서울');
+  const season = generateSeasonMatches(2026, seoul, HIGH_SCHOOLS_DATA);
+  const first = season.filter(m => m.tournamentId === FESTIVAL);
+  assert.equal(first.length, 8, '1회전 8경기');
+  OFFICIAL_2026.forEach(([home, away, month, day, time], k) => {
+    const m = first.find(x => x.id === `${FESTIVAL}_0_${k}`);
+    assert.deepEqual(m.date, { month, day });
+    assert.ok(m.description.startsWith(`${time} 서귀포야구장 · `), m.description);
+    assert.equal(m.round, '16강전');
+    assert.equal(home === '서울' ? m.homeSchoolId : regionOf(m.homeSchoolId), home === '서울' ? 'rep_서울' : home);
+    assert.equal(away === '서울' ? m.awaySchoolId : regionOf(m.awaySchoolId), away === '서울' ? 'rep_서울' : away);
+  });
+  assert.ok(first.every(m => !m.isPlayerTeamMatch), '선발전 전에는 서울 대표 미정');
+  const qualifier = season.filter(m => m.tournamentId === QUALIFIER);
+  const seoulSchools = HIGH_SCHOOLS_DATA.filter(s => s.region === '서울').length;
+  assert.equal(seoulSchools, 22);
+  assert.equal(qualifier.length, 16, '22개교 = 1회전 6경기 + 부전승 10개교');
+  assert.equal(qualifier.filter(m => m.awaySchoolId === 'bye').length, 10);
+  assert.ok(qualifier.every(m => m.round === '1회전' && m.date.month === 6 && m.date.day === 9));
+  assert.equal(new Set(qualifier.flatMap(m => [m.homeSchoolId, m.awaySchoolId]).filter(id => id !== 'bye')).size, 22);
+});
+
+test('전국체전: 학교가 1개뿐인 시·도는 선발전 없이 대표로 출전한다', () => {
+  const jeju = HIGH_SCHOOLS_DATA.filter(s => s.region === '제주');
+  assert.equal(jeju.length, 1);
+  const season = generateSeasonMatches(2026, jeju[0], HIGH_SCHOOLS_DATA);
+  assert.equal(season.filter(m => m.tournamentId === QUALIFIER).length, 0);
+  const opener = season.find(m => m.id === `${FESTIVAL}_0_7`);
+  assert.equal(opener.homeSchoolId, jeju[0].id);
+  assert.ok(opener.isPlayerTeamMatch);
+  assert.ok(opener.description.startsWith('14:00 서귀포야구장 · 제주 대표 '));
+});
+
+test('전국체전: 선발전 우승 시 대표로 출전하고 대진표 순서대로 결승까지 진행한다', () => {
+  const school = HIGH_SCHOOLS_DATA.find(s => s.region === '경남');
+  const matches = playFestivalSeason(school, true);
+  const qualifierFinal = matches.find(m => m.tournamentId === QUALIFIER && m.round === '결승전');
+  assert.equal(qualifierFinal.result === 'home' ? qualifierFinal.homeSchoolId : qualifierFinal.awaySchoolId, school.id);
+  assert.deepEqual(matches.filter(m => m.tournamentId === QUALIFIER && m.isPlayerTeamMatch).map(m => `${m.date.month}/${m.date.day}`), ['6/16', '6/18', '6/23'], '경남 8개교: 8강·4강·결승은 선발전 마지막 3일');
+  const festival = matches.filter(m => m.tournamentId === FESTIVAL);
+  assert.equal(festival.length, 15, '16강 8 + 8강 4 + 4강 2 + 결승 1');
+  assert.ok(festival.every(m => m.result), '모든 경기 종료');
+  assert.ok(!festival.some(m => m.homeSchoolId.startsWith('rep_') || m.awaySchoolId.startsWith('rep_')), '대표 자리 표시 남음');
+  const mine = festival.filter(m => m.isPlayerTeamMatch);
+  assert.deepEqual(mine.map(m => `${m.round} ${m.date.month}/${m.date.day}`), ['16강전 10/17', '8강전 10/19', '4강 준결승 10/21', '결승전 10/22'], '경남은 1회전 5경기 → 8강 3경기 → 4강 2경기(10:00) → 결승');
+  for (const [stage, k] of [[1, 0], [1, 3], [2, 0], [3, 0]]) {
+    const m = festival.find(x => x.id === `${FESTIVAL}_${stage}_${k}`);
+    const feeders = [2 * k, 2 * k + 1].map(i => festival.find(x => x.id === `${FESTIVAL}_${stage - 1}_${i}`));
+    const winners = feeders.map(f => f.result === 'home' ? f.homeSchoolId : f.awaySchoolId);
+    assert.deepEqual([m.homeSchoolId, m.awaySchoolId], winners, `대진표 트리 불일치: ${m.id}`);
   }
 });
 
-test('전국체전: 이전 버전 저장본은 개막 전일 때만 대진을 보완한다', () => {
-  const school = HIGH_SCHOOLS_DATA[0];
-  const legacy = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId !== 'national_sports_festival');
-  const september = { year: 2026, month: 9, day: 1, weekday: 2, grade: 1 };
-  const beforeFestival = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, september);
-  assert.equal(beforeFestival.filter(m => m.tournamentId === 'national_sports_festival').length, 8);
-  assert.equal(beforeFestival.filter(m => m.tournamentId !== 'national_sports_festival').length, legacy.length, '기존 경기 보존');
-  assert.equal(addMissingNationals(beforeFestival, 2026, school, HIGH_SCHOOLS_DATA, september), beforeFestival, '이미 있으면 변경 없음');
-  const afterOpening = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, { year: 2026, month: 10, day: 20, weekday: 2, grade: 1 });
-  assert.equal(afterOpening, legacy, '개막 이후에는 소급 추가하지 않음');
+test('전국체전: 선발전에서 탈락하면 같은 시·도 우승교가 대표로 나가고 대회는 그대로 진행된다', () => {
+  const school = HIGH_SCHOOLS_DATA.find(s => s.region === '경남');
+  const matches = playFestivalSeason(school, false);
+  const festival = matches.filter(m => m.tournamentId === FESTIVAL);
+  assert.ok(!festival.some(m => m.isPlayerTeamMatch || m.homeSchoolId === school.id || m.awaySchoolId === school.id));
+  const opener = festival.find(m => m.id === `${FESTIVAL}_0_4`);
+  assert.equal(regionOf(opener.homeSchoolId), '경남', '경남 선발전 우승교가 경남 자리에 출전');
+  assert.ok(opener.description.includes(`경남 대표 ${opener.homeSchoolName}`), opener.description);
+  assert.equal(festival.length, 15);
+  assert.ok(festival.every(m => m.result));
+});
+
+test('전국체전: 이전 버전 저장본은 시기에 맞춰 선발전·대진을 보완한다', () => {
+  const school = HIGH_SCHOOLS_DATA.find(s => s.region === '경남');
+  const legacy = generateSeasonMatches(2026, school, HIGH_SCHOOLS_DATA).filter(m => m.tournamentId !== FESTIVAL && m.tournamentId !== QUALIFIER);
+  const at = (month, day) => ({ year: 2026, month, day, weekday: 1, grade: 1 });
+  const spring = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, at(5, 1));
+  assert.ok(spring.some(m => m.tournamentId === QUALIFIER && m.isPlayerTeamMatch), '선발전 전이면 선발전부터');
+  assert.equal(spring.filter(m => m.tournamentId === FESTIVAL).length, 8);
+  assert.equal(spring.filter(m => m.tournamentId !== FESTIVAL && m.tournamentId !== QUALIFIER).length, legacy.length, '기존 경기 보존');
+  assert.equal(addMissingNationals(spring, 2026, school, HIGH_SCHOOLS_DATA, at(5, 1)), spring, '이미 있으면 변경 없음');
+  const summer = addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, at(7, 1));
+  assert.equal(summer.filter(m => m.tournamentId === QUALIFIER).length, 0, '선발전이 지났으면 선발전 없음');
+  assert.ok(summer.some(m => m.tournamentId === FESTIVAL && m.isPlayerTeamMatch), '선발전을 놓친 저장본은 대표로 출전');
+  assert.equal(addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, at(10, 20)), legacy, '개막 이후에는 소급 추가하지 않음');
 });
