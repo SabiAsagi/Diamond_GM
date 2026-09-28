@@ -1,0 +1,43 @@
+/* v1.9: 주전 경쟁과 경기 전후 흐름 */
+.team-panel { padding: clamp(16px,3vw,28px); width:100%; max-width:1100px; margin:0 auto; overflow-y:auto; min-height:0; }
+.team-panel h2,.team-panel h3,.team-panel h4 { margin: 0 0 10px; }
+.team-panel section { margin-top:24px; }
+.team-section-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.team-summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:20px 0 12px; }
+.team-summary-grid>div { display:flex; flex-direction:column; gap:7px; padding:16px; border:1px solid #ffffff20; border-radius:12px; background:#ffffff05; }
+.team-summary-grid strong { font-size:clamp(20px,3vw,30px); color:#6ee7b7; }
+.team-summary-grid span,.team-help { font-size:13px; color:#aebdd0; line-height:1.7; }
+.team-table-scroll { overflow-x:auto; }
+.team-depth-table { width:100%; border-collapse:collapse; font-size:14px; }
+.team-depth-table th,.team-depth-table td { text-align:left; padding:12px 10px; border-bottom:1px solid #ffffff15; white-space:nowrap; }
+.team-depth-table thead { color:#aebdd0; }
+.team-depth-table .is-player,.team-lineup .is-player { color:#6ee7b7; background:#10b98112; }
+.team-panel select { margin:6px; padding:9px; background:#172638; color:#eef4fa; border:1px solid #ffffff30; border-radius:7px; }
+.team-entry { padding:12px 0; border-bottom:1px solid #ffffff20; line-height:1.7; }
+.team-entry summary,.team-selection summary { cursor:pointer; }
+.team-meeting-options { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px; }
+.team-meeting-options>button,.team-meeting-options>div { display:flex; flex-direction:column; align-items:stretch; gap:9px; white-space:normal; padding:14px; }
+.team-meeting-options small { font-size:12px; line-height:1.5; font-weight:400; }
+.team-feedback,.team-selection { border:1px solid #6ee7b738; background:#10b98109; padding:16px; border-radius:12px; line-height:1.7; }
+.team-selection { margin:12px 0; text-align:left; max-height:42vh; overflow-y:auto; }
+.team-role-chip { color:#6ee7b7; background:#10b98115; border-radius:999px; padding:4px 12px; font-size:14px; }
+.team-advice { margin:12px 0; padding:8px 12px; border-left:3px solid #6ee7b7; }
+.team-advice small { display:block; color:#aebdd0; }
+.team-lineup { list-style:none; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.team-lineup li { display:flex;flex-direction:column;padding:8px;border:1px solid #ffffff15;border-radius:6px; }
+.team-lineup span { font-size:12px;color:#aebdd0; }
+.team-home-button { display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;width:100%; }
+.team-training-tip { margin:8px 0; padding:10px 12px; border-left:3px solid #6ee7b7; color:#c2d5dc; font-size:13px; line-height:1.6; }
+.result-log-preview { white-space:pre-line; max-height:35vh; overflow-y:auto; }
+@media(max-width:640px) { .team-summary-grid { gap:6px; } .team-summary-grid>div { padding:10px; } .team-summary-grid small,.team-summary-grid span { font-size:11px; } .team-meeting-options { grid-template-columns:1fr; } .team-panel { padding-bottom:90px; } .team-lineup { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.home-left-rail>.team-home-button { flex-shrink:0; white-space:normal; }
+.team-home-button small { width:100%; text-align:left; font-size:11px; }
+.home-center-stage>.forced-slot-panel { flex-shrink:0; overflow-y:auto; }
+.team-training-tip { flex-shrink:0; }
+@media(max-width:768px) {
+ .home-left-rail>.team-home-button { grid-column:1/-1; grid-row:2; min-height:38px; padding:6px 9px; }
+ .home-next-event { grid-row:3; }
+ .home-center-stage { overflow-y:auto; }
+ .home-center-stage>.free-slot-panel { min-height:360px; }
+ .team-training-tip { font-size:11px; padding:6px 8px; margin:0; }
+}
