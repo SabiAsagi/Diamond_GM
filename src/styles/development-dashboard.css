@@ -1,0 +1,404 @@
+/* ==========================================
+   3개년 커리어 육성 대시보드 (Development Dashboard)
+   ========================================== */
+.dashboard-main-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px !important;
+}
+
+.career-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.player-num-tag {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #60a5fa;
+}
+
+.player-pos-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #93c5fd;
+}
+
+.school-tag {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.career-calendar-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+
+.calendar-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.calendar-current-date {
+  font-size: 1.1rem;
+  color: #fbbf24;
+}
+
+.career-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .career-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-card {
+  padding: 14px 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px !important;
+}
+
+.card-top-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ovr-large-display {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ovr-num {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #60a5fa;
+  line-height: 1;
+}
+
+.ovr-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.potential-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.potential-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.condition-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.condition-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.condition-tag.good { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.condition-tag.normal { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.condition-tag.bad { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+.condition-val {
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.condition-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.condition-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.fame-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fame-grade {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.fame-val {
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fame-traits-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.trait-chip-sm {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.career-middle-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 14px;
+}
+
+@media (max-width: 860px) {
+  .career-middle-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stats-dashboard-card,
+.training-selection-card {
+  padding: 16px !important;
+  border-radius: 14px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stats-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-name {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.stat-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 4px;
+}
+
+.stat-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: right;
+}
+
+.training-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.training-option-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #fff;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.training-option-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.training-option-btn.selected {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.t-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.t-icon {
+  font-size: 1.2rem;
+}
+
+.t-name {
+  font-size: 0.88rem;
+  color: #fff;
+}
+
+.t-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.t-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.t-stats {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #34d399;
+}
+
+.t-cost {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.advance-turn-btn {
+  margin-top: 6px;
+  padding: 12px !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.current-event-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(245, 158, 11, 0.15) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
+  padding: 14px 18px !important;
+  border-radius: 12px !important;
+}
+
+.event-icon-circle {
+  font-size: 1.8rem;
+}
+
+.event-text-group {
+  flex: 1;
+}
+
+.event-title {
+  font-size: 0.95rem;
+  color: #fde68a;
+  display: block;
+}
+
+.event-desc {
+  font-size: 0.82rem;
+  color: #f1f5f9;
+  margin: 2px 0 0 0;
+}
+
+.career-logs-card {
+  padding: 14px 18px !important;
+  border-radius: 12px !important;
+}
+
+.logs-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.logs-scroll-box {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-line {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.log-bullet {
+  color: var(--primary);
+  font-weight: 800;
+}

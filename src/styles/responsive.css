@@ -1,0 +1,50 @@
+/* ==========================================================================
+   반응형 모바일 미디어 쿼리 (~768px 이하)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .onepage-viewport-container {
+    padding: 6px 8px 0 8px;
+  }
+
+  .home-dashboard-layout {
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 10px;
+  }
+
+  .home-left-rail {
+    width: 100%;
+    max-width: 100%;
+    overflow-y: visible;
+  }
+
+  .compact-gauges-row {
+    padding: 8px 10px;
+  }
+
+  .cg-big-num {
+    font-size: 1rem;
+  }
+
+  .daily-top-bar {
+    padding: 8px 10px;
+  }
+
+  .daily-status-line {
+    font-size: 0.78rem;
+  }
+
+  .sub-activities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-main-nav {
+    height: 52px;
+    padding: 0 4px;
+  }
+
+  .nav-tab-label {
+    font-size: 0.65rem;
+  }
+}

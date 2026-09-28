@@ -1,0 +1,234 @@
+/* ==========================================================================
+   즉시 스탯 변화 결과 모달 (SlotResultModal)
+   ========================================================================== */
+
+.result-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.result-modal-card {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.result-modal-close:hover {
+  color: #ffffff;
+}
+
+.result-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.result-log-preview {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.result-deltas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.delta-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.delta-item.delta-positive {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.delta-item.delta-negative {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.delta-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.delta-val {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.delta-icon {
+  margin-left: 2px;
+}
+
+.result-injury-alert {
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fca5a5;
+  text-align: center;
+}
+
+.result-confirm-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   이벤트 컷신 모달 (EventCutsceneModal)
+   ========================================================================== */
+
+.cutscene-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 16px;
+}
+
+.cutscene-modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 40px rgba(245, 158, 11, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cutscene-top-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.cutscene-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cutscene-icon-huge {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.cutscene-header-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cutscene-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.cutscene-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cutscene-dialogue-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cutscene-speaker-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #60a5fa;
+}
+
+.speaker-role-chip {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.cutscene-quote {
+  font-size: 0.95rem;
+  color: #f1f5f9;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.cutscene-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cutscene-confirm-btn {
+  padding: 10px 20px;
+}
