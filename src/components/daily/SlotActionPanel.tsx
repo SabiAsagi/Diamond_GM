@@ -58,7 +58,7 @@ export function SlotActionPanel({
 
   // 2차 세부 행동 후보군 (카테고리 선택 시마다 가중치 기반 3~4개 랜덤 샘플링!)
   const [sampledSubActivities, setSampledSubActivities] = useState<ActivityOption[]>(() =>
-    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1) : []
+    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date) : []
   );
   const [selectedSubId, setSelectedSubId] = useState<string>(() => sampledSubActivities[0]?.id || '');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -70,7 +70,7 @@ export function SlotActionPanel({
     setPrevKey(currentKey);
     setSelectedCategory(defaultCat);
     if (!assignment.forced) {
-      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1);
+      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date);
       setSampledSubActivities(sampled);
       setSelectedSubId(sampled[0]?.id || '');
     }
@@ -78,7 +78,7 @@ export function SlotActionPanel({
 
   const handleCategorySelect = (cat: DailyActivityCategory) => {
     setSelectedCategory(cat);
-    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot, player.grade ?? 1);
+    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot, player.grade ?? 1, date);
     setSampledSubActivities(sampled);
     setSelectedSubId(sampled[0]?.id || '');
   };

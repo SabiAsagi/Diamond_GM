@@ -30,8 +30,8 @@ const { useGameClockStore: store } = require(path.join(dir, 'store/gameClockStor
 const { HIGH_SCHOOLS_DATA } = require(path.join(dir, 'data/highSchools.js'));
 const { normalizePlayer } = require(path.join(dir, 'data/playerDevelopment.js'));
 const { INITIAL_RELATIONSHIPS } = require(path.join(dir, 'types/bondScores.js'));
-const { SUB_ACTIVITY_POOL, getActivityCategories, isActivityAvailable } = require(path.join(dir, 'types/activity.js'));
-const { isSchoolDay, isVacationPeriod } = require(path.join(dir, 'types/academicCalendar.js'));
+const { SUB_ACTIVITY_POOL, getActivityCategories, isActivityAvailable, sampleSubActivities } = require(path.join(dir, 'types/activity.js'));
+const { isSchoolDay, isVacationPeriod, isWinterVacation } = require(path.join(dir, 'types/academicCalendar.js'));
 const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } = require(path.join(dir, 'types/tournament.js'));
 const openNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn'];
 function seededRandom(seed) {
@@ -95,7 +95,7 @@ for (const scenario of [
   test(`1학년 완주: ${scenario.position}/${scenario.region ?? `${scenario.tier}학교`}/seed=${scenario.seed}`, { timeout: 60000 }, async t => {
     const originalRandom = Math.random;
     Math.random = seededRandom(scenario.seed);
-    const stats = { events: 0, reports: 0, draws: 0, reloads: 0, slots: 0, summer: 0, winter: 0 };
+    const stats = { events: 0, reports: 0, draws: 0, reloads: 0, slots: 0, summer: 0, winter: 0, winterTraining: 0 };
     const coverage = new Map();
     const seenSlots = new Set();
     const seenMatches = new Set();
@@ -137,10 +137,15 @@ for (const scenario of [
         } else {
           const categories = getActivityCategories(clock.currentSlot, isSchoolDay(clock.date)).map(c => c.category);
           const preferred = before.player.condition < 65 ? 'rest' : categories[stats.slots % categories.length];
-          const candidates = SUB_ACTIVITY_POOL[preferred].filter(o => isActivityAvailable(o, before.player.position, clock.currentSlot, 1));
+          const candidates = SUB_ACTIVITY_POOL[preferred].filter(o => isActivityAvailable(o, before.player.position, clock.currentSlot, 1, clock.date));
           assert.ok(candidates.length, `선택 가능한 활동 없음: ${slotKey}/${preferred}`);
           const option = candidates[stats.slots % candidates.length];
           await before.selectActivity(clock.currentSlot, preferred, option.id);
+          if (option.season === 'winter') {
+            assert.ok(isWinterVacation(clock.date.month, clock.date.day), `겨울방학 밖 겨울 활동: ${slotKey}/${option.id}`);
+            assert.notEqual(key(store.getState().clock), slotKey, `겨울 활동 실행 실패: ${option.id}`);
+            stats.winterTraining++;
+          }
           if (clock.currentSlot === 'morning' && isVacationPeriod(clock.date.month, clock.date.day)) {
             if ([7, 8].includes(clock.date.month)) stats.summer++;
             if ([12, 1, 2].includes(clock.date.month)) stats.winter++;
@@ -185,6 +190,7 @@ for (const scenario of [
       if (scenario.region) assert.ok(festival.qualified && festival.games >= 1, '단독 시·도 대표의 전국체전 출전 누락');
       for (const kind of ['scrimmage_', 'practice_']) assert.ok([...coverage.keys()].some(id => id.startsWith(kind)), `${kind} 미진행`);
       assert.ok(stats.summer > 0 && stats.winter > 0, '여름·겨울 방학 오전 자유활동 누락');
+      assert.ok(stats.winterTraining > 0, '겨울방학 동계 훈련 전용 활동 미선택');
       assert.ok(stats.events > 0 && stats.reports >= 12 && stats.draws >= 4 && stats.reloads >= 20);
       assert.equal(saved.teamCompetition.grade, 2);
       assert.equal(saved.teamCompetition.roster.find(n => n.id === 'peer').grade, 2);
@@ -320,4 +326,55 @@ test('전국체전: 이전 버전 저장본은 시기에 맞춰 선발전·대�
   assert.equal(summer.filter(m => m.tournamentId === QUALIFIER).length, 0, '선발전이 지났으면 선발전 없음');
   assert.ok(summer.some(m => m.tournamentId === FESTIVAL && m.isPlayerTeamMatch), '선발전을 놓친 저장본은 대표로 출전');
   assert.equal(addMissingNationals(legacy, 2026, school, HIGH_SCHOOLS_DATA, at(10, 20)), legacy, '개막 이후에는 소급 추가하지 않음');
+});
+
+const WINTER_IDS = Object.values(SUB_ACTIVITY_POOL).flat().filter(o => o.season === 'winter').map(o => o.id);
+
+test('겨울훈련: 겨울 전용 활동은 겨울방학(12/24~2/5)에만 선택지에 나온다', () => {
+  assert.equal(WINTER_IDS.length, 8);
+  const offered = (month, day, slot = 'afternoon') => ['training', 'rest', 'relationship', 'special']
+    .flatMap(c => sampleSubActivities(c, 100, 'TwoWay', slot, 1, { month, day }))
+    .filter(o => o.season === 'winter').map(o => o.id);
+  for (const [month, day] of [[12, 23], [2, 6], [7, 30], [11, 15], [3, 2]]) assert.deepEqual(offered(month, day), [], `${month}/${day}에 겨울 활동 노출`);
+  for (const [month, day] of [[12, 24], [1, 15], [2, 5]]) {
+    assert.ok(isWinterVacation(month, day) && isVacationPeriod(month, day), '겨울방학은 기존 방학 구조의 일부');
+    assert.ok(offered(month, day).includes('winter_weight'), `${month}/${day}에 겨울 훈련 누락`);
+  }
+  // 날짜를 모르면 열지 않는다. 시간대·포지션 제한은 기존 규칙대로 적용된다.
+  const bullpen = SUB_ACTIVITY_POOL.training.find(o => o.id === 'winter_indoor_bullpen');
+  assert.equal(isActivityAvailable(bullpen, 'P', 'afternoon'), false);
+  assert.equal(isActivityAvailable(bullpen, 'P', 'afternoon', 1, { month: 1, day: 10 }), true);
+  assert.equal(isActivityAvailable(bullpen, 'SS', 'afternoon', 1, { month: 1, day: 10 }), false);
+  assert.equal(isActivityAvailable(bullpen, 'P', 'night', 1, { month: 1, day: 10 }), false);
+  assert.deepEqual(offered(1, 10, 'morning').sort(), ['winter_circuit', 'winter_goal_setting', 'winter_hill_running', 'winter_sauna'].sort());
+});
+
+test('겨울훈련: 방학 중 선택하면 능력치·인연 효과가 적용되고 기간 밖에서는 거부된다', async () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const at = (date, slot) => ({ ...starter(school, 'TwoWay', 'male'), gameDate: date, currentSlot: slot });
+  const stats = { events: 0, reports: 0, draws: 0 };
+
+  await store.getState().initClock(at({ year: 2026, month: 12, day: 22, weekday: 2, grade: 1 }, 'afternoon'));
+  const beforeWinter = structuredClone(store.getState().clock);
+  await store.getState().selectActivity('afternoon', 'training', 'winter_circuit');
+  assert.deepEqual(store.getState().clock, beforeWinter, '방학 전 겨울 활동 선택 거부');
+  assert.equal(store.getState().lastActionResult, null);
+
+  await store.getState().initClock(at({ year: 2026, month: 12, day: 28, weekday: 1, grade: 1 }, 'afternoon'));
+  assert.match(store.getState().dailyPlan.slots.afternoon.label, /동계 훈련/);
+  const before = structuredClone(store.getState().player);
+  await store.getState().selectActivity('afternoon', 'training', 'winter_circuit');
+  const circuit = store.getState().lastActionResult;
+  assert.ok(circuit, '방학 중 겨울 훈련 실행');
+  assert.ok(circuit.statChanges.stamina > 0 && circuit.statChanges.speed > 0 && circuit.statChanges.power > 0);
+  assert.ok(saved.stamina > before.stamina && saved.speed > before.speed && saved.power > before.power, '능력치 반영');
+  assert.equal(saved.relationships.peer, before.relationships.peer + 1, '동기 인연 +1');
+  assert.ok(saved.condition < before.condition, '동계 훈련 피로 누적');
+  assert.equal(store.getState().clock.currentSlot, 'night');
+
+  await dismissInterruptions(stats);
+  const beforeNight = structuredClone(saved);
+  await store.getState().selectActivity('night', 'relationship', 'winter_camp_snack');
+  assert.equal(saved.relationships.peer, beforeNight.relationships.peer + 3);
+  assert.equal(saved.relationships.senior, beforeNight.relationships.senior + 1);
 });
