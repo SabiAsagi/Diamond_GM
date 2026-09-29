@@ -163,3 +163,91 @@ test('지역별 외출 명소와 미등록 지역 대체 장소를 제공한다'
 });
 
 process.on('exit', () => fs.rmSync(dir, { recursive: true, force: true }));
+
+const { generateCast, getBondName, personalizeText, DEFAULT_CAST, CAST_IDS } = require(path.join(dir, 'data/cast.js'));
+const { formatBondChanges, BOND_NAMES } = require(path.join(dir, 'types/bondScores.js'));
+const { HIGH_SCHOOLS_DATA } = require(path.join(dir, 'data/highSchools.js'));
+const { SUB_ACTIVITY_POOL } = require(path.join(dir, 'types/activity.js'));
+const { CUTSCENE_EVENTS_POOL } = require(path.join(dir, 'data/cutsceneEvents.js'));
+const REGIONS = [...new Set(HIGH_SCHOOLS_DATA.map(s => s.region))];
+
+function seeded(seed) { let n = seed >>> 0; return () => { n = (Math.imul(n, 1664525) + 1013904223) >>> 0; return n / 4294967296; }; }
+const castPlayer = { name: '김선수', gender: 'male', appearance: { hairStyleId: 'male_spiky' }, highSchool: HIGH_SCHOOLS_DATA[0].name };
+
+test('회차별 인물: 이름·성별·외모가 무작위로 정해지고 서로·선수와 겹치지 않는다', () => {
+  for (let seed = 1; seed <= 40; seed++) {
+    const cast = generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(seed));
+    assert.deepEqual(Object.keys(cast).sort(), [...CAST_IDS].sort());
+    const names = CAST_IDS.map(id => cast[id].name);
+    assert.equal(new Set(names).size, 7, `이름 중복 (seed ${seed})`);
+    assert.equal(new Set(names.map(n => n.slice(1))).size, 7, `성을 뺀 이름 중복 (seed ${seed})`);
+    assert.ok(!names.includes(castPlayer.name), '선수 이름과 중복');
+    const team = ['senior', 'peer', 'rival', 'junior'].map(id => cast[id]);
+    for (const member of team) {
+      assert.equal(member.portrait.kind, 'preset');
+      assert.ok(member.portrait.appearance.hairStyleId.startsWith(`${member.gender}_`), '성별과 얼굴 불일치');
+    }
+    const faces = team.map(m => m.portrait.appearance.hairStyleId);
+    assert.equal(new Set(faces).size, 4, '야구부 인물 얼굴 중복');
+    assert.ok(!faces.includes('male_spiky'), '선수와 같은 얼굴');
+    assert.equal(cast.senior.portrait.schoolName, castPlayer.highSchool);
+    assert.notEqual(cast.rival.portrait.schoolName, castPlayer.highSchool, '라이벌은 다른 학교 유니폼');
+    assert.equal(HIGH_SCHOOLS_DATA.find(s => s.name === cast.rival.portrait.schoolName)?.region, HIGH_SCHOOLS_DATA[0].region, '라이벌은 같은 시·도 학교·팀 소속');
+    const friends = ['childhood', 'neighbor', 'deskmate'].map(id => cast[id]);
+    assert.ok(friends.every(m => m.portrait.kind === 'image'));
+    assert.equal(new Set(friends.map(m => m.portrait.src)).size, 3, '친구 일러스트 중복');
+  }
+  const casts = [1, 2, 3, 4, 5].map(seed => generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(seed)));
+  assert.ok(new Set(casts.map(c => c.peer.name)).size > 1, '회차마다 같은 동기 이름');
+  assert.ok(new Set(casts.map(c => c.peer.gender + c.senior.gender + c.rival.gender + c.junior.gender)).size > 1, '회차마다 같은 성별 구성');
+  assert.ok(new Set(casts.map(c => c.childhood.portrait.src)).size > 1, '회차마다 같은 소꿉친구 외모');
+});
+
+test('회차별 인물: 이전 저장본은 기존 인물을 유지하고, 새 회차는 이번 이름으로 표시된다', () => {
+  const legacy = normalizePlayer({ id: 1, name: '예전선수', gender: 'male', position: 'P', relationships: { ...INITIAL_RELATIONSHIPS } });
+  assert.equal(legacy.cast, undefined);
+  assert.equal(getBondName(legacy, 'peer'), '이도현');
+  assert.equal(getBondName(legacy, 'coach'), '야구부 감독');
+  assert.ok(buildBondProfiles(legacy).some(p => p.name === '입학 동기 이도현'));
+  assert.equal(DEFAULT_CAST.childhood.gender, 'female');
+
+  const cast = generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(7));
+  const current = normalizePlayer({ ...legacy, cast });
+  assert.ok(buildBondProfiles(current).some(p => p.name === `입학 동기 ${cast.peer.name}`));
+  const rivalProfile = buildBondProfiles(current).find(p => p.id === 'rival');
+  assert.equal(rivalProfile.name, `지역 라이벌 ${cast.rival.name}`);
+  assert.equal(rivalProfile.role, `라이벌 · ${cast.rival.portrait.schoolName}`, '라이벌 소속 표시');
+  assert.equal(buildBondProfiles(legacy).find(p => p.id === 'rival').role, '라이벌');
+  assert.equal(formatBondChanges({ peer: 3, coach: 2 }), '{peer} 인연 +3 · 야구부 감독 인연 +2');
+  assert.equal(personalizeText(formatBondChanges({ peer: 3 }), current), `${cast.peer.name} 인연 +3`);
+});
+
+test('회차별 인물: 이름 뒤 조사는 받침에 맞춰 고른다', () => {
+  const withName = (peer, rival) => ({ cast: { ...DEFAULT_CAST, peer: { ...DEFAULT_CAST.peer, name: peer }, rival: { ...DEFAULT_CAST.rival, name: rival } } });
+  const p = withName('김하준', '박수아');
+  assert.equal(personalizeText('{peer|과} {rival|과}', p), '김하준과 박수아와');
+  assert.equal(personalizeText('{peer|이} {rival|이}', p), '김하준이 박수아가');
+  assert.equal(personalizeText('{peer|은} {rival|은}', p), '김하준은 박수아는');
+  assert.equal(personalizeText('{peer|를} {rival|를}', p), '김하준을 박수아를');
+  assert.equal(personalizeText('{peer}의 {rival}도', p), '김하준의 박수아도');
+  assert.equal(personalizeText('{rival|과} 대결', null), '박태성과 대결', '플레이어가 없으면 기본 인물');
+});
+
+test('회차별 인물: 활동·이벤트·외출 문구에 기본 인물 이름이 직접 적혀 있지 않다', () => {
+  const defaults = CAST_IDS.map(id => BOND_NAMES[id]);
+  const texts = [
+    ...Object.values(SUB_ACTIVITY_POOL).flat().flatMap(o => [o.label, o.description]),
+    ...CUTSCENE_EVENTS_POOL.flatMap(e => [e.title, e.subtitle, e.speakerName, e.dialogue, ...(e.dialogueLines ?? []).map(l => l.text), ...(e.choices ?? []).flatMap(c => [c.label, c.response])]),
+    ...REGIONS.flatMap(region => getOutdoorLocations(region).map(l => l.description)),
+  ];
+  for (const name of defaults) {
+    const hit = texts.find(t => typeof t === 'string' && t.includes(name));
+    assert.equal(hit, undefined, `기본 이름 "${name}"이 문구에 남아 있음: ${hit}`);
+  }
+  const cast = generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(3));
+  const arcade = SUB_ACTIVITY_POOL.relationship.find(o => o.id === 'rel_friends_arcade');
+  assert.ok(personalizeText(arcade.label, { cast }).startsWith(`${cast.peer.name}·${cast.neighbor.name}`));
+  const juniorScene = CUTSCENE_EVENTS_POOL.find(e => e.id === 'junior_advice');
+  assert.equal(juniorScene.speakerId, 'junior');
+  assert.equal(personalizeText(juniorScene.speakerName, { cast }), `후배 ${cast.junior.name}`);
+});

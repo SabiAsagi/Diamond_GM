@@ -1,3 +1,4 @@
+import { personalizeText } from '../../../data/cast';
 import { getNationalPercentile } from '../../../data/nationalRanking';
 import { getRelScore } from '../../../types/relationship';
 import { useState } from 'react';
@@ -135,7 +136,7 @@ export function PlayerStatsView({ player: raw, section }: { player: Player; onCl
                 rows={[
                   ['academics', '학업', '교과 이해도'],
                   ['coachBond', '감독 신뢰', '감독과의 개별 인연'],
-                  ['peerBond', '동기 인연', '이도현과의 개별 인연'],
+                  ['peerBond', '동기 인연', personalizeText('{peer|과}의 개별 인연', p)],
                 ]}
                 player={p}
               />

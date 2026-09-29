@@ -949,6 +949,10 @@
   object-fit: cover;
   object-position: top;
 }
+.cast-person > .character-portrait-preset {
+  width: 100%;
+  height: 100%;
+}
 .cast-person .player-portrait-preset {
   background: transparent;
   border-radius: 0;

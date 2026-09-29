@@ -1,6 +1,7 @@
 import { TeamCompetitionPanel } from '../../components/daily/TeamCompetitionPanel';
 import { TEAM_ROLE_LABELS, getStanding } from '../../data/teamCompetition';
 import { RivalReportModal } from '../../components/daily/RivalReportModal';
+import { getBondName, getRivalSchool } from '../../data/cast';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../db';
@@ -243,7 +244,7 @@ export default function DevelopmentDashboard() {
         <EventCutsceneModal key={activeCutscene.id} cutscene={activeCutscene} player={player} onChoose={resolveCutscene} />
       )}
 
-      {showRivalReport && player.pendingRivalReport && <RivalReportModal report={player.pendingRivalReport} onClose={() => { void dismissRivalReport(); }} />}
+      {showRivalReport && player.pendingRivalReport && <RivalReportModal report={player.pendingRivalReport} rivalName={getBondName(player, 'rival')} rivalSchool={getRivalSchool(player)} onClose={() => { void dismissRivalReport(); }} />}
 
       {/* 6. 졸업 축하 배너 */}
       {isCareerEnded && (

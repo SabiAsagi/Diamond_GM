@@ -3,6 +3,8 @@ import type { EventCutscene } from '../../types/randomEvent';
 import type { Player } from '../../types';
 import { PlayerPortrait } from '../PlayerAppearance';
 import { formatBondChanges, actualBondChanges, applyBondChanges } from '../../types/bondScores';
+import { personalizeText } from '../../data/cast';
+import { CharacterPortrait } from '../CharacterPortrait';
 
 function rewardText(event: EventCutscene, player: Player, choiceId: string) {
   const effect = (event.choices?.find((c) => c.id === choiceId)?.effect ?? event.effect)(player);
@@ -20,7 +22,7 @@ function rewardText(event: EventCutscene, player: Player, choiceId: string) {
     movement: '무브먼트',
     avoidK: '삼진 회피',
   };
-  return (
+  return personalizeText(
     [
       ...Object.entries(effect.statChanges).flatMap(([key, value]) => {
         if (typeof value !== 'number') return [];
@@ -32,7 +34,8 @@ function rewardText(event: EventCutscene, player: Player, choiceId: string) {
       ),
     ]
       .filter(Boolean)
-      .join(' · ') || '현재 능력치 유지'
+      .join(' · ') || '현재 능력치 유지',
+    player,
   );
 }
 
@@ -46,6 +49,8 @@ export function EventCutsceneModal({
   onChoose: (choice: string) => Promise<void>;
 }) {
   const [step, setStep] = useState(-1);
+  // 대사 속 {peer} 같은 인물 자리를 이번 회차 이름으로 바꾼다.
+  const t = (text: string) => personalizeText(text, player);
   const [chosen, setChosen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -79,8 +84,8 @@ export function EventCutsceneModal({
       onCancel={(e) => e.preventDefault()}
     >
       <header className="story-heading">
-        <small>{step < 0 ? '새로운 이야기' : cutscene.subtitle}</small>
-        <h2 id="story-title">{cutscene.title}</h2>
+        <small>{step < 0 ? '새로운 이야기' : t(cutscene.subtitle)}</small>
+        <h2 id="story-title">{t(cutscene.title)}</h2>
       </header>
       <div className="story-cast" aria-hidden="true">
         <div className={isPlayer ? 'cast-person speaking' : 'cast-person'}>
@@ -93,15 +98,15 @@ export function EventCutsceneModal({
           />
         </div>
         <div className={!isPlayer ? 'cast-person speaking' : 'cast-person'}>
-          <img src={cutscene.portrait} alt="" />
+          {cutscene.speakerId ? <CharacterPortrait player={player} id={cutscene.speakerId} /> : <img src={cutscene.portrait} alt="" />}
         </div>
       </div>
       <section className="story-dialogue">
         <strong className="story-speaker">
-          {step < 0 ? '잠깐, 누군가 다가옵니다' : isPlayer ? player.name : cutscene.speakerName}
+          {step < 0 ? '잠깐, 누군가 다가옵니다' : isPlayer ? player.name : t(cutscene.speakerName)}
         </strong>
         <p key={`${step}-${chosen}`} className="story-line" aria-live="polite">
-          {step < 0 ? cutscene.subtitle : choice ? choice.response : line.text}
+          {t(step < 0 ? cutscene.subtitle : choice ? choice.response : line.text)}
         </p>
         {step < 0 ? (
           <button autoFocus className="btn btn-primary" onClick={() => setStep(0)}>
@@ -115,7 +120,7 @@ export function EventCutsceneModal({
           <div className="story-choices">
             {cutscene.choices?.map((c) => (
               <button className="btn btn-secondary" key={c.id} onClick={() => setChosen(c.id)}>
-                <span>{c.label}</span>
+                <span>{t(c.label)}</span>
                 <small>{rewardText(cutscene, player, c.id)}</small>
               </button>
             ))}

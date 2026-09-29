@@ -1,4 +1,5 @@
 import { getBallparkVisit } from '../../../data/proSchedule';
+import { personalizeText } from '../../../data/cast';
 import { useState } from 'react';
 import type { Player } from '../../../types';
 import {
@@ -151,7 +152,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
                 <strong>
                   {selectedLocation.icon} {selectedLocation.name}
                 </strong>
-                <p>{selectedLocation.description}</p>
+                <p>{personalizeText(selectedLocation.description, player)}</p>
                 {ballpark && (
                   <div className="ballpark-schedule">
                     <strong>{ballpark.reason}</strong>

@@ -11,7 +11,7 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-1.12-3b82f6?style=flat-square)
+![version](https://img.shields.io/badge/version-1.12.1-3b82f6?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
 ![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
 
@@ -92,6 +92,7 @@
 
 ### 💞 인연과 이야기
 - 감독, 동기, 라이벌, 소꿉친구 등 **13명과의 개별 인연**
+- 동기·라이벌·친구들은 **매 회차 이름 · 성별 · 외모가 새로** 정해짐
 - 관계가 깊어질수록 훈련 · 경기 보너스
 - 선택지에 따라 달라지는 캐릭터 대화와 이벤트
 - 성별과 관계없이 열려 있는 로맨스
@@ -108,25 +109,25 @@
 <table align="center">
 <tr>
 <td align="center"><img src="public/assets/characters/coach.webp" width="100"><br><b>야구부 감독</b><br><sub>당신의 출전을 결정하는 사람</sub></td>
-<td align="center"><img src="public/assets/characters/senior-v18.webp" width="100"><br><b>강민준</b><br><sub>야구부 주장 선배</sub></td>
-<td align="center"><img src="public/assets/characters/peer-v18.webp" width="100"><br><b>이도현</b><br><sub>입학 동기 · 포지션 경쟁자</sub></td>
-<td align="center"><img src="public/assets/characters/rival-v18.webp" width="100"><br><b>박태성</b><br><sub>지역 라이벌</sub></td>
+<td align="center"><img src="public/assets/characters/senior-v18.webp" width="100"><br><b>주장 선배</b><br><sub>경기 전 조언을 건네는 선배</sub></td>
+<td align="center"><img src="public/assets/characters/peer-v18.webp" width="100"><br><b>입학 동기</b><br><sub>친구이자 포지션 경쟁자</sub></td>
+<td align="center"><img src="public/assets/characters/rival-v18.webp" width="100"><br><b>지역 라이벌</b><br><sub>같은 지역 학교의 에이스</sub></td>
 </tr>
 <tr>
-<td align="center"><img src="public/assets/characters/childhood-v18.webp" width="100"><br><b>한서윤</b><br><sub>소꿉친구</sub></td>
-<td align="center"><img src="public/assets/characters/deskmate-v18.webp" width="100"><br><b>윤하린</b><br><sub>옆자리 단짝</sub></td>
-<td align="center"><img src="public/assets/characters/junior-v18.webp" width="100"><br><b>이준서</b><br><sub>야구부 후배</sub></td>
+<td align="center"><img src="public/assets/characters/childhood-v18.webp" width="100"><br><b>소꿉친구</b><br><sub>어릴 적부터 곁에 있던 친구</sub></td>
+<td align="center"><img src="public/assets/characters/deskmate-v18.webp" width="100"><br><b>옆자리 단짝</b><br><sub>교실에서 가장 가까운 친구</sub></td>
+<td align="center"><img src="public/assets/characters/junior-v18.webp" width="100"><br><b>야구부 후배</b><br><sub>2학년부터 만나는 후배</sub></td>
 <td align="center"><img src="public/assets/characters/coach2-v18.webp" width="100"><br><b>기술 코치</b><br><sub>폼과 구종의 스승</sub></td>
 </tr>
 </table>
 
-<p align="center"><sub>이 밖에도 담임 선생님, 체육 선생님, 동네 친구 최민재, 부모님이 함께합니다.</sub></p>
+<p align="center"><sub>주장 · 동기 · 라이벌 · 후배 · 소꿉친구 · 동네 친구 · 단짝은 매 회차 이름 · 성별 · 외모가 새로 정해집니다. 위 그림은 예시입니다.<br>이 밖에도 담임 선생님, 체육 선생님, 동네 친구, 부모님이 함께합니다.</sub></p>
 
 <br>
 
 ## 🚧 로드맵
 
-현재 버전은 **1.12**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
+현재 버전은 **1.12.1**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
 
 - [x] 1.10 — 1학년 완주 자동 검증
 - [x] 1.11 — 전국체전

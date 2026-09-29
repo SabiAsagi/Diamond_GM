@@ -2,6 +2,7 @@ import { prepareTeamContext, updateCompetitionAfterAction, TEAM_ROLE_LABELS, dat
 import { getBallparkVisit } from '../data/proSchedule';
 import { initializeRival, updateMonthlyRival } from '../data/rival';
 import { applyBondChanges, formatBondChanges, actualBondChanges } from '../types/bondScores';
+import { personalizeText } from '../data/cast';
 import { captureAchievements } from '../data/achievements';
 import { normalizePlayer, EXTRA_RATINGS, trainPitch, overallRating } from '../data/playerDevelopment';
 import { create } from 'zustand';
@@ -199,6 +200,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const actualBonds = formatBondChanges(result.relationshipTargets);
     if(expectedBonds && result.logMessage.includes(expectedBonds)) result.logMessage=result.logMessage.replace(expectedBonds,actualBonds || '인연 변화 없음 (상한 도달)');
     else if(actualBonds) result.logMessage += ` · ${actualBonds}`;
+    result.logMessage = personalizeText(result.logMessage, player);
     for(const key of Object.keys(EXTRA_RATINGS) as (keyof typeof EXTRA_RATINGS)[]) extra[key]=Math.max(0,Math.min(100,extra[key]!+(sc[key]??0)));
     extra.velocity=Math.round(Math.max(80,Math.min(170,extra.velocity!+(sc.velocity??0)))*10)/10;
     if(result.pitchTraining) extra.pitches=trainPitch(extra,result.pitchTraining,result.pitchXp??0);
@@ -481,6 +483,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       let updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
       const relationshipTargets = actualBondChanges(player,updated);
       if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
+      effect.logMessage = personalizeText(effect.logMessage, player);
       for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics',...Object.keys(EXTRA_RATINGS)]){
         const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
       }

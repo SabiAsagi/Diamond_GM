@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { personalizeText } from '../../data/cast';
 import type { Player, Position } from '../../types';
 import { POSITION_LABELS } from '../../types';
 import { useGameClockStore } from '../../store/gameClockStore';
@@ -37,7 +38,7 @@ export function TeamCompetitionPanel({player,onClose}:{player:Player;onClose:()=
     <p className="team-help">능력·훈련 성과·최근 경기 내용·컨디션으로 평가합니다. 감독은 신뢰와 경험도 고려합니다. 포지션 1위는 주전, 2위는 백업이며 주전 평가 65점부터 핵심 선수입니다.</p>
     {t.poorStarts>0&&<p>최근 연속 부진 {t.poorStarts}경기 · 신뢰 75 이상인 기존 주전은 포지션 2위 이내에서 부진 두 경기까지 지위를 유지합니다.</p>}
     <section><div className="team-section-heading"><h3>포지션별 경쟁자</h3><label>포지션 <select value={position} onChange={e=>setPosition(e.target.value as FieldPosition)}>{FIELD_POSITIONS.map(p=><option key={p} value={p}>{POSITION_LABELS[p]}</option>)}</select></label></div>
-      <p className="team-help">학교 선수 규모와 포지션 경쟁도를 반영한 게임 속 선수들입니다. 이도현은 친구이자 같은 포지션의 경쟁자로 시작하며, 포지션을 바꿔도 그의 포지션은 유지됩니다.</p>
+      <p className="team-help">{personalizeText('학교 선수 규모와 포지션 경쟁도를 반영한 게임 속 선수들입니다. {peer|은} 친구이자 같은 포지션의 경쟁자로 시작하며, 포지션을 바꿔도 {peer}의 포지션은 유지됩니다.', player)}</p>
       <div className="team-table-scroll"><table className="team-depth-table"><thead><tr><th scope="col">서열</th><th scope="col">선수</th><th scope="col">학년</th><th scope="col">평가</th><th scope="col">컨디션</th></tr></thead><tbody>{chart.map((n,i)=><tr key={n.id} className={n.isPlayer?'is-player':''}><td>{i+1}</td><th scope="row">{n.name}{n.isPlayer?' (나)':n.bondId==='peer'?' · 동기':n.bondId==='senior'?' · 주장':''}</th><td>{n.grade}학년</td><td>{n.score.toFixed(1)}</td><td>{n.condition}</td></tr>)}</tbody></table></div>
     </section>
     <section><h3>대회 엔트리 발표</h3><p className="team-help">개막 3일 전 확정 · 게임 규칙: 투수 최대 5명, 야수 포지션별 최대 2명. 발표 후 해당 대회 동안 고정됩니다. 주말리그·평가전은 경기마다 기회를 판단합니다.</p>
