@@ -1,4 +1,4 @@
-import { BOND_NAMES, formatBondChanges, type RelationshipTargets, type BondId } from './bondScores';
+import { BOND_NAMES, bondNameToken, formatBondChanges, type RelationshipTargets, type BondId } from './bondScores';
 import { PITCH_NAMES, EXTRA_RATINGS, type PitchType } from '../data/playerDevelopment';
 import type { TimeSlot } from './calendar';
 import type { DailyActivityCategory } from './dailySchedule';
@@ -422,13 +422,13 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
 
   relationship: [
     {id:'rel_tech_coach_video',label:'기술 코치와 영상 분석',category:'relationship',icon:'🎥',description:'기술 코치와 스윙·투구 영상을 돌려보며 조언을 듣습니다.',staminaDelta:-4,mentalDelta:2,statChanges:{eye:1},relationshipTargets:{coach2:4},targetPosition:'ALL',allowedSlots:['afternoon']},
-    {id:'rel_rival_training_match',label:'라이벌과 자체 미니게임',category:'relationship',icon:'🔥',description:'박태성과 가벼운 내기를 걸고 훈련 대결을 펼칩니다.',staminaDelta:-6,mentalDelta:3,statChanges:{condition:2},relationshipTargets:{rival:4},targetPosition:'ALL',allowedSlots:['afternoon']},
-    {id:'rel_junior_catch',label:'후배와 캐치볼',category:'relationship',icon:'⚾',description:'이준서와 캐치볼을 하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:4,statChanges:{},relationshipTargets:{junior:4},minGrade:2,targetPosition:'ALL',allowedSlots:['afternoon','night']},
-    {id:'rel_deskmate_notes',label:'짝과 필기 공유',category:'relationship',icon:'📝',description:'윤하린과 서로의 필기를 비교하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:3,statChanges:{academics:1},relationshipTargets:{deskmate:4},targetPosition:'ALL',allowedSlots:['morning']},
-    {id:'rel_neighbor_hangout',label:'동네 친구와 놀기',category:'relationship',icon:'🎮',description:'최민재와 오랜만에 만나 편하게 시간을 보냅니다.',staminaDelta:3,mentalDelta:6,statChanges:{condition:4},relationshipTargets:{neighbor:4},targetPosition:'ALL',allowedSlots:['night']},
+    {id:'rel_rival_training_match',label:'라이벌과 자체 미니게임',category:'relationship',icon:'🔥',description:'{rival|과} 가벼운 내기를 걸고 훈련 대결을 펼칩니다.',staminaDelta:-6,mentalDelta:3,statChanges:{condition:2},relationshipTargets:{rival:4},targetPosition:'ALL',allowedSlots:['afternoon']},
+    {id:'rel_junior_catch',label:'후배와 캐치볼',category:'relationship',icon:'⚾',description:'{junior|와} 캐치볼을 하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:4,statChanges:{},relationshipTargets:{junior:4},minGrade:2,targetPosition:'ALL',allowedSlots:['afternoon','night']},
+    {id:'rel_deskmate_notes',label:'짝과 필기 공유',category:'relationship',icon:'📝',description:'{deskmate|과} 서로의 필기를 비교하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:3,statChanges:{academics:1},relationshipTargets:{deskmate:4},targetPosition:'ALL',allowedSlots:['morning']},
+    {id:'rel_neighbor_hangout',label:'동네 친구와 놀기',category:'relationship',icon:'🎮',description:'{neighbor|와} 오랜만에 만나 편하게 시간을 보냅니다.',staminaDelta:3,mentalDelta:6,statChanges:{condition:4},relationshipTargets:{neighbor:4},targetPosition:'ALL',allowedSlots:['night']},
     ...(Object.keys(BOND_NAMES) as BondId[]).map((id): ActivityOption => ({
-      id: `bond_talk_${id}`, label: `${BOND_NAMES[id]} · 대화`, category: 'relationship', weight: 2,
-      description: `${BOND_NAMES[id]}의 근황과 고민을 듣고 서로의 이야기를 나눕니다.`, icon: '💬',
+      id: `bond_talk_${id}`, label: `${bondNameToken(id)} · 대화`, category: 'relationship', weight: 2,
+      description: `${bondNameToken(id)}의 근황과 고민을 듣고 서로의 이야기를 나눕니다.`, icon: '💬',
       staminaDelta: -3, mentalDelta: 5, statChanges: {}, relationshipTargets: {[id]:6},
       targetPosition: 'ALL', minGrade: id === 'junior' ? 2 : undefined,
       allowedSlots: ['teacher','deskmate'].includes(id) ? ['morning']
@@ -443,7 +443,7 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
     {"id": "rel_lunch_table", "label": "친구들과 점심 대화", "description": "점심시간에 취미 이야기를 나눕니다.", relationshipTargets: { deskmate: 4 }, statChanges: { "condition": 2 }, "allowedSlots": ["morning"], "staminaDelta": -4, "mentalDelta": 3, "weight": 2, "targetPosition": "ALL", "icon": "🤝", "category": "relationship"},
     {
       id: 'rel_friends_arcade',
-      label: '이도현·최민재와 오락실/PC방',
+      label: '{peer}·{neighbor|와} 오락실/PC방',
       category: 'relationship',
       weight: 3,
       description: '스트레스도 날리고 전우애도 깊어지는 즐거운 시간입니다.',

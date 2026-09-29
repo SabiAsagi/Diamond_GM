@@ -6,6 +6,8 @@ export const BOND_NAMES = {
   childhood: '한서윤', neighbor: '최민재', deskmate: '윤하린', mother: '어머니', father: '아버지',
 } as const;
 export type BondId = keyof typeof BOND_NAMES;
+/** 회차마다 이름·성별·외모가 새로 정해지는 학생 인물 (data/cast.ts) */
+export const CAST_BOND_IDS = ['senior', 'peer', 'rival', 'junior', 'childhood', 'neighbor', 'deskmate'] as const;
 export type RelationshipCharacterId = BondId;
 export type BondScores = Record<BondId, number>;
 export type RelationshipTargets = Partial<BondScores>;
@@ -63,5 +65,7 @@ export function actualBondChanges(before: Player, after: Player): RelationshipTa
   }
   return changes;
 }
+/** 학생 인물은 {peer} 같은 자리 표시로 남기고, 화면에 보일 때 personalizeText로 이번 회차 이름을 넣는다. */
+export const bondNameToken = (id: BondId) => (CAST_BOND_IDS as readonly string[]).includes(id) ? `{${id}}` : BOND_NAMES[id];
 export const formatBondChanges = (targets: RelationshipTargets = {}) => Object.entries(targets)
-  .filter(([,delta]) => delta !== 0).map(([id,delta]) => `${BOND_NAMES[id as BondId]} 인연 ${delta > 0 ? '+' : ''}${delta}`).join(' · ');
+  .filter(([,delta]) => delta !== 0).map(([id,delta]) => `${bondNameToken(id as BondId)} 인연 ${delta > 0 ? '+' : ''}${delta}`).join(' · ');

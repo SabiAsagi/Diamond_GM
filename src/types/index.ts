@@ -43,6 +43,7 @@ export interface Player {
   stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
   pitches?: import('../data/playerDevelopment').PitchRating[];
   appearance?: import('../data/playerDevelopment').Appearance;
+  cast?: import('../data/cast').Cast; // 회차별 학생 인물. 없으면 기존 기본 인물
   siblings?: 'none' | 'older' | 'younger' | 'both';
   savedMatches?: import('./tournament').ScheduledMatch[];
   savedSeasonYear?: number;

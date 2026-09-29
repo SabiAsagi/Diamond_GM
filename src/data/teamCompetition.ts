@@ -6,6 +6,7 @@ import { getMatchKind, getPlayerMatchForDate } from '../types/tournament';
 import type { ActivityResult } from '../types/activity';
 import { battingRating, pitchingRating } from './playerDevelopment';
 import { getRelScore } from '../types/bondScores';
+import { getBondName } from './cast';
 
 export const FIELD_POSITIONS = ['P','C','1B','2B','3B','SS','LF','CF','RF'] as const;
 export type FieldPosition = typeof FIELD_POSITIONS[number];
@@ -40,8 +41,8 @@ function createRoster(player:Player,school:HighSchoolData,date:GameDate):Teammat
       ability:round(20+pressure(school,position)*1.7+(grade-1)*7+seed%7),form:45+seed%16,condition:65+seed%26});
   }
   const peer=roster.find(n=>n.position===fieldPosition(player.position))!;
-  Object.assign(peer,{id:'peer',name:'이도현',grade:date.grade,bondId:'peer',ability:26+pressure(school,peer.position)*1.5+(date.grade-1)*9});
-  if(date.grade<3){const senior=roster.find(n=>n.id!=='peer'&&n.position==='SS')!;Object.assign(senior,{id:'senior',name:'강민준',grade:date.grade+1,bondId:'senior',ability:42+pressure(school,'SS')});}
+  Object.assign(peer,{id:'peer',name:getBondName(player,'peer'),grade:date.grade,bondId:'peer',ability:26+pressure(school,peer.position)*1.5+(date.grade-1)*9});
+  if(date.grade<3){const senior=roster.find(n=>n.id!=='peer'&&n.position==='SS')!;Object.assign(senior,{id:'senior',name:getBondName(player,'senior'),grade:date.grade+1,bondId:'senior',ability:42+pressure(school,'SS')});}
   return roster;
 }
 export function ensureTeamCompetition(player:Player,school:HighSchoolData,date:GameDate):Player {
@@ -97,7 +98,8 @@ export function selectMatch(player:Player,match:ScheduledMatch,date:GameDate):Ma
     const chosen=pos===fieldPosition(player.position)&&start?rows.find(n=>n.isPlayer):rows.find(n=>!n.isPlayer);
     const fallback=chosen??rows[0];return {position:pos,id:fallback?.id??`empty-${pos}`,name:fallback?.name??'선발 공석'};
   });
-  const advice=getRelScore(player,'senior')>=55?(date.grade<3?'강민준: “경쟁은 길어. 오늘 네가 준비한 한 가지에 집중해.”':'강민준의 메시지: “결과보다 준비한 플레이에 집중해. 네 경기를 해.”'):undefined;
+  const senior=getBondName(player,'senior');
+  const advice=getRelScore(player,'senior')>=55?(date.grade<3?`${senior}: “경쟁은 길어. 오늘 네가 준비한 한 가지에 집중해.”`:`${senior}의 메시지: “결과보다 준비한 플레이에 집중해. 네 경기를 해.”`):undefined;
   return {matchId:match.id,year:date.year,role,reason,lineup,protected:protectedStart,advice};
 }
 /** 엔트리는 개막 3일 전, 선발 명단은 당일 오후에 한 번만 확정한다. */

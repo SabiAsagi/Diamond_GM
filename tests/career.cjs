@@ -557,7 +557,8 @@ test('라이벌은 연도·월당 한 번 성장하고 잠재력을 넘지 않�
   const { initializeRival, growRivalIfNeeded } = require(path.join(dir, 'data/rival.js'));
   const p = player();
   p.rivalProgress = initializeRival(p, { year: 2026, month: 12 }, () => 0.5);
-  assert.equal(p.rivalProgress.overall, p.overall);
+  assert.equal(p.rivalProgress.overall, p.overall + 3, '라이벌은 시작부터 조금 앞선다');
+  assert.ok(p.rivalProgress.potential >= 78, '라이벌은 잠재력이 높은 선수');
   let calls = 0;
   const random = () => {
     calls++;

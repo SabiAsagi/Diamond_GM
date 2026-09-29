@@ -2,6 +2,7 @@ import { getRelScore, type BondId } from './bondScores';
 export { getRelScore } from './bondScores';
 export type { RelationshipCharacterId } from './bondScores';
 import type { Player } from './index';
+import { getBondName, getRivalSchool } from '../data/cast';
 
 export type RelationshipStage = 1 | 2 | 3 | 4 | 5;
 export const STAGE_LABELS = ['', '아는 사이', '친한 사이', '가까운 사이', '신뢰하는 사이', '특별한 인연'];
@@ -15,7 +16,7 @@ interface BondEffectRule {
 }
 
 // 배율/단계를 조정할 때는 이 정의를 수정한다. 계산과 stageEffects 문구가 함께 갱신된다.
-// 동기 이도현 5단계만 +10%를 제공한다. 감독과 합산해 최대 총 +18%.
+// 동기 5단계만 +10%를 제공한다. 감독과 합산해 최대 총 +18%.
 const BOND_EFFECT_RULES: Record<'coach' | 'peer', readonly BondEffectRule[]> = {
   coach: [
     { stage: 2, kind: 'training', amount: 0.03 },
@@ -117,7 +118,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     },
     {
       id: 'senior',
-      name: grade >= 3 ? '졸업 선배 강민준' : '야구부 주장 강민준',
+      name: `${grade >= 3 ? '졸업 선배' : '야구부 주장'} ${getBondName(player, 'senior')}`,
       role: grade >= 3 ? '졸업 선배' : '주장 선배',
       icon: '⚾',
       note: '인연 55부터 경기 전 조언을 건네며 출전 시 멘탈 회복을 돕습니다.',
@@ -126,7 +127,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     },
     {
       id: 'peer',
-      name: '입학 동기 이도현',
+      name: `입학 동기 ${getBondName(player, 'peer')}`,
       role: player.teamCompetition?.roster.some(n => n.bondId === 'peer' && n.position === (player.position === 'TwoWay' ? 'P' : player.position)) ? '동기 · 포지션 경쟁자' : '동기',
       icon: '🤝',
       note: '인물별 인연과 이벤트 조건에 따라 가까워집니다.',
@@ -135,8 +136,8 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     },
     {
       id: 'rival',
-      name: '지역 라이벌 박태성',
-      role: '라이벌',
+      name: `지역 라이벌 ${getBondName(player, 'rival')}`,
+      role: getRivalSchool(player) ? `라이벌 · ${getRivalSchool(player)}` : '라이벌',
       icon: '🔥',
       note: '대결할수록 집중력과 실전 감각이 오릅니다.',
       stageLabels: ['경계 대상 1호', '의식되는 라이벌', '자극제가 되는 호적수', '인정하는 맞수', '운명의 숙적'],
@@ -145,7 +146,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       ? [
           {
             id: 'junior',
-            name: '야구부 후배 이준서',
+            name: `야구부 후배 ${getBondName(player, 'junior')}`,
             role: '후배',
             icon: '🌱',
             note: '조언과 멘토링 이벤트가 열립니다.',
@@ -155,7 +156,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       : []),
     {
       id: 'childhood',
-      name: '소꿉친구 한서윤',
+      name: `소꿉친구 ${getBondName(player, 'childhood')}`,
       role: '소꿉친구',
       icon: '🌸',
       note: '인물별 인연과 이벤트 조건에 따라 가까워집니다.',
@@ -164,7 +165,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     },
     {
       id: 'neighbor',
-      name: '동네 친구 최민재',
+      name: `동네 친구 ${getBondName(player, 'neighbor')}`,
       role: '동네 친구',
       icon: '🎮',
       note: '휴식과 취미 이벤트를 함께합니다.',
@@ -172,7 +173,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     },
     {
       id: 'deskmate',
-      name: '옆자리 단짝 윤하린',
+      name: `옆자리 단짝 ${getBondName(player, 'deskmate')}`,
       role: '반 친구',
       icon: '📚',
       note: '인물별 인연과 이벤트 조건에 따라 가까워집니다.',

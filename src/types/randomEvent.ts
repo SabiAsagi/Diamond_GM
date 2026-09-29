@@ -10,6 +10,7 @@ export interface EventChoice {
 }
 export interface EventCutscene {
   portrait?: string;
+  speakerId?: import('../data/characterPortraits').PortraitCharacterId; // 회차별 인물이면 이번 회차 초상화로 표시
   dialogueLines?: { speaker: 'npc' | 'player'; text: string }[];
   choices?: EventChoice[];
   categories?: import('./dailySchedule').DailyActivityCategory[];

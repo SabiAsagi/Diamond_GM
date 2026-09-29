@@ -16,9 +16,10 @@ export interface RivalReport {
   playerOverall: number;
   playerDelta: number;
 }
+/** 라이벌은 같은 지역 학교·팀의 잘하는 선수: 시작부터 조금 앞서고(+1~+5) 잠재력도 높다(78~95). */
 export function initializeRival(player: Player, date: Pick<GameDate,'year'|'month'>, random = Math.random): RivalProgress {
-  const potential = 65 + Math.floor(random()*21);
-  return {overall:Math.min(potential,Math.max(15,player.overall-2+Math.floor(random()*5))),potential,
+  const potential = 78 + Math.floor(random()*18);
+  return {overall:Math.min(potential,Math.max(15,player.overall+1+Math.floor(random()*5))),potential,
     lastUpdatedYear:date.year,lastUpdatedMonth:date.month,playerMonthStartOverall:player.overall};
 }
 // 연도도 기록하여 연말·연초 및 다음 해 같은 달의 성장을 구분한다.
@@ -43,9 +44,9 @@ export function updateMonthlyRival(player: Player, date: Pick<GameDate,'year'|'m
     playerDelta:player.overall-before.playerMonthStartOverall};
   return {...player,rivalProgress:after,pendingRivalReport};
 }
-export function getRivalComparison(playerOverall: number, rivalOverall: number): string {
+export function getRivalComparison(playerOverall: number, rivalOverall: number, rivalName = '라이벌'): string {
   const gap = playerOverall-rivalOverall;
-  return gap >= 8 ? '당신이 크게 앞서고 있습니다. 박태성도 꾸준히 격차를 좁히고 있습니다.'
+  return gap >= 8 ? `당신이 크게 앞서고 있습니다. ${rivalName}도 꾸준히 격차를 좁히고 있습니다.`
     : gap >= 0 ? '당신이 근소하게 앞서거나 대등합니다. 잠시 방심하면 순서가 바뀔 수 있습니다.'
-    : '박태성이 앞서 있습니다. 다음 달에는 격차를 좁혀 봅시다.';
+    : `${rivalName}의 기록이 앞서 있습니다. 다음 달에는 격차를 좁혀 봅시다.`;
 }

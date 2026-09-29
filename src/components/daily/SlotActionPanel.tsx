@@ -1,6 +1,7 @@
 import { MatchSelectionCard } from './TeamCompetitionPanel';
 import { trainingRecommendation } from '../../data/teamCompetition';
-import { BOND_NAMES, type BondId } from '../../types/bondScores';
+import type { BondId } from '../../types/bondScores';
+import { getBondName, personalizeText } from '../../data/cast';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useState } from 'react';
 import type { TimeSlot, GameDate } from '../../types/calendar';
@@ -224,11 +225,11 @@ export function SlotActionPanel({
             >
               <div className="card-top">
                 <span className="card-icon">{opt.icon}</span>
-                <strong className="card-title">{opt.label}</strong>
+                <strong className="card-title">{personalizeText(opt.label, player)}</strong>
                 {isSelected && <CheckCircle2 size={18} className="check-icon" />}
               </div>
 
-              <p className="card-desc">{opt.description}</p>
+              <p className="card-desc">{personalizeText(opt.description, player)}</p>
 
               {/* 스탯 및 체력 변동 칩 */}
               <div className="card-meta-chips">
@@ -238,7 +239,7 @@ export function SlotActionPanel({
                   체력 {opt.staminaDelta > 0 ? `+${opt.staminaDelta}` : opt.staminaDelta}
                 </span>
 
-                {Object.entries(opt.relationshipTargets ?? {}).map(([id,delta]) => <span key={id} className="stat-chip">{BOND_NAMES[id as BondId]} 인연 {delta > 0 ? '+' : ''}{delta}</span>)}
+                {Object.entries(opt.relationshipTargets ?? {}).map(([id,delta]) => <span key={id} className="stat-chip">{getBondName(player, id as BondId)} 인연 {delta > 0 ? '+' : ''}{delta}</span>)}
                 {Object.entries(opt.statChanges).map(([k, v]) => (
                   <span key={k} className="stat-chip">
                     {EXTRA_RATINGS[k as keyof typeof EXTRA_RATINGS]?.[0]}
@@ -279,7 +280,7 @@ export function SlotActionPanel({
         <div className="preview-summary-text">
           {selectedOption && (
             <span>
-              선택: <strong>{selectedOption.label}</strong>
+              선택: <strong>{personalizeText(selectedOption.label, player)}</strong>
               {evaluatedPreview && (
                 <span className="preview-text-sub"> — {evaluatedPreview.logMessage}</span>
               )}

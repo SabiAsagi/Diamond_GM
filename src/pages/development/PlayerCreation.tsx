@@ -1,4 +1,5 @@
 import { initializeRival } from '../../data/rival';
+import { generateCast } from '../../data/cast';
 import { INITIAL_RELATIONSHIPS } from '../../types/bondScores';
 import { AppearanceEditor } from '../../components/PlayerAppearance';
 import { DEFAULT_APPEARANCE, normalizeAppearance, normalizePlayer, overallRating } from '../../data/playerDevelopment';
@@ -8,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../../db';
 import type { Player, Position, Handedness, PitchingForm, BattingForm, PitcherRole, Gender } from '../../types';
 import { POSITION_LABELS } from '../../types';
-import { HIGH_SCHOOLS_BY_REGION, getHighSchoolDataByName } from '../../data/highSchools';
+import { HIGH_SCHOOLS_BY_REGION, HIGH_SCHOOLS_DATA, getHighSchoolDataByName } from '../../data/highSchools';
 import { PITCHING_FORM_GUIDES, BATTING_FORM_GUIDES, type FormGuide } from '../../data/formGuides';
 import { SchoolEmblem } from '../../components/SchoolEmblem';
 import { SchoolGraphs } from '../../components/SchoolGraphs';
@@ -146,6 +147,8 @@ export default function PlayerCreation() {
     const normalized = normalizePlayer(newPlayer);
     normalized.overall=overallRating(normalized);
     normalized.rivalProgress = initializeRival(normalized,{year:2026,month:3});
+    // 회차마다 주장·동기·라이벌·후배·친구들의 이름·성별·외모를 새로 정한다.
+    normalized.cast = generateCast(normalized, HIGH_SCHOOLS_DATA);
     const id = await db.players.add(normalized);
     navigate(`/development/interview/${id}`);
   };

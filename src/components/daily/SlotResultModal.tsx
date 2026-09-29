@@ -1,4 +1,6 @@
-import { BOND_NAMES, type BondId } from '../../types/bondScores';
+import type { BondId } from '../../types/bondScores';
+import { getBondName } from '../../data/cast';
+import { useGameClockStore } from '../../store/gameClockStore';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
 import { useEffect } from 'react';
 import type { ActivityResult } from '../../types/activity';
@@ -10,6 +12,7 @@ interface SlotResultModalProps {
 }
 
 export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
+  const player = useGameClockStore(s => s.player);
   // ESC 키로 닫기 지원
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -98,7 +101,7 @@ export function SlotResultModal({ result, onClose }: SlotResultModalProps) {
           {result.moneyDelta !== undefined && result.moneyDelta !== 0 && (
             <div className={`delta-item ${result.moneyDelta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">소지금</span><span className="delta-val">{result.moneyDelta > 0 ? '+' : ''}{result.moneyDelta.toLocaleString()}원</span></div>
           )}
-          {Object.entries(result.relationshipTargets ?? {}).map(([id,delta]) => <div key={id} className={`delta-item ${delta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">{BOND_NAMES[id as BondId]} 인연</span><span className="delta-val">{delta > 0 ? '+' : ''}{delta}</span></div>)}
+          {Object.entries(result.relationshipTargets ?? {}).map(([id,delta]) => <div key={id} className={`delta-item ${delta > 0 ? 'delta-positive' : 'delta-negative'}`}><span className="delta-label">{getBondName(player, id as BondId)} 인연</span><span className="delta-val">{delta > 0 ? '+' : ''}{delta}</span></div>)}
           {statEntries.map(([key, val]) => {
             const numVal = val as number;
             const isPos = numVal > 0;

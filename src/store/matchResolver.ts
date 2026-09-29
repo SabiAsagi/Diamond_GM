@@ -6,6 +6,7 @@ import type { HighSchoolData } from '../types/highSchool';
 import type { ActivityResult } from '../types/activity';
 import { getCoachWinProbabilityBonus } from '../types/relationship';
 import { getRelScore } from '../types/bondScores';
+import { personalizeText } from '../data/cast';
 import { APPEARANCE_LABELS, prepareTeamContext, selectMatch, type MatchPerformance } from '../data/teamCompetition';
 
 /** 간이 경기 엔진: 실제 출전 역할에 따라 개인 성적과 육성 보상을 계산한다. */
@@ -68,7 +69,7 @@ export function resolveMatchPlaceholder(match:ScheduledMatch,input:Player,school
   if(played){relationships.coach=good?2:bad?-2:1;relationships.coach2=good?1:0;}
   if(peerRival)relationships.peer=peerClose?1:good?-1:0;
   if(selection.advice)relationships.senior=1;
-  const bondStory=peerRival?(peerClose?'이도현과 서로의 플레이를 복기하며 다음 훈련을 약속했습니다.':good?'같은 포지션의 이도현이 당신의 활약을 의식합니다.':'이도현의 플레이를 보며 다음 경쟁을 준비합니다.') : '';
+  const bondStory=personalizeText(peerRival?(peerClose?'{peer|과} 서로의 플레이를 복기하며 다음 훈련을 약속했습니다.':good?'같은 포지션의 {peer|이} 당신의 활약을 의식합니다.':'{peer}의 플레이를 보며 다음 경쟁을 준비합니다.') : '',player);
   const logMessage=`⚾ [${match.tournamentName} ${match.round}] ${school.name} ${myScore} : ${oppScore} ${match.homeSchoolId===school.id?match.awaySchoolName:match.homeSchoolName} (${won?'승리':'패배'})\n[${APPEARANCE_LABELS[role]}] ${played?lines.join(' · '):'미출전 · 개인 기록과 경기 성장치 없음'}\n${selection.advice??''}${selection.advice?'\n':''}${bondStory}${coachBonus?' · 감독 신뢰로 승리 확률 보정 +4%p':''}`;
   return {activityCategory:'match',statChanges,relationshipTargets:relationships,staminaDelta:played?(role==='starter'?-20:-8):-3,mentalDelta:played?(good?6:bad?-6:1)+(selection.advice?3:0):role==='outside'?-3:-1,logMessage,matchPerformance:performance,matchOutcome:{matchId:match.id,tournamentId:match.tournamentId,won}};
 }
