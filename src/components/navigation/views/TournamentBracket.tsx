@@ -1,4 +1,4 @@
-import { getMatchKind } from '../../../types/tournament';
+import { getMatchKind, getTournamentRuleText } from '../../../types/tournament';
 import { useState } from 'react';
 import type { ScheduledMatch } from '../../../types/tournament';
 import { useGameClockStore } from '../../../store/gameClockStore';
@@ -39,7 +39,7 @@ export function TournamentBracket({ matches }: { matches: ScheduledMatch[] }) {
           ))}
         </select>
       </label>
-      <p>게임 대회 규칙: 4팀씩 조별 토너먼트 예선 → 조 우승팀 본선 16강 → 8강 → 4강 → 결승</p>
+      <p>{getTournamentRuleText(selected)}</p>
       <p>다음 라운드는 이전 라운드 승리 학교가 결정된 후 편성됩니다.</p>
       {!drawn && (
         <button
