@@ -98,7 +98,7 @@ export function EventCutsceneModal({
           />
         </div>
         <div className={!isPlayer ? 'cast-person speaking' : 'cast-person'}>
-          {cutscene.speakerId ? <CharacterPortrait player={player} id={cutscene.speakerId} /> : <img src={cutscene.portrait} alt="" />}
+          {cutscene.speakerId ? <CharacterPortrait player={player} id={cutscene.speakerId} variant={cutscene.portraitVariant} /> : <img src={cutscene.portrait} alt="" />}
         </div>
       </div>
       <section className="story-dialogue">

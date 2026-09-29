@@ -182,25 +182,24 @@ test('회차별 인물: 이름·성별·외모가 무작위로 정해지고 서�
     assert.equal(new Set(names).size, 7, `이름 중복 (seed ${seed})`);
     assert.equal(new Set(names.map(n => n.slice(1))).size, 7, `성을 뺀 이름 중복 (seed ${seed})`);
     assert.ok(!names.includes(castPlayer.name), '선수 이름과 중복');
-    const team = ['senior', 'peer', 'rival', 'junior'].map(id => cast[id]);
-    for (const member of team) {
-      assert.equal(member.portrait.kind, 'preset');
-      assert.ok(member.portrait.appearance.hairStyleId.startsWith(`${member.gender}_`), '성별과 얼굴 불일치');
-    }
-    const faces = team.map(m => m.portrait.appearance.hairStyleId);
-    assert.equal(new Set(faces).size, 4, '야구부 인물 얼굴 중복');
-    assert.ok(!faces.includes('male_spiky'), '선수와 같은 얼굴');
+    const team = ['senior', 'peer', 'rival'].map(id => cast[id]);
+    assert.ok(team.every(member => member.portrait.kind === 'image'));
+    assert.equal(new Set(team.map(m => m.portrait.src)).size, 3, '야구부 인물 얼굴 중복');
+    assert.equal(cast.junior.portrait.kind, 'preset');
+    assert.ok(cast.junior.portrait.appearance.hairStyleId.startsWith(`${cast.junior.gender}_`), '후배 성별과 얼굴 불일치');
+    assert.ok(!cast.junior.portrait.appearance.hairStyleId.includes('male_spiky'), '선수와 같은 얼굴');
     assert.equal(cast.senior.portrait.schoolName, castPlayer.highSchool);
     assert.notEqual(cast.rival.portrait.schoolName, castPlayer.highSchool, '라이벌은 다른 학교 유니폼');
     assert.equal(HIGH_SCHOOLS_DATA.find(s => s.name === cast.rival.portrait.schoolName)?.region, HIGH_SCHOOLS_DATA[0].region, '라이벌은 같은 시·도 학교·팀 소속');
     const friends = ['childhood', 'neighbor', 'deskmate'].map(id => cast[id]);
-    assert.ok(friends.every(m => m.portrait.kind === 'image'));
-    assert.equal(new Set(friends.map(m => m.portrait.src)).size, 3, '친구 일러스트 중복');
+    assert.ok(friends.every(m => m.portrait.kind === 'imagePair'));
+    assert.equal(new Set(friends.map(m => m.portrait.schoolSrc)).size, 3, '친구 교복 일러스트 중복');
+    assert.ok(friends.every(m => m.portrait.schoolSrc !== m.portrait.casualSrc), '교복·사복 파일이 같음');
   }
   const casts = [1, 2, 3, 4, 5].map(seed => generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(seed)));
   assert.ok(new Set(casts.map(c => c.peer.name)).size > 1, '회차마다 같은 동기 이름');
   assert.ok(new Set(casts.map(c => c.peer.gender + c.senior.gender + c.rival.gender + c.junior.gender)).size > 1, '회차마다 같은 성별 구성');
-  assert.ok(new Set(casts.map(c => c.childhood.portrait.src)).size > 1, '회차마다 같은 소꿉친구 외모');
+  assert.ok(new Set(casts.map(c => c.childhood.portrait.schoolSrc)).size > 1, '회차마다 같은 소꿉친구 외모');
 });
 
 test('회차별 인물: 이전 저장본은 기존 인물을 유지하고, 새 회차는 이번 이름으로 표시된다', () => {

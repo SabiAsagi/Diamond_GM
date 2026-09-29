@@ -1,6 +1,7 @@
 import type { Appearance } from './playerDevelopment';
 import { PORTRAIT_PRESETS } from './playerDevelopment';
 import { CHARACTER_PORTRAITS } from './characterPortraits';
+import { RANDOM_RELATIONSHIP_PROFILES } from './randomRelationshipProfiles';
 import type { Gender, Player } from '../types';
 import type { HighSchoolData } from '../types/highSchool';
 import { BOND_NAMES, CAST_BOND_IDS, type BondId } from '../types/bondScores';
@@ -8,11 +9,11 @@ import { BOND_NAMES, CAST_BOND_IDS, type BondId } from '../types/bondScores';
 /** 회차마다 새로 정해지는 학생 인물. 감독·교사·부모는 고정 인물이다. */
 export const CAST_IDS = CAST_BOND_IDS;
 export type CastId = typeof CAST_IDS[number];
-const TEAM_CAST: CastId[] = ['senior', 'peer', 'rival', 'junior'];
-const FRIEND_CAST: CastId[] = ['childhood', 'neighbor', 'deskmate'];
+const FRIEND_CAST = ['childhood', 'neighbor', 'deskmate'] as const;
 
 export type CastPortrait =
-  | { kind: 'image'; src: string }
+  | { kind: 'image'; src: string; schoolName?: string }
+  | { kind: 'imagePair'; schoolSrc: string; casualSrc: string }
   | { kind: 'preset'; appearance: Appearance; schoolName: string; number: number };
 export interface CastMember { name: string; gender: Gender; portrait: CastPortrait }
 export type Cast = Record<CastId, CastMember>;
@@ -27,12 +28,6 @@ export const DEFAULT_CAST: Cast = Object.fromEntries(CAST_IDS.map(id => [id, {
   name: BOND_NAMES[id], gender: DEFAULT_GENDERS[id], portrait: { kind: 'image', src: CHARACTER_PORTRAITS[id] },
 }])) as Cast;
 
-/** 친구 인물용 교복·사복 일러스트. 그림이 성별을 정한다. 그림을 추가하면 후보가 늘어난다. */
-const CASUAL_PORTRAITS: { src: string; gender: Gender }[] = [
-  { src: CHARACTER_PORTRAITS.childhood, gender: 'female' },
-  { src: CHARACTER_PORTRAITS.deskmate, gender: 'female' },
-  { src: CHARACTER_PORTRAITS.neighbor, gender: 'male' },
-];
 const ACCESSORIES: (string | undefined)[] = [undefined, undefined, 'headband', 'goggles'];
 
 const SURNAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권', '황', '안', '송', '류', '홍', '전', '고', '문', '배', '백'];
@@ -44,7 +39,7 @@ const GIVEN_NAMES: Record<Gender, string[]> = {
 /** 회차별 라이벌의 소속 학교·팀. 이전 저장본의 기본 라이벌은 소속 정보가 없다. */
 export function getRivalSchool(player: Pick<Player, 'cast'>): string | undefined {
   const portrait = getCastMember(player, 'rival').portrait;
-  return portrait.kind === 'preset' ? portrait.schoolName : undefined;
+  return portrait.kind === 'preset' || portrait.kind === 'image' ? portrait.schoolName : undefined;
 }
 
 export function getCastMember(player: Pick<Player, 'cast'>, id: CastId): CastMember {
@@ -98,7 +93,7 @@ export function generateCast(
     return pick(SURNAMES) + given;
   };
 
-  // 야구부 인물: 성별별 선수 프리셋을 겹치지 않게 나눠 준다. 한쪽 얼굴이 모자라면 다른 성별로 넘긴다.
+  // 후배는 선수 생성 프리셋을 사용한다. 나머지 야구부 인물은 역할별 전용 일러스트 풀에서 뽑는다.
   const faces: Record<Gender, string[]> = {
     male: shuffle(PORTRAIT_PRESETS.male.map(p => p.id).filter(id => id !== player.appearance?.hairStyleId)),
     female: shuffle(PORTRAIT_PRESETS.female.map(p => p.id).filter(id => id !== player.appearance?.hairStyleId)),
@@ -109,20 +104,35 @@ export function generateCast(
   const rivalSchools = otherSchools.filter(s => !home || s.region === home.region);
   const rivalSchool = pick(rivalSchools.length ? rivalSchools : otherSchools)?.name ?? player.highSchool;
   const cast: Partial<Cast> = {};
-  for (const id of TEAM_CAST) {
+  for (const id of ['senior', 'peer', 'rival'] as const) {
+    const profile = pick([...RANDOM_RELATIONSHIP_PROFILES[id]]);
+    cast[id] = {
+      name: nameFor(profile.gender),
+      gender: profile.gender,
+      portrait: {
+        kind: 'image',
+        src: profile.baseballPortrait!,
+        schoolName: id === 'rival' ? rivalSchool : player.highSchool,
+      },
+    };
+  }
+  for (const id of ['junior'] as const) {
     let gender: Gender = random() < 0.5 ? 'male' : 'female';
     if (!faces[gender].length) gender = gender === 'male' ? 'female' : 'male';
     const hairStyleId = faces[gender].shift() ?? PORTRAIT_PRESETS[gender][0].id;
     cast[id] = {
       name: nameFor(gender), gender,
-      portrait: { kind: 'preset', appearance: { hairStyleId, accessoryId: pick(ACCESSORIES) }, schoolName: id === 'rival' ? rivalSchool : player.highSchool, number: 2 + Math.floor(random() * 58) },
+      portrait: { kind: 'preset', appearance: { hairStyleId, accessoryId: pick(ACCESSORIES) }, schoolName: player.highSchool, number: 2 + Math.floor(random() * 58) },
     };
   }
-  // 친구 인물: 교복·사복 일러스트를 무작위로 나눠 준다.
-  const casual = shuffle(CASUAL_PORTRAITS);
-  FRIEND_CAST.forEach((id, i) => {
-    const art = casual[i % casual.length];
-    cast[id] = { name: nameFor(art.gender), gender: art.gender, portrait: { kind: 'image', src: art.src } };
+  // 친구 인물: 역할별 10명 중 하나를 뽑고, 교복·사복 한 쌍을 함께 저장한다.
+  FRIEND_CAST.forEach(id => {
+    const profile = pick([...RANDOM_RELATIONSHIP_PROFILES[id]]);
+    cast[id] = {
+      name: nameFor(profile.gender),
+      gender: profile.gender,
+      portrait: { kind: 'imagePair', schoolSrc: profile.schoolPortrait!, casualSrc: profile.casualPortrait! },
+    };
   });
   return cast as Cast;
 }

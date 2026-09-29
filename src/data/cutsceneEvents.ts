@@ -121,5 +121,5 @@ export const CUTSCENE_EVENTS_POOL: EventCutscene[] = EVENTS.map(event => {
    logMessage:alternative[2],
  })});
  if(event.id==='homeroom_checkin' && choices)choices.push({id:'consult',label:'진로 고민을 털어놓는다',response:'네가 고민하는 걸 알려줘서 고맙다. 진로는 함께 천천히 알아보자.',effect:p=>({statChanges:{condition:Math.min(100,p.condition+8)},relationshipTargets:{teacher:4},logMessage:'담임 선생님에게 진로 고민을 이야기했습니다.'})});
- return {...event,speakerId:scene.portrait,portrait:CHARACTER_PORTRAITS[scene.portrait],dialogueLines:[{speaker:'npc',text:event.dialogue},{speaker:'player',text:scene.reply},{speaker:'npc',text:scene.ending}],choices};
+ return {...event,speakerId:scene.portrait,portrait:CHARACTER_PORTRAITS[scene.portrait],portraitVariant:event.id==='childhood_date'?'casual':undefined,dialogueLines:[{speaker:'npc',text:event.dialogue},{speaker:'player',text:scene.reply},{speaker:'npc',text:scene.ending}],choices};
 });
