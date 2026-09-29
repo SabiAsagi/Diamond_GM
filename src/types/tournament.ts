@@ -107,19 +107,15 @@ export const FESTIVAL_QUALIFIER_ID = 'festival_qualifier';
 const QUALIFIER_ROUND_DATES = [{ month: 6, day: 9 }, { month: 6, day: 11 }, { month: 6, day: 16 }, { month: 6, day: 18 }, { month: 6, day: 23 }];
 
 /**
- * 제107회 전국체육대회(2026 제주) 남자18세이하부 야구 공식 일정 (대한체육회 대회정보, 2026-09-28 확인).
+ * 전국체전 게임 일정. 실제 대회의 틀(10월 중순 일주일, 하루 최대 3경기, 4강 전 하루 휴식)만 참고해 새로 짰다.
  * 라운드별 경기는 대진표 위에서부터의 순서이며, 다음 라운드 k번째 경기는 이전 라운드 2k·2k+1번째 경기 승자끼리 치른다.
  */
-const FESTIVAL_VENUE = '서귀포야구장';
-const FESTIVAL_OFFICIAL_YEAR = 2026;
 const FESTIVAL_ROUNDS: { round: string; games: [month: number, day: number, time: string][] }[] = [
-  { round: '16강전', games: [[10, 18, '09:00'], [10, 18, '11:30'], [10, 17, '09:00'], [10, 16, '09:00'], [10, 17, '11:30'], [10, 17, '14:00'], [10, 16, '11:30'], [10, 16, '14:00']] },
-  { round: '8강전', games: [[10, 19, '14:00'], [10, 19, '09:00'], [10, 19, '11:30'], [10, 18, '14:00']] },
-  { round: '4강 준결승', games: [[10, 21, '12:30'], [10, 21, '10:00']] },
+  { round: '16강전', games: [[10, 16, '09:00'], [10, 16, '11:30'], [10, 16, '14:00'], [10, 17, '09:00'], [10, 17, '11:30'], [10, 17, '14:00'], [10, 18, '09:00'], [10, 18, '11:30']] },
+  { round: '8강전', games: [[10, 18, '14:00'], [10, 19, '09:00'], [10, 19, '11:30'], [10, 19, '14:00']] },
+  { round: '4강 준결승', games: [[10, 21, '10:00'], [10, 21, '12:30']] },
   { round: '결승전', games: [[10, 22, '10:00']] },
 ];
-/** 2026 공식 1회전 대진의 시·도 배치 (경기 순서대로 홈, 원정). 발표 전 연도는 같은 일정에 시·도를 무작위로 배치한다. */
-const FESTIVAL_2026_DRAW = ['인천', '전남', '전북', '강원', '광주', '경북', '부산', '대전', '경남', '경기', '대구', '충남', '충북', '울산', '제주', '서울'];
 
 /** 대진표 화면에 표시하는 대회 방식 안내 */
 export function getTournamentRuleText(tournamentId: string): string {
@@ -159,14 +155,12 @@ function festivalMatch(year: number, stage: number, k: number, home: Team, away:
   return {id:`${NATIONAL_FESTIVAL_ID}_${stage}_${k}`,year,kind:'national',date:{month,day},tournamentId:NATIONAL_FESTIVAL_ID,tournamentName:'전국체육대회 고등부 야구',
     round:FESTIVAL_ROUNDS[stage].round,drawn:true,homeSchoolId:home.id,homeSchoolName:home.name,awaySchoolId:away.id,awaySchoolName:away.name,
     isPlayerTeamMatch:home.id===playerSchool.id||away.id===playerSchool.id,
-    description:`${time} ${FESTIVAL_VENUE}${year===FESTIVAL_OFFICIAL_YEAR?'':' (가상 일정)'} · ${matchup}`};
+    description:`${time} 경기 · ${matchup}`};
 }
 
-/** 전국체전 1회전 8경기. 플레이어 시·도는 선발전 우승교(qualifier) 또는 지정 학교가 대표로 나간다. */
+/** 전국체전 1회전 8경기. 시·도 배치는 매년 무작위이고, 플레이어 시·도는 선발전 우승교(qualifier) 또는 지정 학교가 대표로 나간다. */
 function buildFestivalFirstRound(year: number, playerSchool: HighSchoolData, allSchools: HighSchoolData[], playerRegionRep: HighSchoolData | 'qualifier'): ScheduledMatch[] {
-  const regions = [...new Set(allSchools.map(s => s.region))];
-  const official = year === FESTIVAL_OFFICIAL_YEAR && regions.length === FESTIVAL_2026_DRAW.length && regions.every(r => FESTIVAL_2026_DRAW.includes(r));
-  const draw = official ? FESTIVAL_2026_DRAW : shuffle(regions).slice(0, 16);
+  const draw = shuffle([...new Set(allSchools.map(s => s.region))]).slice(0, 16);
   if (draw.length < 16) return [];
   const teamFor = (region: string): Team => region !== playerSchool.region
     ? pickRegionRepresentative(allSchools.filter(s => s.region === region))
@@ -229,7 +223,7 @@ function progressFestival(matches: ScheduledMatch[], current: ScheduledMatch, re
   const [upper, lower] = [byId(stage, k - (k % 2)), byId(stage, k - (k % 2) + 1)];
   if (!upper?.result || !lower?.result || byId(stage + 1, k >> 1)) return updated;
   const winner = (m: ScheduledMatch): Team => m.result === 'home' ? { id: m.homeSchoolId, name: m.homeSchoolName } : { id: m.awaySchoolId, name: m.awaySchoolName };
-  return settleScheduleConflicts([...updated, festivalMatch(current.year ?? FESTIVAL_OFFICIAL_YEAR, stage + 1, k >> 1, winner(upper), winner(lower), playerSchool)]);
+  return settleScheduleConflicts([...updated, festivalMatch(current.year ?? 2026, stage + 1, k >> 1, winner(upper), winner(lower), playerSchool)]);
 }
 
 /** 전국대회 1라운드(조 추첨 전) 대진을 만든다. 16개 조, 각 조 4팀 예선 후 조 우승팀만 본선 16강 진출 (게임 규칙). */
