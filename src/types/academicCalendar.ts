@@ -112,12 +112,14 @@ export function isVacationPeriod(month: number, day: number): boolean {
   if (month === 7 && day >= 21) return true;
   if (month === 8 && day <= 20) return true;
 
-  // 겨울방학
+  return isWinterVacation(month, day);
+}
+
+/** 겨울방학(12월 24일 ~ 다음해 2월 5일). 동계 훈련 전용 활동이 열리는 기간이다. */
+export function isWinterVacation(month: number, day: number): boolean {
   if (month === 12 && day >= 24) return true;
   if (month === 1) return true;
-  if (month === 2 && day <= 5) return true;
-
-  return false;
+  return month === 2 && day <= 5;
 }
 
 /**

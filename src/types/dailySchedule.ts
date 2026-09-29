@@ -1,6 +1,6 @@
 import type { GameDate, TimeSlot } from './calendar';
 import type { AcademicEvent } from './academicCalendar';
-import { getActiveAcademicEvent, isSchoolDay } from './academicCalendar';
+import { getActiveAcademicEvent, isSchoolDay, isWinterVacation } from './academicCalendar';
 import type { ScheduledMatch } from './tournament';
 import { getPlayerMatchForDate } from './tournament';
 
@@ -44,6 +44,7 @@ export function buildDailyPlan(date: GameDate, context: DailyPlanContext): Daily
   const matchToday = getPlayerMatchForDate(date, context.matches);
   const academicEventToday = getActiveAcademicEvent(date, context.academicEvents);
   const schoolDay = isSchoolDay(date);
+  const winterTraining = isWinterVacation(date.month, date.day);
 
   // 기본 슬롯 (자유 일정)
   const slots: Record<TimeSlot, SlotAssignment> = {
@@ -60,8 +61,10 @@ export function buildDailyPlan(date: GameDate, context: DailyPlanContext): Daily
       slot: 'afternoon',
       forced: false,
       category: 'training',
-      label: '방과 후 팀 훈련 & 야구 활동',
-      description: '그라운드에서 팀 정규 훈련, 연습 경기, 특화 훈련을 진행합니다.',
+      label: winterTraining ? '❄️ 동계 훈련 기간 · 팀 훈련' : '방과 후 팀 훈련 & 야구 활동',
+      description: winterTraining
+        ? '겨울방학 동계 훈련 기간입니다. 서킷·웨이트·실내 훈련 같은 겨울 전용 활동을 고를 수 있습니다.'
+        : '그라운드에서 팀 정규 훈련, 연습 경기, 특화 훈련을 진행합니다.',
     },
     night: {
       slot: 'night',

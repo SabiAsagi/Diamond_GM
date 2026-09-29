@@ -411,7 +411,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     const pool = SUB_ACTIVITY_POOL[category] || [];
     const option = pool.find(o => o.id === subActivityId);
-    if (!option || !isActivityAvailable(option, player.position, _slot, player.grade ?? 1)) return;
+    if (!option || !isActivityAvailable(option, player.position, _slot, player.grade ?? 1, get().clock.date)) return;
 
     // 체력 및 멘탈 게이팅 평가 (체력 20 이하 효율 반감 및 부상 롤)
     const result = evaluateActivityWithGating(

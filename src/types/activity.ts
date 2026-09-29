@@ -3,6 +3,7 @@ import { PITCH_NAMES, EXTRA_RATINGS, type PitchType } from '../data/playerDevelo
 import type { TimeSlot } from './calendar';
 import type { DailyActivityCategory } from './dailySchedule';
 import type { Position } from './index';
+import { isWinterVacation } from './academicCalendar';
 
 export interface PlayerStatsSubset {
   gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number; stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
@@ -36,6 +37,7 @@ export interface ActivityOption {
   targetPosition?: 'P' | 'B' | 'ALL';
   positionSpecific?: Position[]; // 투수/타자/공통
   allowedSlots?: TimeSlot[];
+  season?: 'winter';            // winter: 겨울방학에만 선택 가능한 동계 훈련 전용 활동
   moneyDelta?: number;
 }
 
@@ -320,6 +322,27 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
     { id: 'train_flat_ground', label: '플랫그라운드 릴리스 점검', category: 'training', weight: 2, description: '짧은 거리에서 릴리스와 회전을 섬세하게 교정합니다.', icon: '🎯', staminaDelta: -10, statChanges: { control: 2 }, targetPosition: 'P' },
     { id: 'train_opposite_field', label: '밀어치기·코스별 배팅', category: 'training', weight: 2, description: '코스에 맞춰 강한 타구를 보내는 능력을 기릅니다.', icon: '⚾', staminaDelta: -12, statChanges: { contact: 2, eye: 1 }, targetPosition: 'B' },
     { id: 'train_reaction', label: '순간 반응·첫발 훈련', category: 'training', weight: 2, description: '수비 첫발과 타구 판단 속도를 끌어올립니다.', icon: '⚡', staminaDelta: -11, statChanges: { defense: 1, speed: 1 }, targetPosition: 'ALL' },
+    // 동계 훈련 (겨울방학 전용): 비시즌에 기초 체력과 기술의 토대를 다진다.
+    { id: 'winter_circuit', label: '❄️ 동계 서킷 트레이닝', category: 'training', season: 'winter', weight: 3, icon: '❄️',
+      description: '겨울방학 한정 · 스테이션을 돌며 전신 근지구력과 순발력을 끌어올립니다.',
+      staminaDelta: -16, mentalDelta: -1, statChanges: { stamina: 2, speed: 1, power: 1 }, relationshipTargets: { peer: 1 },
+      targetPosition: 'ALL', allowedSlots: ['morning', 'afternoon'] },
+    { id: 'winter_weight', label: '❄️ 겨울 벌크업 웨이트', category: 'training', season: 'winter', weight: 3, icon: '🏋️',
+      description: '겨울방학 한정 · 시즌 중엔 못 하던 고중량 웨이트로 힘의 기반을 만듭니다.',
+      staminaDelta: -16, mentalDelta: -1, statChanges: { power: 2, stamina: 1, gapPower: 1 },
+      targetPosition: 'ALL', allowedSlots: ['afternoon', 'night'] },
+    { id: 'winter_hill_running', label: '❄️ 언덕 러닝 & 계단 오르기', category: 'training', season: 'winter', weight: 2, icon: '⛰️',
+      description: '겨울방학 한정 · 찬 공기를 가르며 언덕과 계단을 오르내립니다.',
+      staminaDelta: -16, mentalDelta: -2, statChanges: { stamina: 2, speed: 2 },
+      targetPosition: 'ALL', allowedSlots: ['morning'] },
+    { id: 'winter_indoor_bullpen', label: '❄️ 실내 불펜 폼 다지기', category: 'training', season: 'winter', weight: 3, icon: '🧊',
+      description: '겨울방학 한정 · 기술 코치와 실내 불펜에서 투구 폼을 처음부터 다시 다집니다.',
+      staminaDelta: -14, mentalDelta: 1, statChanges: { control: 2, stuff: 1, movement: 1 }, relationshipTargets: { coach2: 2 },
+      targetPosition: 'P', allowedSlots: ['afternoon'] },
+    { id: 'winter_tee_batting', label: '❄️ 실내 케이지 티배팅 1000개', category: 'training', season: 'winter', weight: 3, icon: '🧤',
+      description: '겨울방학 한정 · 손바닥이 벗겨질 때까지 스윙 궤도를 몸에 새깁니다.',
+      staminaDelta: -14, mentalDelta: -1, statChanges: { contact: 2, avoidK: 1, gapPower: 1 },
+      targetPosition: 'B', allowedSlots: ['afternoon', 'night'] },
   ],
 
   rest: [
@@ -391,6 +414,10 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
       statChanges: { condition: 12 },
       targetPosition: 'ALL',
     },
+    { id: 'winter_sauna', label: '❄️ 아버지와 찜질방 회복', category: 'rest', season: 'winter', weight: 2, icon: '♨️',
+      description: '겨울방학 한정 · 뜨끈한 찜질방에서 뭉친 근육을 풀고 아버지와 이야기를 나눕니다.',
+      staminaDelta: 18, mentalDelta: 6, statChanges: { condition: 9 }, relationshipTargets: { father: 2 },
+      targetPosition: 'ALL', allowedSlots: ['morning', 'night'] },
   ],
 
   relationship: [
@@ -474,6 +501,10 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
       relationshipTargets: { deskmate: 5, peer: 5 }, statChanges: {  },
       targetPosition: 'ALL',
     },
+    { id: 'winter_camp_snack', label: '❄️ 동계 합숙 야식 모임', category: 'relationship', season: 'winter', weight: 3, icon: '🍜',
+      description: '겨울방학 한정 · 합숙소에서 동기, 주장 선배와 라면을 끓이며 새 시즌 각오를 나눕니다.',
+      staminaDelta: -2, mentalDelta: 5, statChanges: { condition: 5 }, relationshipTargets: { peer: 3, senior: 1 },
+      targetPosition: 'ALL', allowedSlots: ['night'] },
   ],
 
   special: [
@@ -531,6 +562,10 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
       statChanges: { fame: 3, stuff: 1, power: 1 },
       targetPosition: 'ALL',
     },
+    { id: 'winter_goal_setting', label: '❄️ 비시즌 목표 설정 면담', category: 'special', season: 'winter', weight: 3, icon: '📝',
+      description: '겨울방학 한정 · 감독님과 지난 시즌을 돌아보고 다음 시즌 목표를 세웁니다.',
+      staminaDelta: -3, mentalDelta: 4, statChanges: { eye: 1, condition: 4 }, relationshipTargets: { coach: 3 },
+      targetPosition: 'ALL', allowedSlots: ['morning', 'night'] },
   ],
 
   // 강제 일정용 기본 풀 (fallback)
@@ -582,7 +617,8 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
  * 가중치 기반 비복원 무작위 추출 (Weighted Sampling without Replacement)
  * 사용자가 카테고리를 누를 때마다 3~4개의 신선한 옵션을 랜덤으로 뽑아냅니다.
  */
-export function isActivityAvailable(option: ActivityOption, position: Position, slot?: TimeSlot, grade = 1): boolean {
+export function isActivityAvailable(option: ActivityOption, position: Position, slot?: TimeSlot, grade = 1, date?: { month: number; day: number }): boolean {
+  if (option.season === 'winter' && !(date && isWinterVacation(date.month, date.day))) return false;
   if (option.minGrade && grade < option.minGrade) return false;
   if (option.maxGrade && grade > option.maxGrade) return false;
   if (slot && option.allowedSlots && !option.allowedSlots.includes(slot)) return false;
@@ -596,10 +632,11 @@ export function sampleSubActivities(
   count = 4,
   playerPosition: Position = 'P',
   slot?: TimeSlot,
-  grade = 1
+  grade = 1,
+  date?: { month: number; day: number }
 ): ActivityOption[] {
   const pool = SUB_ACTIVITY_POOL[category] || [];
-  const filteredPool = pool.filter(opt => isActivityAvailable(opt, playerPosition, slot, grade));
+  const filteredPool = pool.filter(opt => isActivityAvailable(opt, playerPosition, slot, grade, date));
 
   if (filteredPool.length <= count) {
     return [...filteredPool];

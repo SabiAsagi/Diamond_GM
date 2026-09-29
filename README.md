@@ -11,7 +11,7 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-1.11-3b82f6?style=flat-square)
+![version](https://img.shields.io/badge/version-1.12-3b82f6?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
 ![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
 
@@ -70,6 +70,7 @@
 ### 📈 성장
 - 컨택 · 파워 · 선구안 · 구위 · 제구 등 세부 능력치
 - 포심부터 변화구까지 **구종 습득** (XP 방식)
+- 겨울방학에만 열리는 **동계 훈련** (서킷 · 웨이트 · 실내 불펜 · 티배팅)
 - 배트 · 글러브 · 스파이크 등 **장비 8슬롯**
 - 동학년 **전국 상위 %** 비교, 월간 성장 리포트
 
@@ -125,11 +126,11 @@
 
 ## 🚧 로드맵
 
-현재 버전은 **1.11**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
+현재 버전은 **1.12**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
 
 - [x] 1.10 — 1학년 완주 자동 검증
 - [x] 1.11 — 전국체전
-- [ ] 1.12 — 겨울훈련
+- [x] 1.12 — 겨울훈련
 - [ ] 1.13 — 학년 마무리 리포트
 - [ ] 2.0 — 1학년 완주 완성
 - [ ] 🏟️ **구단 운영(GM) 모드** — 선수 육성 모드 완성 후 개발 예정
