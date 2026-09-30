@@ -1,0 +1,263 @@
+{
+  "목표": "70명·100장, 1024×1536 WebP. 기존 야구만화풍 유지 및 단정한 학생 외형",
+  "수정대상": "소꿉친구·동네 친구·옆자리 단짝 30명, 교복/사복 60장",
+  "화풍기준": "reference/결의에 찬 야구부 주장.png — 굵고 또렷한 선화, 절제된 셀 채색, 자연스러운 비율. 얼굴은 복제하지 않음.",
+  "금지요소": [
+    "과한 염색",
+    "피어싱",
+    "문신",
+    "과한 화장",
+    "과장된 언더컷·아프로",
+    "성인처럼 보이는 얼굴"
+  ],
+  "검수": [
+    "인물별 교복·사복 얼굴과 머리 일치",
+    "전체 70명 대조하여 외형 중복 확인",
+    "해상도와 WebP 디코딩 확인",
+    "후배 전용 풀 연결 코드 검증"
+  ],
+  "진행상태": "친구 30명 60장 재생성 및 후배 10명 전용 풀 연결 완료",
+  "인물": [
+    {
+      "id": "childhood-01",
+      "성별": "여",
+      "외형": "girl, broad oval face, slightly downturned warm eyes, straight black hair in ONE low braid over right shoulder, wispy parted fringe",
+      "사복": "cream crewneck cardigan over plain blue T-shirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-1e433be6-75c7-4fcc-9dc0-f5b72f9e90dc.png"
+    },
+    {
+      "id": "childhood-02",
+      "성별": "여",
+      "외형": "girl, round face and round eyes, dark brown chin-length inward bob, straight full fringe, small nose",
+      "사복": "pale yellow sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-0544f0a5-6ec8-4905-bc9b-43633e45e333.png"
+    },
+    {
+      "id": "childhood-03",
+      "성별": "여",
+      "외형": "girl, narrow oval face, long calm eyes, straight black shoulder length hair with a side part, small mole below left eye",
+      "사복": "navy zip hoodie over white shirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-fd2d53bf-3acb-4a95-873e-d4601d933491.png"
+    },
+    {
+      "id": "childhood-04",
+      "성별": "여",
+      "외형": "girl, slightly square face, bright smiling eyes, dark brown medium hair tied in a low ponytail, forehead visible",
+      "사복": "muted rose long sleeve top",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-681b9275-b2a2-4e32-a28a-ed052ea64fc3.png"
+    },
+    {
+      "id": "childhood-05",
+      "성별": "여",
+      "외형": "girl, petite heart shaped face, wide spaced gentle eyes, natural black ear-length short cut with neat side swept bangs",
+      "사복": "sage green cardigan",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-9feb0ea3-4c7b-409f-95f6-fe3cf1448ab2.png"
+    },
+    {
+      "id": "childhood-06",
+      "성별": "남",
+      "외형": "boy, round full cheeks, gently drooping eyes, neat straight black bowl haircut with a slightly uneven fringe, stocky shoulders",
+      "사복": "grey sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-2820f210-52bc-4ac4-a722-7418b8444243.png"
+    },
+    {
+      "id": "childhood-07",
+      "성별": "남",
+      "외형": "boy, long rectangular face, thin eyebrows, neat dark brown 7:3 side part, slim shoulders, reserved smile",
+      "사복": "beige knit sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-baf97645-683f-432f-b6b9-3aaeb65263f3.png"
+    },
+    {
+      "id": "childhood-08",
+      "성별": "남",
+      "외형": "boy, broad soft jaw, small lively eyes, natural black short crew cut, light freckles, healthy tan",
+      "사복": "blue cotton hoodie",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-59540386-759f-49fc-9a0b-7350967c9028.png"
+    },
+    {
+      "id": "childhood-09",
+      "성별": "남",
+      "외형": "boy, narrow triangular face, small round glasses, dark brown smooth medium hair with curved fringe, shy closed smile",
+      "사복": "forest green pullover",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-730f3372-d404-44dd-b6f9-d48df45f3943.png"
+    },
+    {
+      "id": "childhood-10",
+      "성별": "남",
+      "외형": "boy, oval face, straight low brows, black naturally wavy short hair, sturdy neck, relaxed smile",
+      "사복": "plain burgundy sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-abcb4a49-93e9-4101-8007-df0bca0006cc.png"
+    },
+    {
+      "id": "neighbor-01",
+      "성별": "여",
+      "외형": "girl, rounded square face, slightly upturned small eyes, black hair in two neat low braids, center parted bangs",
+      "사복": "light grey hoodie",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-a78b6a7e-36cd-4923-b873-eb1fbc149d2f.png"
+    },
+    {
+      "id": "neighbor-02",
+      "성별": "여",
+      "외형": "girl, long oval face, slender eyes, dark brown straight collarbone length hair with airy full bangs, oval glasses",
+      "사복": "cream knit sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-559e807c-a6ab-4e0c-b5b6-67d68907c25f.png"
+    },
+    {
+      "id": "neighbor-03",
+      "성별": "여",
+      "외형": "girl, full round face, arched eyebrows, naturally black short bob tucked behind ears, broad warm smile",
+      "사복": "dusty blue sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-fff693d8-0d97-4f56-bef0-73c3cef4aab2.png"
+    },
+    {
+      "id": "neighbor-04",
+      "성별": "여",
+      "외형": "girl, triangular face, narrow calm eyes, long straight black hair with forehead visible and a simple thin navy headband",
+      "사복": "tan cardigan over white T-shirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-9828adb5-9e9c-4b8b-bf62-6983d5cad5e1.png"
+    },
+    {
+      "id": "neighbor-05",
+      "성별": "여",
+      "외형": "girl, broad oval face, slightly drooping eyes, dark brown shoulder-length hair gently flipped inward, small side hair clip",
+      "사복": "muted green cotton pullover",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-f0bb142d-acac-47ed-8ef1-cebb8bc2a35d.png"
+    },
+    {
+      "id": "neighbor-06",
+      "성별": "남",
+      "외형": "boy, broad square face, thick flat brows, black close cropped hair, tan skin, sturdy build, friendly grin",
+      "사복": "dark blue track jacket",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-0ee0ca0f-02c4-48a0-829c-4b370edb5abf.png"
+    },
+    {
+      "id": "neighbor-07",
+      "성별": "남",
+      "외형": "boy, small oval face, high forehead, dark brown natural soft curls cropped neatly, round curious eyes",
+      "사복": "cream hoodie",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-3b38f623-87c5-4d50-8dc2-fd43a152e714.png"
+    },
+    {
+      "id": "neighbor-08",
+      "성별": "남",
+      "외형": "boy, long face, rectangular glasses, neat black hair side parted with forehead visible, thin build",
+      "사복": "grey cardigan over plain tee",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-e5a0c0ca-9ffa-4ca4-8249-326412eb98a6.png"
+    },
+    {
+      "id": "neighbor-09",
+      "성별": "남",
+      "외형": "boy, round cheeks, thick arched brows, straight dark brown short fringe, small eyes, broad shoulders",
+      "사복": "muted olive sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-dee001a3-2077-44ab-bd88-c1882d5f8345.png"
+    },
+    {
+      "id": "neighbor-10",
+      "성별": "남",
+      "외형": "boy, heart shaped face, black medium hair with natural center part, slightly drooping eyelids, slim build, gentle smile",
+      "사복": "light blue crewneck sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-31036dde-de51-48db-92b5-94258e18c0a3.png"
+    },
+    {
+      "id": "deskmate-01",
+      "성별": "여",
+      "외형": "girl, oval face with pointed chin, rectangular glasses, long dark brown straight hair in a low loose bun with neat side fringe",
+      "사복": "navy cardigan",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-e943b53d-61ee-44ea-992e-63ccc78a350c.png"
+    },
+    {
+      "id": "deskmate-02",
+      "성별": "여",
+      "외형": "girl, round face, large attentive eyes, black straight jaw length bob with diagonal side fringe, thin eyebrows",
+      "사복": "cream sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-3422f720-ff26-41c5-bf69-98662ea45727.png"
+    },
+    {
+      "id": "deskmate-03",
+      "성별": "여",
+      "외형": "girl, long slim face, small eyes with straight brows, dark brown hair in two low ponytails, forehead partly visible",
+      "사복": "soft blue knit sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-67a03053-0198-45de-a214-ba57276e787c.png"
+    },
+    {
+      "id": "deskmate-04",
+      "성별": "여",
+      "외형": "girl, square jaw softened by cheeks, narrow smiling eyes, natural black shoulder length slightly wavy hair, off center part",
+      "사복": "oatmeal hoodie",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-51f1b418-65cc-4bfa-aa04-e49fd010cc26.png"
+    },
+    {
+      "id": "deskmate-05",
+      "성별": "여",
+      "외형": "girl, heart shaped face, slightly upturned eyes, long black straight hair with full blunt bangs, small mole on right cheek",
+      "사복": "muted pink cardigan",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-c83db66f-9279-4665-b6d6-fb1f64288eda.png"
+    },
+    {
+      "id": "deskmate-06",
+      "성별": "남",
+      "외형": "boy, rectangular face, small almond eyes, tidy dark brown short hair with fully side swept fringe, thin metal oval glasses",
+      "사복": "tan crewneck sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-d069c947-59ca-4e03-840c-271f3bc3a8a6.png"
+    },
+    {
+      "id": "deskmate-07",
+      "성별": "남",
+      "외형": "boy, wide round face, tiny nose, black straight hair with a soft full fringe, chubby build, closed mouth smile",
+      "사복": "navy sweatshirt",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-dc6c6a91-e77a-4eec-abb5-c0986e25c69b.png"
+    },
+    {
+      "id": "deskmate-08",
+      "성별": "남",
+      "외형": "boy, narrow oval face, thick eyebrows, neat black short hair brushed forward with small separated bangs, light tan",
+      "사복": "grey zip hoodie",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-b6431c18-df6c-413c-b177-35b36bb88af7.png"
+    },
+    {
+      "id": "deskmate-09",
+      "성별": "남",
+      "외형": "boy, diamond shaped face, broad nose, slightly drooping eyes, dark brown thick straight hair with off center part, tall slim build",
+      "사복": "dark green knit sweater",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-92066e03-dfc6-4797-a6cf-764b3ff9b8e7.png"
+    },
+    {
+      "id": "deskmate-10",
+      "성별": "남",
+      "외형": "boy, short square face, wide set eyes, black neatly tapered short hair and natural cowlick, light freckles across nose, cheerful",
+      "사복": "pale blue cotton jacket",
+      "상태": "생성 및 교복·사복 분리 완료",
+      "원본파일": "exec-c8ec807a-1d2c-4b41-8be8-462edf5c3687.png"
+    }
+  ],
+  "검증결과": "100장 WebP 디코딩·1024×1536 확인, 동일 바이트 중복 없음. 전체 비교표 육안 검토. 인물 구별은 헤어·눈매·표정·안경·체형 조합으로 확인하며 지각적 유사성의 수치 보증은 하지 않음."
+}

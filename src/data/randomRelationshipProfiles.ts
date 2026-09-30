@@ -2,6 +2,7 @@ export type RandomRelationshipRole =
   | 'senior'
   | 'peer'
   | 'rival'
+  | 'junior'
   | 'childhood'
   | 'neighbor'
   | 'deskmate';
@@ -18,7 +19,7 @@ export interface RandomRelationshipProfile {
 }
 
 const 야구부프로필 = (
-  role: 'senior' | 'peer' | 'rival',
+  role: 'senior' | 'peer' | 'rival' | 'junior',
   names: readonly string[],
 ): readonly RandomRelationshipProfile[] =>
   names.map((name, index) => ({
@@ -54,6 +55,10 @@ export const RANDOM_RELATIONSHIP_PROFILES = {
   rival: 야구부프로필('rival', [
     '박태성', '김건호', '이현석', '최도하', '정우찬',
     '강민혁', '윤재성', '한도윤', '서지아', '류채원',
+  ]),
+  junior: 야구부프로필('junior', [
+    '김시온', '이하준', '박도하', '최선우', '정유찬',
+    '강이안', '윤지환', '한승민', '오시은', '서주아',
   ]),
   childhood: 친구프로필('childhood', [
     '한서윤', '김나연', '박소희', '이채린', '정다은',

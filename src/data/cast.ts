@@ -1,5 +1,4 @@
 import type { Appearance } from './playerDevelopment';
-import { PORTRAIT_PRESETS } from './playerDevelopment';
 import { CHARACTER_PORTRAITS } from './characterPortraits';
 import { RANDOM_RELATIONSHIP_PROFILES } from './randomRelationshipProfiles';
 import type { Gender, Player } from '../types';
@@ -27,8 +26,6 @@ const DEFAULT_GENDERS: Record<CastId, Gender> = {
 export const DEFAULT_CAST: Cast = Object.fromEntries(CAST_IDS.map(id => [id, {
   name: BOND_NAMES[id], gender: DEFAULT_GENDERS[id], portrait: { kind: 'image', src: CHARACTER_PORTRAITS[id] },
 }])) as Cast;
-
-const ACCESSORIES: (string | undefined)[] = [undefined, undefined, 'headband', 'goggles'];
 
 const SURNAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권', '황', '안', '송', '류', '홍', '전', '고', '문', '배', '백'];
 const GIVEN_NAMES: Record<Gender, string[]> = {
@@ -79,12 +76,6 @@ export function generateCast(
   random: () => number = Math.random,
 ): Cast {
   const pick = <T,>(items: T[]) => items[Math.floor(random() * items.length)];
-  const shuffle = <T,>(items: T[]) => {
-    const copy = [...items];
-    for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
-    return copy;
-  };
-
   // 성만 다르고 이름이 같으면 헷갈리므로 이름(성 제외)도 서로·선수와 겹치지 않게 고른다.
   const usedGiven = new Set([player.name.slice(1)]);
   const nameFor = (gender: Gender) => {
@@ -93,18 +84,14 @@ export function generateCast(
     return pick(SURNAMES) + given;
   };
 
-  // 후배는 선수 생성 프리셋을 사용한다. 나머지 야구부 인물은 역할별 전용 일러스트 풀에서 뽑는다.
-  const faces: Record<Gender, string[]> = {
-    male: shuffle(PORTRAIT_PRESETS.male.map(p => p.id).filter(id => id !== player.appearance?.hairStyleId)),
-    female: shuffle(PORTRAIT_PRESETS.female.map(p => p.id).filter(id => id !== player.appearance?.hairStyleId)),
-  };
+  // 야구부 인물 네 역할은 모두 역할별 전용 일러스트 풀에서 뽑는다.
   const home = schools.find(s => s.name === player.highSchool);
   // 라이벌은 선수가 고른 학교·팀과 같은 시·도의 다른 학교·팀 소속. 같은 지역에 다른 팀이 없으면 전국에서 고른다.
   const otherSchools = schools.filter(s => s.name !== player.highSchool);
   const rivalSchools = otherSchools.filter(s => !home || s.region === home.region);
   const rivalSchool = pick(rivalSchools.length ? rivalSchools : otherSchools)?.name ?? player.highSchool;
   const cast: Partial<Cast> = {};
-  for (const id of ['senior', 'peer', 'rival'] as const) {
+  for (const id of ['senior', 'peer', 'rival', 'junior'] as const) {
     const profile = pick([...RANDOM_RELATIONSHIP_PROFILES[id]]);
     cast[id] = {
       name: nameFor(profile.gender),
@@ -114,15 +101,6 @@ export function generateCast(
         src: profile.baseballPortrait!,
         schoolName: id === 'rival' ? rivalSchool : player.highSchool,
       },
-    };
-  }
-  for (const id of ['junior'] as const) {
-    let gender: Gender = random() < 0.5 ? 'male' : 'female';
-    if (!faces[gender].length) gender = gender === 'male' ? 'female' : 'male';
-    const hairStyleId = faces[gender].shift() ?? PORTRAIT_PRESETS[gender][0].id;
-    cast[id] = {
-      name: nameFor(gender), gender,
-      portrait: { kind: 'preset', appearance: { hairStyleId, accessoryId: pick(ACCESSORIES) }, schoolName: player.highSchool, number: 2 + Math.floor(random() * 58) },
     };
   }
   // 친구 인물: 역할별 10명 중 하나를 뽑고, 교복·사복 한 쌍을 함께 저장한다.
