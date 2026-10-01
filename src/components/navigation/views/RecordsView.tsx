@@ -1,3 +1,4 @@
+import { GradeReportContent } from '../../daily/GradeReportModal';
 import { useState } from 'react';
 import type { Player } from '../../../types';
 import type { ScheduledMatch } from '../../../types/tournament';
@@ -11,7 +12,7 @@ interface RecordsViewProps {
   matches: ScheduledMatch[];
   historyLogs: DayLogRecord[];
   onClose: () => void;
-  defaultSubTab?: 'matches' | 'tournaments';
+  defaultSubTab?: 'matches' | 'tournaments' | 'years';
 }
 
 export function RecordsView({
@@ -21,7 +22,7 @@ export function RecordsView({
   onClose,
   defaultSubTab = 'matches',
 }: RecordsViewProps) {
-  const [subTab, setSubTab] = useState<'matches' | 'tournaments'>(defaultSubTab);
+  const [subTab, setSubTab] = useState<'matches' | 'tournaments' | 'years'>(defaultSubTab);
 
   return (
     <div className="records-unified-wrapper animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -41,10 +42,13 @@ export function RecordsView({
         >
           <Award size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 대회·리그
         </button>
+        <button className={`tab-btn ${subTab === 'years' ? 'active' : ''}`} onClick={() => setSubTab('years')}>학년 일지</button>
       </div>
 
       {subTab === 'matches' ? (
         <MatchesView showBracket={false} player={player} matches={matches} historyLogs={historyLogs} onClose={onClose} />
+      ) : subTab === 'years' ? (
+        <div className="menu-view-container glass-panel"><div className="menu-view-body">{player.gradeReports?.length ? player.gradeReports.map(report => <details key={report.id}><summary>{report.grade}학년 · {report.start.date.year}학년도</summary><GradeReportContent report={report} player={player} /></details>) : <p>학년을 마치면 한 해의 기록이 이곳에 남습니다.</p>}</div></div>
       ) : (
         <div className="menu-view-container glass-panel"><div className="menu-view-body"><TournamentBracket matches={matches} />
           <section aria-label="주말리그"><h4>주말리그 일정·결과</h4>

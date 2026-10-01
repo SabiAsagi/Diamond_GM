@@ -1,0 +1,15 @@
+.grade-report-card { width: min(720px, calc(100vw - 24px)); max-height: 90dvh; display: flex; flex-direction: column; padding: 24px; gap: 16px; }
+.grade-report-card header h2 { margin: 10px 0; }
+.grade-report-scroll { min-height: 0; overflow-y: auto; }
+.grade-report-content { display: flex; flex-direction: column; gap: 14px; line-height: 1.6; }
+.grade-report-content section { padding: 16px; border: 1px solid var(--glass-border, #334155); border-radius: 12px; }
+.grade-report-content h3 { font-size: 1rem; margin: 0 0 8px; }
+.grade-report-content p { margin: 4px 0; }
+.grade-report-content small, .grade-report-card footer small { color: var(--text-secondary, #94a3b8); }
+.grade-report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grade-report-content ul { padding: 0; margin: 0; list-style: none; }
+.grade-report-content li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--glass-border, #334155); }
+.grade-report-advice { background: rgba(16,185,129,.08); }
+.grade-report-card footer { display: flex; flex-direction: column; gap: 8px; }
+.grade-report-note { color: #fbbf24; }
+@media (max-width: 540px) { .grade-report-grid { grid-template-columns: 1fr; } .grade-report-card { padding: 16px; } }

@@ -1,3 +1,4 @@
+import { GradeReportModal } from '../../components/daily/GradeReportModal';
 import { TeamCompetitionPanel } from '../../components/daily/TeamCompetitionPanel';
 import { TEAM_ROLE_LABELS, getStanding } from '../../data/teamCompetition';
 import { RivalReportModal } from '../../components/daily/RivalReportModal';
@@ -84,7 +85,9 @@ export default function DevelopmentDashboard() {
     );
   }
 
-  const showRivalReport = !!player.pendingRivalReport && activeNavTab === 'home' && !outingOpen && !drawDue && !activeCutscene && !lastActionResult;
+  const gradeReport = player.gradeReports?.find(r => r.id === player.pendingGradeReportId);
+  const showGradeReport = !!gradeReport && !activeCutscene && !lastActionResult;
+  const showRivalReport = !gradeReport && !!player.pendingRivalReport && activeNavTab === 'home' && !outingOpen && !drawDue && !activeCutscene && !lastActionResult;
   const currentSlotAssignment = dailyPlan.slots[clock.currentSlot];
 
 
@@ -101,7 +104,7 @@ export default function DevelopmentDashboard() {
 
       {/* 2. 메인 중앙 콘텐츠 영역 */}
       {drawDue && confirmedDraw !== drawKey && !activeCutscene && !lastActionResult && <div className="cutscene-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draw-intro-title"><div className="cutscene-modal-card glass-panel"><span className="cutscene-top-tag">📢 대회 개막</span><h2 id="draw-intro-title">{drawDue.tournamentName} 조 추첨일</h2><p>전국 각지의 학교들이 대진 조 추첨을 위해 모였습니다. 우리 학교는 어떤 상대를 만나게 될까요?</p><button autoFocus className="btn btn-primary" onClick={() => setConfirmedDraw(drawKey)}>조 추첨 현장으로 이동</button></div></div>}
-      <main className="onepage-main-stage" inert={showRivalReport || (!!drawDue && confirmedDraw !== drawKey)}>
+      <main className="onepage-main-stage" inert={showGradeReport || showRivalReport || (!!drawDue && confirmedDraw !== drawKey)}>
         {drawDue && confirmedDraw === drawKey && <div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><div className="menu-view-body"><TournamentBracket key={drawKey} matches={seasonMatches.filter(m => m.tournamentId === drawDue.tournamentId)} /></div></div>}
         {activeNavTab === 'home' && teamOpen && !drawDue && <TeamCompetitionPanel player={player} onClose={() => setTeamOpen(false)} />}
         {activeNavTab === 'home' && !teamOpen && !outingOpen && !drawDue && (
@@ -232,7 +235,7 @@ export default function DevelopmentDashboard() {
       </main>
 
       {/* 3. 앱 메인 네비게이션 (데스크톱 사이드 / 모바일 하단 탭바) */}
-      <div inert={!!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
+      <div inert={showGradeReport || !!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
       {lastActionResult && (
@@ -244,6 +247,7 @@ export default function DevelopmentDashboard() {
         <EventCutsceneModal key={activeCutscene.id} cutscene={activeCutscene} player={player} onChoose={resolveCutscene} />
       )}
 
+      {showGradeReport && gradeReport && <GradeReportModal report={gradeReport} player={player} />}
       {showRivalReport && player.pendingRivalReport && <RivalReportModal report={player.pendingRivalReport} rivalName={getBondName(player, 'rival')} rivalSchool={getRivalSchool(player)} onClose={() => { void dismissRivalReport(); }} />}
 
       {/* 6. 졸업 축하 배너 */}

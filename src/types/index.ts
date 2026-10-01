@@ -35,6 +35,9 @@ export type PitcherRole = 'Starter' | 'Reliever' | 'Closer' | 'None';
 export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 
 export interface Player {
+  gradeStartSnapshot?: import('../data/gradeReport').GradeSnapshot;
+  gradeReports?: import('../data/gradeReport').GradeReport[];
+  pendingGradeReportId?: string;
   dailyActionLogs?: { date: string; logs: Partial<Record<TimeSlot, string>> };
   teamCompetition?: import('../data/teamCompetition').TeamCompetition;
   earnedAchievementIds?: string[];

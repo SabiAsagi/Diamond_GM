@@ -23,8 +23,9 @@ compile(path.resolve('src'));
 fs.copyFileSync('src/data/kbo2026.json', path.join(dir, 'data/kbo2026.json'));
 fs.symlinkSync(path.resolve('node_modules'), path.join(dir, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir');
 let saved;
+let failNextSave = false;
 require.cache[path.join(dir, 'db.js')] = { id: path.join(dir, 'db.js'), filename: path.join(dir, 'db.js'), loaded: true,
-  exports: { db: { players: { put: async p => { saved = structuredClone(p); return p.id; } } } } };
+  exports: { db: { players: { put: async p => { if (failNextSave) { failNextSave = false; throw new Error('save failed'); } saved = structuredClone(p); return p.id; } } } } };
 after(() => fs.rmSync(dir, { recursive: true, force: true }));
 const { useGameClockStore: store } = require(path.join(dir, 'store/gameClockStore.js'));
 const { HIGH_SCHOOLS_DATA } = require(path.join(dir, 'data/highSchools.js'));
@@ -76,6 +77,7 @@ async function dismissInterruptions(stats) {
       stats.events++;
       continue;
     }
+    if (state.player.pendingGradeReportId) { await state.dismissGradeReport(); continue; }
     if (state.player.pendingRivalReport) { await state.dismissRivalReport(); stats.reports++; continue; }
     const d = state.clock.date;
     const draw = state.seasonMatches.find(m => m.isPlayerTeamMatch && m.drawn === false && m.date.month === d.month && m.date.day === d.day);
@@ -172,6 +174,9 @@ for (const scenario of [
           const snapshot = structuredClone(saved);
           await store.getState().initClock(snapshot);
           assert.deepEqual(store.getState().clock, afterState.clock);
+          assert.deepEqual(store.getState().player.gradeStartSnapshot, snapshot.gradeStartSnapshot);
+          assert.deepEqual(store.getState().player.gradeReports, snapshot.gradeReports);
+          assert.equal(store.getState().player.pendingGradeReportId, snapshot.pendingGradeReportId);
           assert.deepEqual(store.getState().player.matchRecords, snapshot.matchRecords);
           assert.deepEqual(store.getState().seasonMatches, snapshot.savedMatches);
           assert.deepEqual(store.getState().player.pendingRivalReport, snapshot.pendingRivalReport);
@@ -180,7 +185,20 @@ for (const scenario of [
           stats.reloads++;
         }
       }
+      const report = saved.gradeReports[0];
+      assert.equal(saved.gradeReports.length, 1);
+      assert.equal(report.grade, 1);
+      assert.equal(report.start.partial, false);
+      assert.equal(saved.pendingGradeReportId, report.id);
+      assert.equal(saved.gradeStartSnapshot.date.grade, 2);
+      assert.equal(report.end.percentile, require(path.join(dir, 'data/nationalRanking.js')).getNationalPercentile({ ...saved, overall: report.end.overall, grade: 1 }).percentile);
+      for (const id of [...openNationals, 'weekend_league']) assert.ok(report.tournaments.some(t => t.id === `2026:${id}`), `학년 리포트 대회 누락: ${id}`);
+      assert.equal(report.officialAppearances + report.benchGames + report.unknownGames, saved.matchRecords.filter(r => !['scrimmage', 'practice'].includes(r.kind)).length);
       await dismissInterruptions(stats);
+      const confirmed = structuredClone(saved);
+      await store.getState().initClock(confirmed);
+      assert.equal(saved.pendingGradeReportId, undefined);
+      assert.deepEqual(saved.gradeReports, confirmed.gradeReports);
       assert.equal(stats.slots, 364 * 3, '2026-03-02부터 2027-03-01까지 모든 슬롯을 진행해야 한다');
       assert.equal(days.size, 364);
       assert.equal(months.size, 12);
@@ -377,4 +395,81 @@ test('겨울훈련: 방학 중 선택하면 능력치·인연 효과가 적용�
   await store.getState().selectActivity('night', 'relationship', 'winter_camp_snack');
   assert.equal(saved.relationships.peer, beforeNight.relationships.peer + 3);
   assert.equal(saved.relationships.senior, beforeNight.relationships.senior + 1);
+});
+
+
+test('학년 리포트: 진급 저장 실패 재시도, 미확인 유지, 확인 저장 실패와 중복 방지', async () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const p = starter(school, 'SS', 'male');
+  p.gameDate = { year: 2027, month: 2, day: 28, weekday: 0, grade: 1 };
+  p.currentSlot = 'night';
+  await store.getState().initClock(p);
+  assert.equal(saved.gradeStartSnapshot.partial, true);
+  const result = { statChanges: {}, logMessage: '학년 마지막 휴식' };
+  const before = structuredClone(store.getState().clock);
+  failNextSave = true;
+  await assert.rejects(store.getState().advanceSlot(result), /save failed/);
+  assert.deepEqual(store.getState().clock, before);
+  assert.equal(store.getState().player.gradeReports, undefined);
+  await store.getState().advanceSlot(result);
+  assert.equal(saved.gradeReports.length, 1);
+  const pending = saved.pendingGradeReportId;
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(saved.pendingGradeReportId, pending);
+  const heldClock = structuredClone(store.getState().clock);
+  await store.getState().advanceSlot(result);
+  assert.deepEqual(store.getState().clock, heldClock, '미확인 리포트가 있으면 시간 진행 금지');
+  failNextSave = true;
+  await assert.rejects(store.getState().dismissGradeReport(), /save failed/);
+  assert.equal(store.getState().player.pendingGradeReportId, pending);
+  assert.equal(store.getState().isLoading, false);
+  await store.getState().dismissGradeReport();
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(saved.pendingGradeReportId, undefined);
+  await store.getState().advanceSlot(result);
+  assert.equal(saved.gradeReports.length, 1);
+  assert.equal(store.getState().clock.currentSlot, 'afternoon');
+});
+
+test('학년 리포트: 벤치와 훈련경기 제외, 인연 단계와 업적 차이만 집계', () => {
+  const { createGradeSnapshot, finishGradeReport, preserveGradeTournaments } = require(path.join(dir, 'data/gradeReport.js'));
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.earnedAchievementIds = ['ach_entrance'];
+  p.gradeStartSnapshot = createGradeSnapshot(p, p.gameDate);
+  p.relationships.peer = 100;
+  p.academics = 95;
+  p.matchRecords = [
+    { kind: 'national', performance: { role: 'bench' } },
+    { kind: 'national', performance: { role: 'pinchRun' } },
+    { kind: 'practice', performance: { role: 'starter' } },
+    { kind: 'national' },
+  ];
+  const match = { id: 'final', year: 2026, tournamentId: 'blue_dragon', tournamentName: '청룡기', kind: 'national', date: { month: 7, day: 25 }, isPlayerTeamMatch: true, homeSchoolName: p.highSchool, awaySchoolName: '상대', result: 'away', round: '결승전' };
+  const archived = preserveGradeTournaments(p, [match]);
+  archived.savedMatches = [];
+  const report = finishGradeReport(archived, { year: 2027, month: 2, day: 28, weekday: 0, grade: 1 }).gradeReports[0];
+  assert.equal(report.officialAppearances, 1);
+  assert.equal(report.benchGames, 1);
+  assert.equal(report.unknownGames, 1);
+  assert.deepEqual(report.newBonds, ['peer']);
+  assert.ok(report.achievements.some(a => a.id === 'ach_academic_excellence'));
+  assert.ok(!report.achievements.some(a => a.id === 'ach_entrance'));
+  assert.equal(report.tournaments[0].result, '준우승');
+});
+
+test('학년 리포트: 2학년 진급과 3학년 졸업도 해당 학년으로 마감', async () => {
+  for (const grade of [2, 3]) {
+    const p = starter(HIGH_SCHOOLS_DATA[0], 'P', 'female');
+    const year = 2026 + grade;
+    const lastDay = year === 2028 ? 29 : 28;
+    p.grade = grade;
+    p.gameDate = { year, month: 2, day: lastDay, weekday: new Date(Date.UTC(year, 1, lastDay)).getUTCDay(), grade };
+    p.currentSlot = 'night';
+    await store.getState().initClock(p);
+    await store.getState().advanceSlot({ statChanges: {}, logMessage: '학년 마지막 날' });
+    assert.equal(saved.gradeReports.length, 1);
+    assert.equal(saved.gradeReports[0].grade, grade);
+    assert.equal(store.getState().clock.date.grade, Math.min(3, grade + 1));
+    assert.equal(store.getState().isCareerEnded, grade === 3);
+  }
 });
