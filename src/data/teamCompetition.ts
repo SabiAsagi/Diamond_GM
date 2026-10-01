@@ -3,7 +3,7 @@ import type { HighSchoolData } from '../types/highSchool';
 import type { GameDate, TimeSlot } from '../types/calendar';
 import type { ScheduledMatch } from '../types/tournament';
 import { getMatchKind, getPlayerMatchForDate } from '../types/tournament';
-import type { ActivityResult } from '../types/activity';
+import type { ActivityOption, ActivityResult } from '../types/activity';
 import { battingRating, pitchingRating } from './playerDevelopment';
 import { getRelScore } from '../types/bondScores';
 import { getBondName } from './cast';
@@ -124,10 +124,24 @@ export function refreshTeamEvaluation(player:Player):Player {
   if(!protectedRole)t.role=standing.role;
   return updated;
 }
+export function trainingFocus(player: Player): 'recovery' | 'control' | 'batting' | 'technique' {
+  if (player.condition < 45) return 'recovery';
+  if ((player.teamCompetition?.recentForm ?? 40) < 40 && player.position !== 'TwoWay') return player.position === 'P' ? 'control' : 'batting';
+  return 'technique';
+}
+export function optionMatchesTrainingAdvice(player: Player, option: ActivityOption): boolean {
+  const focus = trainingFocus(player);
+  if (focus === 'recovery') return option.category === 'rest' && Number(option.statChanges.condition) > 0;
+  if (!['training', 'special'].includes(option.category)) return false;
+  const keys = focus === 'control' ? ['control'] : focus === 'batting' ? ['contact', 'eye'] : player.position === 'P' ? ['stuff', 'control', 'movement', 'velocity'] : player.position === 'TwoWay' ? ['contact', 'eye', 'power', 'defense', 'stuff', 'control', 'movement', 'velocity'] : ['contact', 'eye', 'power', 'defense', 'fieldingRange', 'fieldingError'];
+  return (focus === 'technique' && ['P', 'TwoWay'].includes(player.position) && !!option.pitchTraining) || keys.some(k => Number((option.statChanges as Record<string, number>)[k]) > 0);
+}
 export function trainingRecommendation(player:Player):string {
-  if(player.condition<45)return '다음 훈련 전에 휴식으로 컨디션을 회복하세요. 피로가 쌓이면 출전 기회도 줄어듭니다.';
-  if((player.teamCompetition?.recentForm??40)<40)return player.position==='P'?'제구 훈련과 경기 영상 분석으로 실점을 줄여보세요.':'컨택·선구안 훈련으로 다음 타석을 준비하세요.';
-  return player.position==='P'?'구종·제구 훈련 성과를 쌓아 다음 평가전에서 보여주세요.':'타격·수비 훈련 성과를 쌓아 다음 평가전에서 보여주세요.';
+  const focus = trainingFocus(player);
+  if(focus === 'recovery')return '다음 훈련 전에 휴식으로 컨디션을 회복하세요. 피로가 쌓이면 출전 기회도 줄어듭니다.';
+  if(focus === 'control')return '제구 훈련과 제구를 다루는 경기 영상 분석으로 실점을 줄여보세요.';
+  if(focus === 'batting')return '컨택·선구안 훈련으로 다음 타석을 준비하세요.';
+  return player.position==='P'?'구종·제구·구위 훈련 성과를 쌓아 다음 평가전에서 보여주세요.':player.position==='TwoWay'?'타격·수비와 구종·제구 훈련을 함께 준비하세요.':'타격·수비 훈련 성과를 쌓아 다음 평가전에서 보여주세요.';
 }
 export function updateCompetitionAfterAction(before:Player,after:Player,result:ActivityResult,date:GameDate):Player {
   if(!after.teamCompetition)return after;

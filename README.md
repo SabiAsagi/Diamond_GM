@@ -11,14 +11,14 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-1.12.1-3b82f6?style=flat-square)
+![version](https://img.shields.io/badge/version-1.14.1-3b82f6?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
 ![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
 
 <br>
 
 <img src="public/assets/portraits/male-spiky-v19.webp" width="130" alt="남자 선수 프리셋">
-<img src="public/assets/characters/peer-v18.webp" width="130" alt="입학 동기 이도현">
+<img src="public/assets/characters/peer-v18.webp" width="130" alt="입학 동기 예시">
 <img src="public/assets/portraits/female-ponytail-v18.webp" width="130" alt="여자 선수 프리셋">
 
 </div>
@@ -33,7 +33,7 @@
 아침엔 수업을 듣고, 오후엔 훈련장에서 땀을 흘리고, 밤엔 개인 훈련을 하거나 친구를 만나러 갑니다.
 
 주전 자리를 두고 동기와 경쟁하고, 황금사자기·청룡기·봉황대기와 전국체전 무대에 서고, 라이벌을 넘어서세요.
-그 3년의 끝에서 KBO 지명, 해외 진출, 대학 진학 중 어떤 길이 열릴지는 당신의 선택에 달려 있습니다.
+졸업까지 진행하는 기반이 있으며, 현재는 1학년의 경기·훈련·인연 흐름을 다듬고 있습니다. 스카우트·드래프트·대학 및 프로 진출 콘텐츠는 이후 확장할 계획입니다.
 
 > 설치 없이 브라우저에서 바로 플레이할 수 있고, 진행 상황은 브라우저에 자동 저장됩니다. PC와 모바일 모두 지원합니다.
 
@@ -72,7 +72,10 @@
 - 포심부터 변화구까지 **구종 습득** (XP 방식)
 - 겨울방학에만 열리는 **동계 훈련** (서킷 · 웨이트 · 실내 불펜 · 티배팅)
 - 배트 · 글러브 · 스파이크 등 **장비 8슬롯**
-- 동학년 **전국 상위 %** 비교, 월간 성장 리포트
+- 동학년 **전국 상위 추정 %** 비교, 월간 성장 리포트
+- 기술 · 휴식 · 야구부 인연 **월간 목표**와 월말 평가
+- 현재 상태에 맞는 목표 추천과 코치 조언 활동 표시
+- 진급 · 졸업 시 **학년 마무리 리포트**, 기록 → 학년 일지에서 다시 보기
 
 </td>
 </tr>
@@ -127,14 +130,18 @@
 
 ## 🚧 로드맵
 
-현재 버전은 **1.12.1**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
+현재 버전은 **1.14.1**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
 
 - [x] 1.10 — 1학년 완주 자동 검증
 - [x] 1.11 — 전국체전
 - [x] 1.12 — 겨울훈련
-- [ ] 1.13 — 학년 마무리 리포트
+- [x] 1.13 — 학년 마무리 리포트
+- [x] 1.14 — 월간 목표 · 행동 선택 · 월말 평가
+- [x] 1.14.1 — 코치 조언에 맞는 행동 안내 · README 갱신
 - [ ] 2.0 — 1학년 완주 완성
 - [ ] 🏟️ **구단 운영(GM) 모드** — 선수 육성 모드 완성 후 개발 예정
+
+자동 완주 검사는 통과했으며, v2.0 완료 판정에는 실제 플레이 흐름 검증이 남아 있습니다.
 
 버전별 변경 사항은 [CHANGELOG.md](CHANGELOG.md), 상세 계획은 [docs/v2.0-roadmap.md](docs/v2.0-roadmap.md)에서 볼 수 있습니다.
 
