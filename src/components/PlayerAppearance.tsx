@@ -47,10 +47,24 @@ export function PlayerPortrait({
           <filter id={`${id}-team`} colorInterpolationFilters="sRGB">
             <feColorMatrix values={fabricColorMatrix(kit.primary)} />
           </filter>
+          <filter id={`${id}-hair-mask`} colorInterpolationFilters="sRGB">
+            <feColorMatrix type="saturate" values="0" />
+            <feComponentTransfer>
+              <feFuncR type="linear" slope="5" intercept="-2" />
+              <feFuncG type="linear" slope="5" intercept="-2" />
+              <feFuncB type="linear" slope="5" intercept="-2" />
+            </feComponentTransfer>
+          </filter>
+          <clipPath id={`${id}-jersey-area`}><path d={fit.jersey} /></clipPath>
+          {fit.hairExclusion && <clipPath id={`${id}-front-hair`}><path d={fit.hairExclusion} /></clipPath>}
           <mask id={`${id}-fabric`} maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="300">
             <g filter={`url(#${id}-alpha)`}>{image}</g>
             <path d={`M0 0H200V300H0Z ${fit.jersey}`} fill="black" fillRule="evenodd" />
-            {fit.hairExclusion && <path d={fit.hairExclusion} fill="black" />}
+            {fit.hairExclusion && (
+              <g clipPath={`url(#${id}-jersey-area)`}>
+                <g clipPath={`url(#${id}-front-hair)`} filter={`url(#${id}-hair-mask)`}>{image}</g>
+              </g>
+            )}
           </mask>
           <clipPath id={`${id}-hair`}>
             <path d={`M0 ${fit.forehead + 2} Q${fit.headX} ${fit.forehead - 7} 200 ${fit.forehead + 2} V300H0Z`} />
@@ -72,7 +86,7 @@ export function PlayerPortrait({
             <path d={`M0 ${fit.cuffY - 1} L35 ${fit.cuffY + 11} M165 ${fit.cuffY + 11} L200 ${fit.cuffY - 1}`} />
           </g>
           <g fill={kit.ink} stroke={fabric} strokeWidth=".6" paintOrder="stroke" fontFamily="system-ui, sans-serif" fontWeight="900" textAnchor="middle">
-            <text x="100" y={fit.chestY} fontSize="12" textLength="86" lengthAdjust="spacingAndGlyphs">{kit.name}</text>
+            <text x="100" y={fit.chestY} fontSize={Math.min(17, 84 / kit.name.length)} letterSpacing=".6">{kit.name}</text>
             <text x={fit.chestX} y={fit.chestY + 24} fontSize="20">{String(number).slice(0, 2)}</text>
           </g>
         </g>
