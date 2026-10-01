@@ -131,7 +131,7 @@ export function trainingFocus(player: Player): 'recovery' | 'control' | 'batting
 }
 export function optionMatchesTrainingAdvice(player: Player, option: ActivityOption): boolean {
   const focus = trainingFocus(player);
-  if (focus === 'recovery') return option.category === 'rest' && Number(option.statChanges.condition) > 0;
+  if (focus === 'recovery') return option.category === 'rest' && (Number(option.statChanges.condition ?? 0) + option.staminaDelta + (option.mentalDelta ?? 0)) > 0;
   if (!['training', 'special'].includes(option.category)) return false;
   const keys = focus === 'control' ? ['control'] : focus === 'batting' ? ['contact', 'eye'] : player.position === 'P' ? ['stuff', 'control', 'movement', 'velocity'] : player.position === 'TwoWay' ? ['contact', 'eye', 'power', 'defense', 'stuff', 'control', 'movement', 'velocity'] : ['contact', 'eye', 'power', 'defense', 'fieldingRange', 'fieldingError'];
   return (focus === 'technique' && ['P', 'TwoWay'].includes(player.position) && !!option.pitchTraining) || keys.some(k => Number((option.statChanges as Record<string, number>)[k]) > 0);

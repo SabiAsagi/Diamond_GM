@@ -1,0 +1,5 @@
+.saved-careers { padding: 16px; margin: 20px 0; text-align: left; }
+.saved-careers h2 { font-size: 1.1rem; margin: 0 0 12px; }
+.saved-careers > div { display: grid; gap: 8px; max-height: 240px; overflow-y: auto; }
+.saved-careers button { display: flex; flex-direction: column; align-items: flex-start; white-space: normal; text-align: left; gap: 6px; }
+.saved-careers button span { font-size: .8rem; color: var(--text-secondary, #94a3b8); }

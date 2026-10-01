@@ -129,7 +129,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   cutsceneHistory: {},
 
   initClock: async (player: Player) => {
-    if (get().isLoading) return;
+    if (get().isLoading) throw new Error('다른 저장이 진행 중입니다. 저장 완료 후 다시 불러오세요.');
     player = normalizePlayer(player);
     set({ isLoading: true });
     try {
@@ -176,6 +176,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       seasonMatches,
       academicEvents,
       todayLogs: [initialLog],
+      historyLogs: [],
       isCareerEnded: !!player.careerEndedAt || !!player.gradeReports?.some(r => r.grade === 3),
       isLoading: false,
       lastActionResult: null,
@@ -255,7 +256,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (sc.fame) newFame = Math.max(0, Math.min(100, newFame + sc.fame));
 
     // 체력 및 컨디션(멘탈) 복합 반영
-    const netStaminaDelta = result.staminaDelta;
+    const netStaminaDelta = result.staminaDelta ?? 0;
     const netMentalDelta = result.mentalDelta || 0;
     newCondition = Math.max(5, Math.min(100, newCondition + (sc.condition ?? 0) + netStaminaDelta + netMentalDelta));
 

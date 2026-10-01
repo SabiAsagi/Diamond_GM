@@ -1,6 +1,6 @@
 import { applyBondChanges, getRelScore, TEAM_BOND_IDS, FRIEND_BOND_IDS, type RelationshipTargets } from '../../types/bondScores';
 import { normalizePlayer, overallRating } from '../../data/playerDevelopment';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../db';
 import type { Player } from '../../types';
@@ -24,6 +24,8 @@ import '../../index.css';
 export default function CoachInterview() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const applying = useRef(false);
+  const [saveError, setSaveError] = useState('');
 
   const [player, setPlayer] = useState<Player | null>(null);
   const [currentQIndex, setCurrentQIndex] = useState<number>(0);
@@ -63,9 +65,9 @@ export default function CoachInterview() {
   };
 
   const handleNextQuestion = () => {
-    if (!selectedInCurrentQ) return;
+    if (!selectedInCurrentQ || applying.current) return;
     const newAnswers = [...confirmedAnswers, selectedInCurrentQ];
-    setConfirmedAnswers(newAnswers);
+    if (currentQIndex < totalQuestions - 1) setConfirmedAnswers(newAnswers);
 
     if (currentQIndex < totalQuestions - 1) {
       setCurrentQIndex(prev => prev + 1);
@@ -77,8 +79,10 @@ export default function CoachInterview() {
   };
 
   const handleFinishInterview = async (allAnswers: InterviewChoiceOption[]) => {
-    if (!player.id) return;
-    setIsApplying(true);
+    if (!player.id || applying.current) return;
+    applying.current = true;
+    setIsApplying(true); setSaveError('');
+    try {
 
     let newStuff = player.stuff;
     let newControl = player.control;
@@ -169,8 +173,11 @@ export default function CoachInterview() {
     if(updatedPlayer.rivalProgress) updatedPlayer.rivalProgress={...updatedPlayer.rivalProgress,playerMonthStartOverall:updatedPlayer.overall};
     await db.players.put(updatedPlayer);
     setPlayer(updatedPlayer);
+    setConfirmedAnswers(allAnswers);
     setIsApplying(false);
     setIsCompleted(true);
+    } catch { setSaveError('면담 결과를 저장하지 못했습니다. 같은 선택으로 다시 시도해주세요.'); }
+    finally { applying.current = false; setIsApplying(false); }
   };
 
   const handleEnterDashboard = () => {
@@ -310,6 +317,7 @@ export default function CoachInterview() {
 
             {/* 하단 진행 버튼 바 */}
             <div className="interview-footer-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+              {saveError && <p role="alert">{saveError}</p>}
               <button
                 className="btn btn-primary btn-lg"
                 disabled={!selectedInCurrentQ || isApplying}

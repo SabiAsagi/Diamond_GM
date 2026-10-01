@@ -18,6 +18,9 @@ import '../../index.css';
 
 export default function PlayerCreation() {
   const navigate = useNavigate();
+  const creating = useRef(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [appearance,setAppearance]=useState(DEFAULT_APPEARANCE);
   const [step, setStep] = useState(1);
   const wizardBodyRef = useRef<HTMLDivElement>(null);
@@ -144,6 +147,9 @@ export default function PlayerCreation() {
       familyBackground: 'parents'
     };
 
+    if (creating.current) return;
+    creating.current = true; setIsCreating(true); setSaveError('');
+    try {
     const normalized = normalizePlayer(newPlayer);
     normalized.overall=overallRating(normalized);
     normalized.rivalProgress = initializeRival(normalized,{year:2026,month:3});
@@ -151,6 +157,8 @@ export default function PlayerCreation() {
     normalized.cast = generateCast(normalized, HIGH_SCHOOLS_DATA);
     const id = await db.players.add(normalized);
     navigate(`/development/interview/${id}`);
+    } catch { setSaveError('선수 저장에 실패했습니다. 입력한 내용으로 다시 시도해주세요.'); }
+    finally { creating.current = false; setIsCreating(false); }
   };
 
   const getTierColor = (tier?: string) => {
@@ -199,7 +207,8 @@ export default function PlayerCreation() {
                   다음 <ChevronRight size={16} />
                 </button>
               ) : (
-                <button className="btn btn-sm btn-primary nav-action-btn" onClick={handleCreate}>
+                <button className="btn btn-sm btn-primary nav-action-btn" disabled={isCreating}
+                  onClick={handleCreate}>
                   <Save size={16} /> 생성 완료
                 </button>
               )}
@@ -569,6 +578,7 @@ export default function PlayerCreation() {
               <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   className="btn btn-primary btn-lg"
+                  disabled={isCreating}
                   onClick={handleCreate}
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '1rem', fontWeight: 700 }}
                 >
@@ -580,6 +590,7 @@ export default function PlayerCreation() {
         </div>
       </div>
 
+      {saveError && <p role="alert">{saveError}</p>}
       {/* ==========================================
           학교 상세 정보 모달 팝업 (뷰포트 정중앙 Portal 렌더링)
           ========================================== */}

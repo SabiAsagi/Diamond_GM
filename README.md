@@ -11,7 +11,7 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-1.15-3b82f6?style=flat-square)
+![version](https://img.shields.io/badge/version-1.16-3b82f6?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
 ![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
 
@@ -130,7 +130,7 @@
 
 ## 🚧 로드맵
 
-현재 버전은 **1.15**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
+현재 버전은 **1.16**이며, **고교 1학년을 처음부터 끝까지 완주할 수 있는 v2.0**을 목표로 하고 있습니다.
 
 - [x] 1.10 — 1학년 완주 자동 검증
 - [x] 1.11 — 전국체전
@@ -139,6 +139,7 @@
 - [x] 1.14 — 월간 목표 · 행동 선택 · 월말 평가
 - [x] 1.14.1 — 코치 조언에 맞는 행동 안내 · README 갱신
 - [x] 1.15 — 저장 실패 복구 · 동시 저장 보호 · 졸업 재접속
+- [x] 1.16 — 한 해의 흐름 · 이어서 하기 · 미리보기 안정화
 - [ ] 2.0 — 1학년 완주 완성
 - [ ] 🏟️ **구단 운영(GM) 모드** — 선수 육성 모드 완성 후 개발 예정
 

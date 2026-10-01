@@ -115,7 +115,7 @@ export function SlotActionPanel({
 
   const selectedOption = sampledSubActivities.find(o => o.id === selectedSubId);
   const evaluatedPreview = selectedOption
-    ? evaluateActivityWithGating(selectedOption, player.condition, player.condition)
+    ? evaluateActivityWithGating(selectedOption, player.condition, player.condition, { rollInjury: false })
     : null;
 
   const isLowStamina = player.condition <= 20;

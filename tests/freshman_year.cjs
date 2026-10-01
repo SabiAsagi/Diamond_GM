@@ -94,6 +94,10 @@ for (const scenario of [
   { seed: 2026, position: 'TwoWay', gender: 'male', tier: 'B' },
   // 학교가 1개뿐인 시·도는 선발전 없이 대표가 되므로 전국체전 실제 출전 흐름을 완주 중에 검증한다.
   { seed: 107, position: 'SS', gender: 'female', region: '제주' },
+  { seed: 777, position: 'P', gender: 'male', tier: 'S', rating: 85 },
+  { seed: 321, position: 'C', gender: 'female', tier: 'A' },
+  { seed: 42, position: 'CF', gender: 'male', tier: 'C' },
+  { seed: 2028, position: 'TwoWay', gender: 'female', region: '울산' },
 ]) {
   test(`1학년 완주: ${scenario.position}/${scenario.region ?? `${scenario.tier}학교`}/seed=${scenario.seed}`, { timeout: 60000 }, async t => {
     const originalRandom = Math.random;
@@ -110,7 +114,12 @@ for (const scenario of [
     try {
       const school = HIGH_SCHOOLS_DATA.find(s => scenario.region ? s.region === scenario.region : s.tier === scenario.tier);
       assert.ok(school, `시나리오 학교 누락: ${scenario.region ?? scenario.tier}`);
-      await store.getState().initClock(starter(school, scenario.position, scenario.gender));
+      const initialPlayer = starter(school, scenario.position, scenario.gender);
+      if (scenario.rating) {
+        for (const key of ['contact','power','eye','speed','defense','stuff','control','stamina',...Object.keys(require(path.join(dir, 'data/playerDevelopment.js')).EXTRA_RATINGS)]) initialPlayer[key] = scenario.rating;
+        initialPlayer.pitches = initialPlayer.pitches?.map(p => ({ ...p, rating: scenario.rating }));
+      }
+      await store.getState().initClock(initialPlayer);
       while (store.getState().clock.date.grade === 1 && stats.slots < 370 * 3) {
         await dismissInterruptions(stats);
         if (!require(path.join(dir, 'data/monthlyGoals.js')).isGoalForMonth(store.getState().player.monthlyGoal, store.getState().clock.date)) {
@@ -579,6 +588,8 @@ test('저장 안정화: 동시 구매·장비·외형 저장은 진행 저장을
   const purchase = store.getState().purchaseEquipment(item.id);
   assert.equal(store.getState().isLoading, true);
   assert.equal(await store.getState().purchaseEquipment(item.id), false);
+  await assert.rejects(store.getState().initClock(p), /다른 저장/);
+  assert.equal(store.getState().isLoading, true, '불러오기 충돌이 기존 저장 잠금을 풀지 않음');
   await store.getState().equipItem(item.id, item.slot);
   await store.getState().saveAppearance({ ...store.getState().player.appearance, hairStyleId: 'male_buzz' });
   await store.getState().advanceSlot({ statChanges: {}, logMessage: '동시 진행 방지' });
@@ -595,4 +606,48 @@ test('저장 안정화: 동시 구매·장비·외형 저장은 진행 저장을
   assert.equal(store.getState().isLoading, false);
   await store.getState().equipItem(item.id, item.slot);
   assert.equal(saved.equippedItems[item.slot], item.id);
+});
+
+
+test('3개년 연결: 1학년부터 윤년을 거쳐 졸업·재접속까지 실제 슬롯 진행', { timeout: 60000 }, async t => {
+  const random = Math.random;
+  Math.random = seededRandom(31415);
+  const stats = { events: 0, reports: 0, draws: 0, slots: 0, reloads: 0 };
+  try {
+    await store.getState().initClock(starter(HIGH_SCHOOLS_DATA.find(s => s.region === '제주'), 'TwoWay', 'female'));
+    while (!store.getState().isCareerEnded && stats.slots < 3300) {
+      await dismissInterruptions(stats);
+      const state = store.getState();
+      const { date, currentSlot } = state.clock;
+      const { isGoalForMonth } = require(path.join(dir, 'data/monthlyGoals.js'));
+      if (!isGoalForMonth(state.player.monthlyGoal, date)) await state.declareMonthlyGoal('recovery');
+      const before = key(state.clock);
+      if (state.dailyPlan.slots[currentSlot].forced) await state.executeForcedSlot(currentSlot);
+      else {
+        const categories = getActivityCategories(currentSlot, isSchoolDay(date)).map(c => c.category);
+        const category = state.player.condition < 65 ? 'rest' : categories[stats.slots % categories.length];
+        const options = SUB_ACTIVITY_POOL[category].filter(o => isActivityAvailable(o, state.player.position, currentSlot, date.grade, date));
+        assert.ok(options.length);
+        await state.selectActivity(currentSlot, category, options[stats.slots % options.length].id);
+      }
+      assert.notEqual(key(store.getState().clock), before);
+      stats.slots++;
+      if (stats.slots % 113 === 0) { await store.getState().initClock(structuredClone(saved)); stats.reloads++; }
+    }
+    assert.equal(stats.slots, 1095 * 3, '364일 + 윤년 366일 + 365일');
+    assert.equal(store.getState().isCareerEnded, true);
+    assert.deepEqual(saved.gradeReports.map(r => r.grade), [1, 2, 3]);
+    assert.equal(new Set(saved.gradeReports.map(r => r.id)).size, 3);
+    assert.equal(saved.monthlyGoalReports.length, 36);
+    const records = saved.matchRecords;
+    assert.equal(new Set(records.map(r => `${r.year}:${r.matchId}`)).size, records.length);
+    await store.getState().initClock(structuredClone(saved));
+    assert.equal(store.getState().isCareerEnded, true);
+    await dismissInterruptions(stats);
+    const clock = structuredClone(store.getState().clock);
+    await store.getState().advanceSlot({ statChanges: {}, logMessage: '졸업 이후 슬롯 차단' });
+    assert.deepEqual(store.getState().clock, clock);
+    assert.deepEqual(saved.gradeReports.map(r => r.monthlyGoals.declared), [12, 12, 12]);
+    t.diagnostic(JSON.stringify({ ...stats, gradeReports: saved.gradeReports.length, monthlyReports: saved.monthlyGoalReports.length, matches: records.length }));
+  } finally { Math.random = random; }
 });

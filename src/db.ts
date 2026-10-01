@@ -20,6 +20,7 @@ export class DiamondGMDexie extends Dexie {
 export const db = new DiamondGMDexie();
 
 export async function initDummyDataIfNeeded() {
+  await db.transaction('rw', db.teams, db.players, db.leagueSeasons, async () => {
   const teamCount = await db.teams.count();
   if (teamCount === 0) {
     await db.teams.bulkAdd([
@@ -89,5 +90,5 @@ export async function initDummyDataIfNeeded() {
       currentStage: 'Offseason'
     });
   }
+  });
 }
-
