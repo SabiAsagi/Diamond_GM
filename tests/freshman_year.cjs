@@ -24,8 +24,9 @@ fs.copyFileSync('src/data/kbo2026.json', path.join(dir, 'data/kbo2026.json'));
 fs.symlinkSync(path.resolve('node_modules'), path.join(dir, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir');
 let saved;
 let failNextSave = false;
+let holdNextSave;
 require.cache[path.join(dir, 'db.js')] = { id: path.join(dir, 'db.js'), filename: path.join(dir, 'db.js'), loaded: true,
-  exports: { db: { players: { put: async p => { if (failNextSave) { failNextSave = false; throw new Error('save failed'); } saved = structuredClone(p); return p.id; } } } } };
+  exports: { db: { players: { put: async p => { if (holdNextSave) { const hold = holdNextSave; holdNextSave = undefined; await hold; } if (failNextSave) { failNextSave = false; throw new Error('save failed'); } saved = structuredClone(p); return p.id; } } } } };
 after(() => fs.rmSync(dir, { recursive: true, force: true }));
 const { useGameClockStore: store } = require(path.join(dir, 'store/gameClockStore.js'));
 const { HIGH_SCHOOLS_DATA } = require(path.join(dir, 'data/highSchools.js'));
@@ -541,4 +542,57 @@ test('월간 목표: 소급·경기·개인 친구 보상 제외, 상한/기간/
   const missed = settleMonthlyGoal(p, date);
   assert.equal(missed.monthlyGoalReports[0].completed, false);
   assert.deepEqual(missed.relationships, p.relationships, '미달성 벌점 없음');
+});
+
+
+test('저장 안정화: 초기화 실패 후 잠금 해제와 졸업 재접속 시 종료 유지', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  failNextSave = true;
+  await assert.rejects(store.getState().initClock(p), /save failed/);
+  assert.equal(store.getState().isLoading, false);
+  p.grade = 3;
+  p.gameDate = { year: 2029, month: 2, day: 28, weekday: 3, grade: 3 };
+  p.currentSlot = 'night';
+  await store.getState().initClock(p);
+  await store.getState().advanceSlot({ statChanges: {}, logMessage: '졸업 전 마지막 휴식' });
+  assert.equal(saved.careerEndedAt.month, 3);
+  const clock = structuredClone(store.getState().clock);
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(store.getState().isCareerEnded, true);
+  await dismissInterruptions({ events: 0, reports: 0, draws: 0 });
+  await store.getState().advanceSlot({ statChanges: {}, logMessage: '졸업 후 진행 금지' });
+  assert.deepEqual(store.getState().clock, clock);
+  const legacy = structuredClone(saved);
+  delete legacy.careerEndedAt;
+  await store.getState().initClock(legacy);
+  assert.equal(store.getState().isCareerEnded, true, '기존 졸업 리포트 저장본도 종료 유지');
+});
+
+test('저장 안정화: 동시 구매·장비·외형 저장은 진행 저장을 덮어쓰지 않는다', async () => {
+  const { EQUIPMENT_CATALOG } = require(path.join(dir, 'types/equipment.js'));
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.money = 999999;
+  await store.getState().initClock(p);
+  const item = EQUIPMENT_CATALOG.find(i => i.slot === 'bat');
+  let release;
+  holdNextSave = new Promise(resolve => { release = resolve; });
+  const purchase = store.getState().purchaseEquipment(item.id);
+  assert.equal(store.getState().isLoading, true);
+  assert.equal(await store.getState().purchaseEquipment(item.id), false);
+  await store.getState().equipItem(item.id, item.slot);
+  await store.getState().saveAppearance({ ...store.getState().player.appearance, hairStyleId: 'male_buzz' });
+  await store.getState().advanceSlot({ statChanges: {}, logMessage: '동시 진행 방지' });
+  assert.equal(store.getState().clock.currentSlot, 'morning');
+  release();
+  assert.equal(await purchase, true);
+  assert.equal(saved.inventory.filter(id => id === item.id).length, 1);
+  assert.equal(saved.money, p.money - item.price);
+  const before = structuredClone(saved);
+  failNextSave = true;
+  await assert.rejects(store.getState().equipItem(item.id, item.slot), /save failed/);
+  assert.deepEqual(saved, before);
+  assert.deepEqual(store.getState().player, before);
+  assert.equal(store.getState().isLoading, false);
+  await store.getState().equipItem(item.id, item.slot);
+  assert.equal(saved.equippedItems[item.slot], item.id);
 });

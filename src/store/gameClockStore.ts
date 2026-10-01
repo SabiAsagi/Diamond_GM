@@ -129,8 +129,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   cutsceneHistory: {},
 
   initClock: async (player: Player) => {
+    if (get().isLoading) return;
     player = normalizePlayer(player);
     set({ isLoading: true });
+    try {
 
     const school = getHighSchoolDataByName(player.highSchool) || HIGH_SCHOOLS_DATA[0];
 
@@ -174,12 +176,13 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       seasonMatches,
       academicEvents,
       todayLogs: [initialLog],
-      isCareerEnded: false,
+      isCareerEnded: !!player.careerEndedAt || !!player.gradeReports?.some(r => r.grade === 3),
       isLoading: false,
       lastActionResult: null,
       activeCutscene: CUTSCENE_EVENTS_POOL.find(e=>e.id===player.pendingEventId) ?? null,
       cutsceneHistory: player.eventHistory ?? {},
     });
+    } finally { set({ isLoading: false }); }
   },
 
   advanceSlot: async (result: ActivityResult) => {
@@ -240,14 +243,14 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if(result.pitchTraining) extra.pitches=trainPitch(extra,result.pitchTraining,result.pitchXp??0);
     extra.savedMatches=seasonMatches;
     extra.savedSeasonYear=clock.date.year;
-    if (sc.stuff) newStuff = Math.min(100, newStuff + sc.stuff);
-    if (sc.control) newControl = Math.min(100, newControl + sc.control);
-    if (sc.stamina) newStaminaRating = Math.min(100, newStaminaRating + sc.stamina);
-    if (sc.contact) newContact = Math.min(100, newContact + sc.contact);
-    if (sc.power) newPower = Math.min(100, newPower + sc.power);
-    if (sc.eye) newEye = Math.min(100, newEye + sc.eye);
-    if (sc.speed) newSpeed = Math.min(100, newSpeed + sc.speed);
-    if (sc.defense) newDefense = Math.min(100, newDefense + sc.defense);
+    if (sc.stuff) newStuff = Math.max(0, Math.min(100, newStuff + sc.stuff));
+    if (sc.control) newControl = Math.max(0, Math.min(100, newControl + sc.control));
+    if (sc.stamina) newStaminaRating = Math.max(0, Math.min(100, newStaminaRating + sc.stamina));
+    if (sc.contact) newContact = Math.max(0, Math.min(100, newContact + sc.contact));
+    if (sc.power) newPower = Math.max(0, Math.min(100, newPower + sc.power));
+    if (sc.eye) newEye = Math.max(0, Math.min(100, newEye + sc.eye));
+    if (sc.speed) newSpeed = Math.max(0, Math.min(100, newSpeed + sc.speed));
+    if (sc.defense) newDefense = Math.max(0, Math.min(100, newDefense + sc.defense));
     if (sc.academics) newAcademics = Math.max(0, Math.min(100, newAcademics + sc.academics));
     if (sc.fame) newFame = Math.max(0, Math.min(100, newFame + sc.fame));
 
@@ -336,9 +339,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
         currentSlot: nextSlot,
       };
 
+      if (isCareerEnded) updatedPlayer.careerEndedAt = { ...nextDate };
       updatedPlayer=finalizeTeam(updatedPlayer,nextDate,nextSlot,updatedMatches);
       updatedPlayer.overall=overallRating(updatedPlayer);
-      if(advanceRes.isMonthChanged) updatedPlayer=updateMonthlyRival(updatedPlayer,nextDate);
+      if(advanceRes.isMonthChanged && !isCareerEnded) updatedPlayer=updateMonthlyRival(updatedPlayer,nextDate);
 
       // 3. 확률적 컷신 이벤트 체크
       let triggeredCutscene: EventCutscene | null = null;
@@ -346,6 +350,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       for (const evt of CUTSCENE_EVENTS_POOL.map(evt=>({evt,rank:Math.random()})).sort((a,b)=>a.rank-b.rank).map(x=>x.evt)) {
         if (!result.activityCategory || !['training','relationship','study','special'].includes(result.activityCategory)) continue;
         if (evt.categories && !evt.categories.includes(result.activityCategory)) continue;
+        if (isCareerEnded) continue;
         if (shouldTriggerCutscene(evt, updatedPlayer, nextDate, nextHistory)) {
           triggeredCutscene = evt;
           nextHistory[evt.id] = {
@@ -530,14 +535,20 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     }finally{set({isLoading:false});}
   },
   saveAppearance: async (appearance) => {
-    const {player}=get(); if(!player)return;
+    const {player}=get(); if(!player || get().isLoading)return;
+    set({isLoading:true});
+    try {
     const updated={...player,appearance}; captureAchievements(updated); await db.players.put(updated);set({player:updated});
+    } finally {set({isLoading:false});}
   },
   revealTournament: async (id) => {
-    const {player,seasonMatches,clock}=get(); if(!player)return;
+    const {player,seasonMatches,clock}=get(); if(!player || get().isLoading || get().isCareerEnded)return;
+    set({isLoading:true});
+    try {
     const matches=seasonMatches.map(m=>m.tournamentId===id?{...m,drawn:true}:m);
     const updated={...player,savedMatches:matches,savedSeasonYear:clock.date.year};
     captureAchievements(updated); await db.players.put(updated);set({player:updated,seasonMatches:matches});get().regenerateDailyPlan();
+    } finally {set({isLoading:false});}
   },
   regenerateDailyPlan: () => {
     const { clock, seasonMatches, academicEvents } = get();
@@ -550,13 +561,16 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   purchaseEquipment: async (itemId) => {
     const { player } = get();
     const item = EQUIPMENT_CATALOG.find(e => e.id === itemId);
-    if (!player || !item || (player.money || 0) < item.price || player.inventory?.includes(itemId)) return false;
+    if (get().isLoading || get().isCareerEnded || !player || !item || (player.money || 0) < item.price || player.inventory?.includes(itemId)) return false;
+    set({isLoading:true});
+    try {
     const updated = { ...player, money: (player.money || 0) - item.price, inventory: [...(player.inventory || []), itemId] };
     captureAchievements(updated); await db.players.put(updated); set({ player: updated }); return true;
+    } finally {set({isLoading:false});}
   },
   equipItem: async (itemId, slot) => {
     const { player } = get();
-    if (!player) return;
+    if (!player || get().isLoading || get().isCareerEnded) return;
     const currentEquipped = player.equippedItems?.[slot];
     const nextEquipped = { ...(player.equippedItems || {}) };
     if (!itemId || currentEquipped === itemId) {
@@ -567,20 +581,25 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if (!item || item.slot !== slot || !isEquipmentRelevant(player, item)) return;
       nextEquipped[slot] = itemId;
     }
+    set({isLoading:true});
+    try {
     const updated = refreshTeamEvaluation({ ...player, equippedItems: nextEquipped });
     updated.overall = overallRating(updated);
     captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });
+    } finally {set({isLoading:false});}
   },
   visitOutdoorLocation: async (location) => {
     const { player, clock } = get();
-    if (!player || (player.money || 0) < location.cost) return false;
+    if (get().isLoading || get().activeCutscene || get().isCareerEnded || player?.pendingGradeReportId || !player || (player.money || 0) < location.cost) return false;
     const game = getBallparkVisit(location.id,clock.date,clock.currentSlot);
     if (game && !game.available) return false;
     if (isSchoolDay(clock.date) && clock.currentSlot !== 'night') return false;
     const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
     if (player.lastOutdoorVisitDate === todayDateStr) return false;
 
+    set({isLoading:true});
+    try {
     let updated: Player = {
       ...applyBondChanges(player,location.effects.relationshipTargets),
       money: (player.money || 0) - location.cost + (location.effects.money || 0),
@@ -596,6 +615,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     captureAchievements(updated); await db.players.put(updated);
     set({ player: updated });
     return true;
+    } finally {set({isLoading:false});}
   },
 }));
 

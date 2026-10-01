@@ -63,11 +63,12 @@ export function SlotActionPanel({
     !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date) : []
   );
   const [selectedSubId, setSelectedSubId] = useState<string>(() => sampledSubActivities[0]?.id || '');
+  const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   // 슬롯 또는 등교일 상태가 변경되었을 때 상태 재설정
-  const [prevKey, setPrevKey] = useState(`${player.id}-${player.grade}-${currentSlot}-${assignment.forced}-${schoolDay}`);
-  const currentKey = `${player.id}-${player.grade}-${currentSlot}-${assignment.forced}-${schoolDay}`;
+  const [prevKey, setPrevKey] = useState(`${player.id}-${player.position}-${date.year}-${date.month}-${date.day}-${currentSlot}-${assignment.forced}-${schoolDay}`);
+  const currentKey = `${player.id}-${player.position}-${date.year}-${date.month}-${date.day}-${currentSlot}-${assignment.forced}-${schoolDay}`;
   if (prevKey !== currentKey) {
     setPrevKey(currentKey);
     setSelectedCategory(defaultCat);
@@ -86,9 +87,13 @@ export function SlotActionPanel({
   };
 
   const handleRunForced = async () => {
+    if (isProcessing) return;
+    setError('');
     setIsProcessing(true);
     try {
       await onExecuteForced(currentSlot);
+    } catch {
+      setError('진행 내용을 저장하지 못했습니다. 현재 슬롯에서 다시 시도해주세요.');
     } finally {
       setIsProcessing(false);
     }
@@ -96,9 +101,13 @@ export function SlotActionPanel({
 
   const handleRunSubActivity = async () => {
     if (!selectedSubId) return;
+    if (isProcessing) return;
+    setError('');
     setIsProcessing(true);
     try {
       await onSelectActivity(currentSlot, selectedCategory, selectedSubId);
+    } catch {
+      setError('진행 내용을 저장하지 못했습니다. 현재 슬롯에서 다시 시도해주세요.');
     } finally {
       setIsProcessing(false);
     }
@@ -139,6 +148,7 @@ export function SlotActionPanel({
         </div>
 
         {isMatch && assignment.sourceEventId && <MatchSelectionCard player={player} matchId={assignment.sourceEventId} />}
+        {error && <p role="alert">{error}</p>}
         <div className="forced-action-footer">
           <div className="forced-notice-text">
             {isMatch
@@ -278,6 +288,7 @@ export function SlotActionPanel({
         })}
       </div>
 
+      {error && <p role="alert">{error}</p>}
       {/* 실행 액션 바 */}
       <div className="slot-action-footer">
         <div className="preview-summary-text">

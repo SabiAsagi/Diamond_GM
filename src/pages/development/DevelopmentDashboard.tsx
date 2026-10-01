@@ -30,6 +30,8 @@ export default function DevelopmentDashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const [loadError, setLoadError] = useState('');
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [activeNavTab, setActiveNavTab] = useState<MainNavTab>('home');
   const [outingOpen, setOutingOpen] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
@@ -60,7 +62,10 @@ export default function DevelopmentDashboard() {
   useEffect(() => {
     async function loadData() {
       if (!id) return;
+      try {
+      setLoadError('');
       const p = await db.players.get(Number(id));
+      if (!p) { setLoadError('선수 저장본을 찾지 못했습니다.'); return; }
       if (p) {
         if (!p.interviewCompleted) {
           navigate(`/development/interview/${p.id}`);
@@ -68,19 +73,20 @@ export default function DevelopmentDashboard() {
         }
         await initClock(p);
       }
+      } catch { setLoadError('저장본을 불러오지 못했습니다. 다시 시도해주세요.'); }
     }
     loadData();
-  }, [id, navigate, initClock]);
+  }, [id, navigate, initClock, loadAttempt]);
 
   const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
   // 추첨마다 키가 달라서, 새 추첨이 오면 이전에 확인한 키와 자동으로 불일치한다.
   const drawKey = drawDue ? `${clock.date.year}:${drawDue.tournamentId}` : null;
 
-  if (!player) {
+  if (!player || player.id !== Number(id) || loadError) {
     return (
       <div className="onepage-viewport-container loading-state">
         <div className="wizard-panel glass-panel" style={{ textAlign: 'center', padding: '60px' }}>
-          <h3>고교 야구 3개년 커리어 데이터를 로딩 중입니다...</h3>
+          {loadError ? <><p role="alert">{loadError}</p><button className="btn btn-primary" onClick={() => setLoadAttempt(n => n + 1)}>다시 불러오기</button><button className="btn btn-secondary" onClick={() => navigate('/')}>시작 화면으로</button></> : <h3>고교 야구 커리어 데이터를 로딩 중입니다...</h3>}
         </div>
       </div>
     );
@@ -258,12 +264,12 @@ export default function DevelopmentDashboard() {
           <div className="cet-left">
             <Trophy size={28} color="#fbbf24" />
             <div>
-              <strong>🎉 3개년 고교 야구 완주 & KBO 드래프트 참가!</strong>
+              <strong>🎉 고교 야구 생활을 마쳤습니다!</strong>
               <p>{player.name} 선수는 3년간의 모든 고교 일정과 대회를 완주하였습니다.</p>
             </div>
           </div>
-          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('goals')}>
-            트로피 확인
+          <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('records')}>
+            기록 돌아보기
           </button>
         </div>
       )}
