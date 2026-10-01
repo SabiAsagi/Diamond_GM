@@ -1,0 +1,9 @@
+.monthly-goals-panel { padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.monthly-goals-panel h3, .monthly-goals-panel p { margin: 0; }
+.monthly-goals-panel progress { width: 100%; accent-color: #10b981; }
+.monthly-goal-options { display: grid; gap: 10px; }
+.monthly-goal-options button { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; white-space: normal; text-align: left; }
+.monthly-goal-options span, .monthly-goal-note, .monthly-goals-panel small { font-size: .8rem; color: var(--text-secondary, #94a3b8); line-height: 1.6; }
+.monthly-goal-history { padding: 0; list-style: none; display: grid; gap: 12px; }
+.monthly-goal-history li { border-top: 1px solid var(--glass-border, #334155); padding: 12px 0; }
+.monthly-goal-badge { display: inline-block; font-size: .75rem; color: #6ee7b7; margin: 4px 0; }

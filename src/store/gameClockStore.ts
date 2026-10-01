@@ -1,3 +1,5 @@
+import { getMonthlyGoalOptions, isGoalForMonth, progressMonthlyGoal, settleMonthlyGoal, type MonthlyGoalKind } from '../data/monthlyGoals';
+import { createGradeSnapshot, preserveGradeTournaments, finishGradeReport } from '../data/gradeReport';
 import { prepareTeamContext, updateCompetitionAfterAction, TEAM_ROLE_LABELS, dateNumber, refreshTeamEvaluation } from '../data/teamCompetition';
 import { getBallparkVisit } from '../data/proSchedule';
 import { initializeRival, updateMonthlyRival } from '../data/rival';
@@ -53,6 +55,8 @@ export interface GameClockState {
   lastActionResult: ActivityResult | null;
   clearLastActionResult: () => void;
   dismissRivalReport: () => Promise<void>;
+  dismissGradeReport: () => Promise<void>;
+  declareMonthlyGoal: (kind: MonthlyGoalKind) => Promise<void>;
   activeCutscene: EventCutscene | null;
   resolveCutscene: (choice: string) => Promise<void>;
   saveAppearance: (appearance: NonNullable<Player['appearance']>) => Promise<void>;
@@ -102,6 +106,25 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     try { const updated={...player,pendingRivalReport:undefined}; await db.players.put(updated);set({player:updated}); }
     finally {set({isLoading:false});}
   },
+  declareMonthlyGoal: async kind => {
+    const { player, clock, isLoading, isCareerEnded, activeCutscene } = get();
+    if (!player || isLoading || isCareerEnded || activeCutscene || player.pendingGradeReportId || isGoalForMonth(player.monthlyGoal, clock.date)) return;
+    const goal = getMonthlyGoalOptions(player, clock.date).find(g => g.kind === kind);
+    if (!goal || player.monthlyGoalReports?.some(r => r.id === goal.id)) return;
+    set({ isLoading: true });
+    try { const updated = { ...player, monthlyGoal: goal }; await db.players.put(updated); set({ player: updated }); }
+    finally { set({ isLoading: false }); }
+  },
+  dismissGradeReport: async () => {
+    const { player, isLoading } = get();
+    if (!player || isLoading || !player.pendingGradeReportId) return;
+    set({ isLoading: true });
+    try {
+      const updated = { ...player, pendingGradeReportId: undefined };
+      await db.players.put(updated);
+      set({ player: updated });
+    } finally { set({ isLoading: false }); }
+  },
   activeCutscene: null,
   cutsceneHistory: {},
 
@@ -126,6 +149,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(addMissingNationals(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate), initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
     player=prepareTeamContext(player,school,initialDate,initialSlot,seasonMatches);
     captureAchievements(player);
+    if (!player.gradeStartSnapshot) player.gradeStartSnapshot = createGradeSnapshot(player, initialDate);
     player.savedMatches=seasonMatches;
     player.savedSeasonYear=initialDate.year;
     captureAchievements(player); await db.players.put(player);
@@ -161,7 +185,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   advanceSlot: async (result: ActivityResult) => {
     const state = get();
     const { player, clock, school, seasonMatches: originalMatches, academicEvents, todayLogs, cutsceneHistory } = state;
-    if (!player || state.isLoading || state.activeCutscene || state.isCareerEnded) return;
+    if (!player || state.isLoading || state.activeCutscene || state.isCareerEnded || player.pendingGradeReportId) return;
     if(result.matchOutcome && player.matchRecords?.some(r=>r.matchId===result.matchOutcome!.matchId&&r.year===clock.date.year))return;
     const seasonMatches=result.matchOutcome&&school?progressTournament(originalMatches,result.matchOutcome,school,HIGH_SCHOOLS_DATA):originalMatches;
     const actionDate=`${clock.date.year}-${clock.date.month}-${clock.date.day}`;
@@ -170,13 +194,23 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     try {
     const finalizeTeam = (p:Player, date:GameDate, slot:TimeSlot, matches:ScheduledMatch[]) => {
       let updated=updateCompetitionAfterAction(player,p,result,clock.date);
+      updated=progressMonthlyGoal(updated,result,clock.date);
+      if (date.month !== clock.date.month || date.year !== clock.date.year) updated=settleMonthlyGoal(updated,clock.date);
+      updated=refreshTeamEvaluation(updated);
       if(result.matchOutcome && updated.teamCompetition?.lastFeedback){
         const f=updated.teamCompetition.lastFeedback;
         result={...result,logMessage:result.logMessage+`\n감독 평가 ${updated.teamCompetition.coachEvaluation.toFixed(1)} (${f.coachDelta>=0?'+':''}${f.coachDelta}) · 코치 평가 ${updated.teamCompetition.technicalEvaluation.toFixed(1)}\n팀 내 위치: ${TEAM_ROLE_LABELS[f.before]} → ${TEAM_ROLE_LABELS[f.after]}\n${f.summary}\n${f.recommendation}`};
         updated.matchRecords=[...(player.matchRecords??[]),{matchId:result.matchOutcome!.matchId,year:clock.date.year,log:result.logMessage,performance:result.matchPerformance,kind:originalMatches.find(m=>m.id===result.matchOutcome!.matchId)?.kind??(result.matchOutcome!.tournamentId==='weekend_league'?'weekend':'national')}];
       }
       updated.dailyActionLogs={date:actionDate,logs:{...actionLogs,[clock.currentSlot]:result.logMessage}};
+      const gradeEnded = date.grade !== clock.date.grade || (clock.date.grade === 3 && clock.date.month === 2 && date.month === 3);
+      if (gradeEnded) {
+        updated.overall = overallRating(updated);
+        captureAchievements(updated);
+        updated = finishGradeReport(updated, clock.date);
+      }
       if(school)updated=prepareTeamContext(updated,school,date,slot,matches);
+      if (gradeEnded && date.grade !== clock.date.grade) updated.gradeStartSnapshot = createGradeSnapshot(updated, date);
       return updated;
     };
     // 1. 스탯 변동 반영
@@ -194,7 +228,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const newMoney = Math.max(0, (player.money || 0) + (result.moneyDelta || 0));
 
     const sc = result.statChanges;
-    const extra = applyBondChanges(normalizePlayer(player), result.relationshipTargets);
+    let extra = applyBondChanges(normalizePlayer(player), result.relationshipTargets);
     const expectedBonds = formatBondChanges(result.relationshipTargets);
     result = {...result, relationshipTargets: actualBondChanges(player,extra)};
     const actualBonds = formatBondChanges(result.relationshipTargets);
@@ -258,6 +292,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
       let updatedMatches = school ? advanceOtherTournamentMatches(seasonMatches,clock.date,school) : seasonMatches;
       if (advanceRes.nextDate.year !== clock.date.year && school) {
+        extra = preserveGradeTournaments(extra, updatedMatches);
         captureAchievements(extra);
         updatedMatches = generateSeasonMatches(advanceRes.nextDate.year, school, HIGH_SCHOOLS_DATA);
       }
