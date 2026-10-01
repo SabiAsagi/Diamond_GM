@@ -1,6 +1,7 @@
+import { getSeasonJourney } from '../../data/seasonJourney';
 import { PlayerPortrait } from '../PlayerAppearance';
 import type { GameDate, TimeSlot } from '../../types/calendar';
-import { calculateDaysUntilDraft, WEEKDAY_NAMES, TIME_SLOT_LABELS } from '../../types/calendar';
+import { WEEKDAY_NAMES, TIME_SLOT_LABELS } from '../../types/calendar';
 import type { Player } from '../../types';
 import { POSITION_LABELS } from '../../types';
 import type { HighSchoolData } from '../../types/highSchool';
@@ -15,7 +16,7 @@ interface DailyTopBarProps {
 }
 
 export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarProps) {
-  const daysUntilDraft = calculateDaysUntilDraft(date);
+  const journey = getSeasonJourney(date);
   const weekdayStr = WEEKDAY_NAMES[date.weekday];
   const slotLabel = TIME_SLOT_LABELS[currentSlot];
 
@@ -75,7 +76,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
 
         <div className="daily-draft-dday-pill">
           <Trophy size={14} className="text-accent" />
-          <span>KBO 드래프트 D-{daysUntilDraft}</span>
+          <span>{player.careerEndedAt || player.gradeReports?.some(r => r.grade === 3) ? '고교 생활 완료' : `${date.grade === 3 ? '졸업' : '학년 마무리'} D-${journey.remainingDays}`}</span>
         </div>
         <div className="daily-draft-dday-pill"><Wallet size={14}/><span>{(player.money || 0).toLocaleString()}원</span></div>
       </div>

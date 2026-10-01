@@ -12,7 +12,7 @@ import ManagementLeague from './pages/management/ManagementLeague';
 
 export default function App() {
   useEffect(() => {
-    initDummyDataIfNeeded();
+    void initDummyDataIfNeeded().catch(() => { /* 시작 화면에서 IndexedDB 로드 오류와 재시도를 안내한다. */ });
   }, []);
 
   return (

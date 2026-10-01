@@ -32,6 +32,8 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
   const [selectedLocation, setSelectedLocation] = useState<OutdoorLocation | null>(null);
   const [notice, setNotice] = useState('');
   const clock = useGameClockStore((s) => s.clock);
+  const isLoading = useGameClockStore(s => s.isLoading);
+  const isCareerEnded = useGameClockStore(s => s.isCareerEnded);
   const region = getHighSchoolDataByName(player.highSchool)?.region || '서울';
   const locations = getOutdoorLocations(region);
   const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
@@ -51,6 +53,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
   );
 
   const act = async (fn: () => Promise<boolean>, ok: string) => {
+    try {
     const success = await fn();
     if (success) setNotice(ok);
     else
@@ -61,6 +64,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
             ? '외출은 야간이나 주말·방학에만 가능합니다.'
             : '소지금이 부족하거나 방문할 수 없습니다.',
       );
+    } catch { setNotice('저장하지 못했습니다. 소지금과 진행 기록은 유지됩니다. 다시 시도해주세요.'); }
   };
 
   return (
@@ -162,7 +166,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
                 )}
                 <button
                   className="btn btn-primary btn-sm"
-                  disabled={
+                  disabled={isLoading || isCareerEnded ||
                     selectedLocation.id !== 'goods' &&
                     (!outingAllowedNow ||
                       isVisitedToday ||
@@ -236,13 +240,15 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
                     {owned ? (
                       <button
                         className="btn btn-secondary btn-sm"
-                        onClick={() => onEquip(equipped ? '' : item.id, item.slot)}
+                        disabled={isLoading || isCareerEnded}
+                        onClick={async () => { try { await onEquip(equipped ? '' : item.id, item.slot); } catch { setNotice('장착 상태를 저장하지 못했습니다. 다시 시도해주세요.'); } }}
                       >
                         {equipped ? '장착 중 (클릭 시 해제)' : '장착하기'}
                       </button>
                     ) : (
                       <button
                         className="btn btn-primary btn-sm"
+                        disabled={isLoading || isCareerEnded}
                         onClick={() =>
                           act(() => onPurchase(item.id), `${item.name}을 구매했습니다.`)
                         }

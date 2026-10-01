@@ -35,6 +35,7 @@ export type PitcherRole = 'Starter' | 'Reliever' | 'Closer' | 'None';
 export type BattingForm = 'Open' | 'Straight' | 'LegKick' | 'ToeTap' | 'None';
 
 export interface Player {
+  careerEndedAt?: GameDate; // 졸업 확정 시 저장하여 재접속 후에도 종료 유지
   monthlyGoal?: import('../data/monthlyGoals').MonthlyGoal;
   monthlyGoalReports?: import('../data/monthlyGoals').MonthlyGoalReport[];
   gradeStartSnapshot?: import('../data/gradeReport').GradeSnapshot;

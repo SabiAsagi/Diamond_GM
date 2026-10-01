@@ -674,7 +674,8 @@ export function sampleSubActivities(
 export function evaluateActivityWithGating(
   option: ActivityOption,
   currentStamina: number,
-  currentMental: number
+  currentMental: number,
+  options: { rollInjury?: boolean } = {}
 ): ActivityResult {
   const isTraining = option.category === 'training';
   const isRestOrRel = option.category === 'rest' || option.category === 'relationship';
@@ -699,7 +700,7 @@ export function evaluateActivityWithGating(
 
       // 부상 확률 롤: base 1% + max(0, 20 - stamina) * 0.5%
       const injuryChance = 0.01 + Math.max(0, 20 - currentStamina) * 0.005;
-      if (Math.random() < injuryChance) {
+      if (options.rollInjury !== false && Math.random() < injuryChance) {
         isInjured = true;
         effectiveMentalDelta -= 20;
         effectiveStaminaDelta -= 10;

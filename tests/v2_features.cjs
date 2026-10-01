@@ -251,11 +251,12 @@ test('회차별 인물: 활동·이벤트·외출 문구에 기본 인물 이름
 const { trainingFocus, trainingRecommendation, optionMatchesTrainingAdvice } = require(path.join(dir, 'data/teamCompetition.js'));
 test('코치 조언은 컨디션 회복을 우선하고 포지션별 보완 활동만 표시한다', () => {
   const player = { position: 'P', condition: 70, teamCompetition: { recentForm: 30 } };
-  const option = (category, statChanges, pitchTraining) => ({ category, statChanges, pitchTraining });
+  const option = (category, statChanges, pitchTraining) => ({ category, statChanges, pitchTraining, staminaDelta: 0 });
   assert.equal(trainingFocus({ ...player, condition: 44 }), 'recovery');
   assert.ok(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('rest', { condition: 3 })));
   assert.equal(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('rest', { condition: -1 })), false);
   assert.equal(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('training', { control: 3 })), false);
+  assert.ok(optionMatchesTrainingAdvice({ ...player, condition: 44 }, { ...option('rest', {}), staminaDelta: 20 }));
   assert.ok(optionMatchesTrainingAdvice(player, option('special', { control: 3 })));
   assert.equal(optionMatchesTrainingAdvice(player, option('training', { power: 3 })), false);
   assert.equal(optionMatchesTrainingAdvice(player, option('relationship', { control: 3 })), false);
@@ -268,4 +269,58 @@ test('코치 조언은 컨디션 회복을 우선하고 포지션별 보완 활�
   assert.ok(optionMatchesTrainingAdvice(twoWay, option('training', {}, { pitch: 'Slider' })));
   assert.ok(trainingRecommendation(twoWay).includes('타격·수비와 구종·제구'));
   assert.equal(trainingFocus({ ...player, condition: 45, teamCompetition: { recentForm: 40 } }), 'technique');
+});
+
+const { evaluateActivityWithGating } = require(path.join(dir, 'types/activity.js'));
+test('미리보기는 부상 난수를 소비하지 않고 실제 수행에서만 부상을 판정한다', () => {
+  const random = Math.random;
+  let rolls = 0;
+  Math.random = () => { rolls++; return 0; };
+  try {
+    const option = SUB_ACTIVITY_POOL.training.find(o => !o.season);
+    const preview = evaluateActivityWithGating(option, 5, 5, { rollInjury: false });
+    assert.equal(rolls, 0);
+    assert.equal(preview.isInjured, false);
+    const actual = evaluateActivityWithGating(option, 5, 5);
+    assert.equal(rolls, 1);
+    assert.equal(actual.isInjured, true);
+    assert.equal(actual.staminaDelta, preview.staminaDelta - 10);
+  } finally { Math.random = random; }
+});
+
+const { getSeasonJourney } = require(path.join(dir, 'data/seasonJourney.js'));
+test('한 해의 흐름은 달력과 윤년을 따르고 1월에 진행률이 초기화되지 않는다', () => {
+  const date = (year, month, day) => ({ year, month, day, grade: 1 });
+  assert.equal(getSeasonJourney(date(2026, 3, 2)).elapsedDays, 1);
+  assert.equal(getSeasonJourney(date(2026, 3, 2)).totalDays, 365);
+  assert.equal(getSeasonJourney(date(2027, 1, 1)).startYear, 2026);
+  assert.equal(getSeasonJourney(date(2027, 2, 28)).remainingDays, 1);
+  assert.equal(getSeasonJourney(date(2027, 12, 24)).totalDays, 366);
+  assert.equal(getSeasonJourney(date(2028, 2, 29)).remainingDays, 1);
+  for (let month = 1; month <= 12; month++) assert.ok(getSeasonJourney(date(2027, month, 1)).chapter);
+});
+
+const { createSaveExport } = require(path.join(dir, 'data/saveExport.js'));
+test('진행 기록 내보내기는 대회·인연·미확인 리포트를 보존하고 원본을 수정하지 않는다', () => {
+  const player = { name: '기록 확인', id: 7, gameDate: { year: 2027, month: 3, day: 1, grade: 2 }, savedMatches: [{ id: 'final', result: 'home' }], relationships: { peer: 70 }, pendingGradeReportId: '2026:1', gradeReports: [{ id: '2026:1' }] };
+  const before = structuredClone(player);
+  const exported = JSON.parse(createSaveExport(player, '2.0', '2026-10-01T00:00:00Z'));
+  assert.equal(exported.format, 'DiamondGM-save');
+  assert.deepEqual(exported.player, before);
+  assert.deepEqual(player, before);
+});
+
+const { getSavedCareers, getCareerRoute } = require(path.join(dir, 'data/savedCareers.js'));
+test('이어서 하기는 샘플 선수 제외·날짜와 졸업 기록 보존·입학 면담 재진입', () => {
+  const players = [
+    { id: 1, status: 'HighSchool', name: '샘플' },
+    { id: 2, status: 'Pro', careerGoal: 'KBO' },
+    { id: 3, status: 'HighSchool', careerGoal: 'KBO' },
+    { id: 4, status: 'HighSchool', interviewCompleted: true, gameDate: { month: 12, day: 24 }, careerEndedAt: { month: 3, day: 1 } },
+  ];
+  const careers = getSavedCareers(players);
+  assert.deepEqual(careers.map(p => p.id), [4, 3]);
+  assert.equal(getCareerRoute(careers[0]), '/development/dashboard/4');
+  assert.equal(getCareerRoute(careers[1]), '/development/interview/3');
+  assert.equal(players[0].id, 1, '표시를 위해 저장본 순서를 변경하지 않음');
 });
