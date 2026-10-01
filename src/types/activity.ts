@@ -42,6 +42,7 @@ export interface ActivityOption {
 }
 
 export interface ActivityResult {
+  activityId?: string;
   matchPerformance?: import('../data/teamCompetition').MatchPerformance;
   competitionInterview?: { choice: 'chance' | 'position' | 'accept'; position?: Position };
   pitchTraining?: PitchType;
@@ -742,6 +743,7 @@ export function evaluateActivityWithGating(
     isInjured,
     injuryNotice,
     moneyDelta: option.moneyDelta,
+    activityId: option.id,
     activityCategory: option.category,
     pitchTraining: option.pitchTraining,
     pitchXp: option.pitchTraining ? (currentStamina <= 20 ? 20 : 40) : undefined,

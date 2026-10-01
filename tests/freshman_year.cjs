@@ -112,6 +112,9 @@ for (const scenario of [
       await store.getState().initClock(starter(school, scenario.position, scenario.gender));
       while (store.getState().clock.date.grade === 1 && stats.slots < 370 * 3) {
         await dismissInterruptions(stats);
+        if (!require(path.join(dir, 'data/monthlyGoals.js')).isGoalForMonth(store.getState().player.monthlyGoal, store.getState().clock.date)) {
+          await store.getState().declareMonthlyGoal(['technique', 'recovery', 'teamwork'][store.getState().clock.date.month % 3]);
+        }
         const before = store.getState();
         const clock = structuredClone(before.clock);
         const slotKey = key(clock);
@@ -174,6 +177,8 @@ for (const scenario of [
           const snapshot = structuredClone(saved);
           await store.getState().initClock(snapshot);
           assert.deepEqual(store.getState().clock, afterState.clock);
+          assert.deepEqual(store.getState().player.monthlyGoal, snapshot.monthlyGoal);
+          assert.deepEqual(store.getState().player.monthlyGoalReports, snapshot.monthlyGoalReports);
           assert.deepEqual(store.getState().player.gradeStartSnapshot, snapshot.gradeStartSnapshot);
           assert.deepEqual(store.getState().player.gradeReports, snapshot.gradeReports);
           assert.equal(store.getState().player.pendingGradeReportId, snapshot.pendingGradeReportId);
@@ -188,6 +193,9 @@ for (const scenario of [
       const report = saved.gradeReports[0];
       assert.equal(saved.gradeReports.length, 1);
       assert.equal(report.grade, 1);
+      assert.equal(saved.monthlyGoalReports.length, 12);
+      assert.equal(new Set(saved.monthlyGoalReports.map(r => r.id)).size, 12);
+      assert.deepEqual(report.monthlyGoals, { declared: 12, completed: saved.monthlyGoalReports.filter(r => r.completed).length });
       assert.equal(report.start.partial, false);
       assert.equal(saved.pendingGradeReportId, report.id);
       assert.equal(saved.gradeStartSnapshot.date.grade, 2);
@@ -472,4 +480,65 @@ test('학년 리포트: 2학년 진급과 3학년 졸업도 해당 학년으로 
     assert.equal(store.getState().clock.date.grade, Math.min(3, grade + 1));
     assert.equal(store.getState().isCareerEnded, grade === 3);
   }
+});
+
+
+test('월간 목표: 선언 저장 실패·변경 금지·월말 보상 한 번·재접속 보존', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.gameDate = { year: 2026, month: 5, day: 31, weekday: 0, grade: 1 };
+  p.currentSlot = 'night';
+  await store.getState().initClock(p);
+  const beforeClock = structuredClone(store.getState().clock);
+  failNextSave = true;
+  await assert.rejects(store.getState().declareMonthlyGoal('recovery'), /save failed/);
+  assert.equal(store.getState().player.monthlyGoal, undefined);
+  await store.getState().declareMonthlyGoal('recovery');
+  assert.equal(saved.monthlyGoal.target, 1);
+  assert.deepEqual(store.getState().clock, beforeClock);
+  await store.getState().declareMonthlyGoal('teamwork');
+  assert.equal(saved.monthlyGoal.kind, 'recovery');
+  const beforeBond = saved.relationships.coach;
+  const action = { activityCategory: 'rest', statChanges: {}, staminaDelta: 0, logMessage: '휴식 목표 검증' };
+  failNextSave = true;
+  await assert.rejects(store.getState().advanceSlot(action), /save failed/);
+  assert.equal(store.getState().player.monthlyGoal.progress, 0);
+  assert.equal(store.getState().player.relationships.coach, beforeBond);
+  await store.getState().advanceSlot(action);
+  assert.equal(saved.monthlyGoalReports.length, 1);
+  assert.equal(saved.monthlyGoalReports[0].completed, true);
+  assert.equal(saved.relationships.coach, beforeBond + 2);
+  const settled = structuredClone(saved);
+  await store.getState().initClock(settled);
+  assert.deepEqual(saved.monthlyGoalReports, settled.monthlyGoalReports);
+  assert.equal(saved.relationships.coach, beforeBond + 2);
+  await store.getState().declareMonthlyGoal('teamwork');
+  assert.equal(saved.monthlyGoal.month, 6);
+  assert.equal(saved.monthlyGoal.progress, 0);
+});
+
+test('월간 목표: 소급·경기·개인 친구 보상 제외, 상한/기간/이월과 표시 기준 일치', () => {
+  const { getMonthlyGoalOptions, progressMonthlyGoal, settleMonthlyGoal, optionMatchesMonthlyGoal } = require(path.join(dir, 'data/monthlyGoals.js'));
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'P', 'male');
+  const date = { year: 2028, month: 2, day: 28, weekday: 1, grade: 2 };
+  const goals = getMonthlyGoalOptions(p, date);
+  assert.ok(goals.every(g => g.target === 1));
+  p.monthlyGoal = goals.find(g => g.kind === 'technique');
+  const bullpen = SUB_ACTIVITY_POOL.training.find(o => o.id === 'winter_indoor_bullpen');
+  assert.equal(optionMatchesMonthlyGoal(p.monthlyGoal, bullpen), true);
+  const result = { activityId: bullpen.id, activityCategory: 'training', statChanges: {}, staminaDelta: 0, logMessage: '저효율·상한 훈련' };
+  const progressed = progressMonthlyGoal(p, result, date);
+  assert.equal(progressed.monthlyGoal.progress, 1, '실제 성장량 0도 기술 훈련 수행 인정');
+  assert.equal(progressMonthlyGoal(progressed, result, date).monthlyGoal.progress, 1);
+  assert.equal(progressMonthlyGoal(p, { ...result, activityCategory: 'match' }, date).monthlyGoal.progress, 0);
+  assert.equal(progressMonthlyGoal(p, result, { ...date, year: 2029 }).monthlyGoal.progress, 0);
+  progressed.relationships.coach2 = 100;
+  const settled = settleMonthlyGoal(progressed, date);
+  assert.deepEqual(settled.monthlyGoalReports[0].reward, {});
+  assert.deepEqual(settleMonthlyGoal(settled, date), settled);
+  p.monthlyGoal = goals.find(g => g.kind === 'teamwork');
+  const friend = { activityCategory: 'relationship', statChanges: {}, relationshipTargets: { childhood: 3 } };
+  assert.equal(progressMonthlyGoal(p, friend, date).monthlyGoal.progress, 0);
+  const missed = settleMonthlyGoal(p, date);
+  assert.equal(missed.monthlyGoalReports[0].completed, false);
+  assert.deepEqual(missed.relationships, p.relationships, '미달성 벌점 없음');
 });

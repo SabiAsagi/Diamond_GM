@@ -1,3 +1,4 @@
+import { getMonthlyGoalOptions, isGoalForMonth, progressMonthlyGoal, settleMonthlyGoal, type MonthlyGoalKind } from '../data/monthlyGoals';
 import { createGradeSnapshot, preserveGradeTournaments, finishGradeReport } from '../data/gradeReport';
 import { prepareTeamContext, updateCompetitionAfterAction, TEAM_ROLE_LABELS, dateNumber, refreshTeamEvaluation } from '../data/teamCompetition';
 import { getBallparkVisit } from '../data/proSchedule';
@@ -55,6 +56,7 @@ export interface GameClockState {
   clearLastActionResult: () => void;
   dismissRivalReport: () => Promise<void>;
   dismissGradeReport: () => Promise<void>;
+  declareMonthlyGoal: (kind: MonthlyGoalKind) => Promise<void>;
   activeCutscene: EventCutscene | null;
   resolveCutscene: (choice: string) => Promise<void>;
   saveAppearance: (appearance: NonNullable<Player['appearance']>) => Promise<void>;
@@ -103,6 +105,15 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     set({isLoading:true});
     try { const updated={...player,pendingRivalReport:undefined}; await db.players.put(updated);set({player:updated}); }
     finally {set({isLoading:false});}
+  },
+  declareMonthlyGoal: async kind => {
+    const { player, clock, isLoading, isCareerEnded, activeCutscene } = get();
+    if (!player || isLoading || isCareerEnded || activeCutscene || player.pendingGradeReportId || isGoalForMonth(player.monthlyGoal, clock.date)) return;
+    const goal = getMonthlyGoalOptions(player, clock.date).find(g => g.kind === kind);
+    if (!goal || player.monthlyGoalReports?.some(r => r.id === goal.id)) return;
+    set({ isLoading: true });
+    try { const updated = { ...player, monthlyGoal: goal }; await db.players.put(updated); set({ player: updated }); }
+    finally { set({ isLoading: false }); }
   },
   dismissGradeReport: async () => {
     const { player, isLoading } = get();
@@ -183,6 +194,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     try {
     const finalizeTeam = (p:Player, date:GameDate, slot:TimeSlot, matches:ScheduledMatch[]) => {
       let updated=updateCompetitionAfterAction(player,p,result,clock.date);
+      updated=progressMonthlyGoal(updated,result,clock.date);
+      if (date.month !== clock.date.month || date.year !== clock.date.year) updated=settleMonthlyGoal(updated,clock.date);
+      updated=refreshTeamEvaluation(updated);
       if(result.matchOutcome && updated.teamCompetition?.lastFeedback){
         const f=updated.teamCompetition.lastFeedback;
         result={...result,logMessage:result.logMessage+`\n감독 평가 ${updated.teamCompetition.coachEvaluation.toFixed(1)} (${f.coachDelta>=0?'+':''}${f.coachDelta}) · 코치 평가 ${updated.teamCompetition.technicalEvaluation.toFixed(1)}\n팀 내 위치: ${TEAM_ROLE_LABELS[f.before]} → ${TEAM_ROLE_LABELS[f.after]}\n${f.summary}\n${f.recommendation}`};

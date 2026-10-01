@@ -19,6 +19,7 @@ export function GradeReportContent({ report, player }: { report: GradeReport; pl
     <section><h3>시즌 성적 · 학교 기준</h3>{report.tournaments.length ? <ul>{report.tournaments.map(t => <li key={t.id}><span>{t.name}</span><strong>{t.result}</strong></li>)}</ul> : <p>보존된 대회 결과가 없습니다.</p>}<small>청백전·연습경기는 제외합니다. 개인 미출전 경기의 팀 성적도 포함합니다.</small></section>
     <section><h3>함께 성장한 인연</h3><p>새롭게 3단계에 도달한 인연 {report.newBonds.length}명</p><p>{report.newBonds.map(id => getBondName(player, id)).join(' · ') || '다음 학년에도 꾸준히 마음을 나눠보세요.'}</p></section>
     <section><h3>새로 얻은 업적 {report.achievements.length}개</h3><p>{report.achievements.map(a => a.title).join(' · ') || '차곡차곡 쌓인 경험은 다음 도전으로 이어집니다.'}</p></section>
+    {report.monthlyGoals && <section><h3>꾸준히 지킨 월간 약속</h3><p>{report.monthlyGoals.declared}개월 선언 · {report.monthlyGoals.completed}개월 달성</p></section>}
     <section className="grade-report-advice"><h3>다음 훈련을 준비하며</h3><p>{report.recommendation}</p></section>
   </div>;
 }

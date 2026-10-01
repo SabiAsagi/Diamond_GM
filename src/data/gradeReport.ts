@@ -39,6 +39,7 @@ export interface GradeReport {
   newBonds: BondId[];
   achievements: { id: string; title: string }[];
   recommendation: string;
+  monthlyGoals?: { declared: number; completed: number };
 }
 
 export function createGradeSnapshot(player: Player, date: GameDate): GradeSnapshot {
@@ -88,6 +89,8 @@ export function finishGradeReport(player: Player, date: GameDate): Player {
     unknownGames: records.filter(r => !r.performance).length,
     newBonds: (Object.keys(end.bonds) as BondId[]).filter(id => scoreToStage(start.bonds[id]) < 3 && scoreToStage(end.bonds[id]) >= 3),
     achievements: buildAchievements(player).filter(a => a.unlocked && !start.achievementIds.includes(a.id)).map(a => ({ id: a.id, title: a.title })),
-    recommendation: trainingRecommendation(player) };
+    recommendation: trainingRecommendation(player),
+    monthlyGoals: { declared: (player.monthlyGoalReports ?? []).filter(r => r.grade === date.grade).length,
+      completed: (player.monthlyGoalReports ?? []).filter(r => r.grade === date.grade && r.completed).length } };
   return { ...player, gradeReports: [...(player.gradeReports ?? []), report], pendingGradeReportId: id };
 }

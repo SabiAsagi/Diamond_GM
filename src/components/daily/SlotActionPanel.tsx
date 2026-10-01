@@ -1,3 +1,4 @@
+import { isGoalForMonth, optionMatchesMonthlyGoal } from '../../data/monthlyGoals';
 import { MatchSelectionCard } from './TeamCompetitionPanel';
 import { trainingRecommendation } from '../../data/teamCompetition';
 import type { BondId } from '../../types/bondScores';
@@ -229,6 +230,7 @@ export function SlotActionPanel({
                 {isSelected && <CheckCircle2 size={18} className="check-icon" />}
               </div>
 
+              {player.monthlyGoal && isGoalForMonth(player.monthlyGoal, date) && player.monthlyGoal.progress < player.monthlyGoal.target && optionMatchesMonthlyGoal(player.monthlyGoal, opt) && <span className="monthly-goal-badge">이번 달 목표에 포함</span>}
               <p className="card-desc">{personalizeText(opt.description, player)}</p>
 
               {/* 스탯 및 체력 변동 칩 */}

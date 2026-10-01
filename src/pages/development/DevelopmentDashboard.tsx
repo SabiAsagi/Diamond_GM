@@ -1,3 +1,4 @@
+import { MonthlyGoalsPanel } from '../../components/daily/MonthlyGoalsPanel';
 import { GradeReportModal } from '../../components/daily/GradeReportModal';
 import { TeamCompetitionPanel } from '../../components/daily/TeamCompetitionPanel';
 import { TEAM_ROLE_LABELS, getStanding } from '../../data/teamCompetition';
@@ -113,6 +114,7 @@ export default function DevelopmentDashboard() {
             <section className="home-left-rail">
               <button className="btn btn-secondary" onClick={() => setOutingOpen(true)}>외출 · 상점</button>
               <button className="btn btn-secondary team-home-button" onClick={() => setTeamOpen(true)}><span>주전 경쟁 · 감독 면담</span><strong>{TEAM_ROLE_LABELS[player.teamCompetition?.role ?? 'bench']} · 포지션 {getStanding(player).rank}위</strong>{player.teamCompetition?.entries.at(-1) && <small>최근 엔트리: {player.teamCompetition.entries.at(-1)!.included ? '합류' : '제외'} · 명단 확인</small>}</button>
+              <MonthlyGoalsPanel compact player={player} date={clock.date} onOpen={() => setActiveNavTab('goals')} />
               {/* 3대 핵심 게이지 요약 바 */}
               <div className="compact-gauges-row glass-panel">
                 {/* OVR */}
