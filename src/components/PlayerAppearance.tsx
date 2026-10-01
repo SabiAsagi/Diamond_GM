@@ -72,7 +72,7 @@ export function PlayerPortrait({
             <path d={`M0 ${fit.cuffY - 1} L35 ${fit.cuffY + 11} M165 ${fit.cuffY + 11} L200 ${fit.cuffY - 1}`} />
           </g>
           <g fill={kit.ink} stroke={fabric} strokeWidth=".6" paintOrder="stroke" fontFamily="system-ui, sans-serif" fontWeight="900" textAnchor="middle">
-            <text x="100" y={fit.chestY} fontSize="12" textLength="86" lengthAdjust="spacingAndGlyphs">{kit.name}</text>
+            <text x="100" y={fit.chestY} fontSize={Math.min(17, 84 / kit.name.length)} letterSpacing=".6">{kit.name}</text>
             <text x={fit.chestX} y={fit.chestY + 24} fontSize="20">{String(number).slice(0, 2)}</text>
           </g>
         </g>

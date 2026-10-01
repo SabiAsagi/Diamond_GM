@@ -11,7 +11,7 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-2.0.1-3b82f6?style=flat-square)
+![version](https://img.shields.io/badge/version-2.0.2-3b82f6?style=flat-square)
 ![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
 ![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
 
@@ -134,7 +134,7 @@
 
 ## 🚧 로드맵
 
-현재 버전은 **2.0.1 — 학교별 선수 키트 정리**입니다. 입학부터 겨울훈련·학년 마무리까지 경기, 훈련, 주전 경쟁과 인연을 연결했습니다.
+현재 버전은 **2.0.2 — 학교별 선수 키트 정리**입니다. 입학부터 겨울훈련·학년 마무리까지 경기, 훈련, 주전 경쟁과 인연을 연결했습니다.
 
 - [x] 1.10 — 1학년 완주 자동 검증
 - [x] 1.11 — 전국체전
@@ -146,6 +146,7 @@
 - [x] 1.16 — 한 해의 흐름 · 이어서 하기 · 미리보기 안정화
 - [x] 2.0 — 1학년 완주 개발 · 자동 검증
 - [x] 2.0.1 — 학교별 모자·유니폼 · 외형별 액세서리 착용 위치
+- [x] 2.0.2 — 가슴 학교명 글자 비율 · 배포 화면 검수
 - [ ] 사용자 최종 플레이 확인
 - [ ] 🏟️ **구단 운영(GM) 모드** — 선수 육성 모드 완성 후 개발 예정
 
