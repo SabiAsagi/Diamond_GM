@@ -1,10 +1,7 @@
 import { useId } from 'react';
-import { getHighSchoolDataByName } from '../data/highSchools';
+import { getSchoolKit, PORTRAIT_FITS, fabricColorMatrix } from '../data/schoolKits';
 import {
-  DEFAULT_APPEARANCE,
-  getPortraitPresets,
-  normalizeAppearance,
-  type Appearance,
+  DEFAULT_APPEARANCE, getPortraitPresets, normalizeAppearance, type Appearance,
 } from '../data/playerDevelopment';
 
 export interface PlayerPortraitProps {
@@ -17,126 +14,95 @@ export interface PlayerPortraitProps {
 }
 
 export function PlayerPortrait({
-  appearance = DEFAULT_APPEARANCE,
-  number = 1,
-  gender = 'male',
-  schoolName = '',
-  size = 150,
-  className = '',
+  appearance = DEFAULT_APPEARANCE, number = 1, gender = 'male', schoolName = '',
+  size = 150, className = '',
 }: PlayerPortraitProps) {
   const normalized = normalizeAppearance(appearance, gender);
-  const preset =
-    getPortraitPresets(gender).find((p) => p.id === normalized.hairStyleId) ??
-    getPortraitPresets(gender)[0];
-  const school = getHighSchoolDataByName(schoolName);
-  const primary = school?.uniformPrimaryColor ?? school?.emblem?.primaryColor ?? '#1e3a8a';
-  const secondary = primary;
-  const maskId = useId().replace(/:/g, '');
-  // Coordinates measured against each original 200 × 300 portrait canvas.
-  const anchors: Record<
-    string,
-    { eyeY: number; eyeX: number; eyeWidth: number; neck: number; hem: number; shoulder: number }
-  > = {
-    male_spiky: { eyeY: 75, eyeX: 82, eyeWidth: 30, neck: 128, hem: 300, shoulder: 151 },
-    male_buzz: { eyeY: 60, eyeX: 85, eyeWidth: 26, neck: 105, hem: 272, shoulder: 126 },
-    male_parted: { eyeY: 63, eyeX: 84, eyeWidth: 27, neck: 109, hem: 270, shoulder: 131 },
-    male_wavy: { eyeY: 63, eyeX: 82, eyeWidth: 26, neck: 111, hem: 269, shoulder: 134 },
-    female_short: { eyeY: 67, eyeX: 83, eyeWidth: 30, neck: 111, hem: 260, shoulder: 130 },
-    female_bob: { eyeY: 67, eyeX: 84, eyeWidth: 30, neck: 112, hem: 263, shoulder: 131 },
-    female_long: { eyeY: 73, eyeX: 84, eyeWidth: 32, neck: 128, hem: 279, shoulder: 151 },
-    female_ponytail: { eyeY: 77, eyeX: 81, eyeWidth: 27, neck: 120, hem: 275, shoulder: 142 },
-  };
-  const a = anchors[preset.id];
-  const femaleJerseys: Record<string, string> = {
-    female_short:
-      'M1 199 Q8 148 29 135 L73 117 Q70 134 102 144 Q128 130 127 115 L169 132 Q188 139 197 200 L165 217 L155 199 L148 229 Q151 251 149 258 Q103 267 53 259 L41 242 L43 210 L34 213 Z',
-    female_bob:
-      'M1 200 Q7 145 28 135 L74 118 Q77 132 105 145 Q130 129 129 116 L170 133 Q189 140 199 200 L169 219 L158 205 L149 247 L151 260 Q109 268 59 259 L43 246 L43 211 L32 220 Z',
-    female_long:
-      'M1 224 Q8 166 25 151 L76 136 Q78 148 103 158 Q131 143 130 131 L162 141 Q187 151 199 224 L168 238 L160 213 L151 251 L154 272 Q105 287 49 269 L41 250 L42 234 L32 240 Z',
-    female_ponytail:
-      'M1 208 Q11 153 26 145 L71 125 Q72 137 96 151 Q122 138 121 124 L160 141 Q177 148 195 205 L158 222 L151 207 L146 251 L151 268 Q102 280 49 269 L39 259 L44 223 L36 222 Z',
-  };
-  const jersey =
-    femaleJerseys[preset.id] ??
-    `M0 ${a.shoulder + 35} Q8 ${a.shoulder} 30 ${a.shoulder - 6} L74 ${a.neck} Q72 ${a.neck + 19} 100 ${a.neck + 31} Q128 ${a.neck + 16} 126 ${a.neck} L172 ${a.shoulder - 5} Q193 ${a.shoulder} 200 ${a.shoulder + 35} L200 ${a.hem - 52} L160 ${a.hem - 44} L163 ${a.hem - 5} Q105 ${a.hem + 6} 39 ${a.hem - 5} L41 ${a.hem - 44} L0 ${a.hem - 52} Z`;
-  const shortSchoolName = (school?.name || schoolName || '고교').replace(/등학교$/, '').slice(0, 5);
+  const preset = getPortraitPresets(gender).find(p => p.id === normalized.hairStyleId)
+    ?? getPortraitPresets(gender)[0];
+  const kit = getSchoolKit(schoolName);
+  const fit = PORTRAIT_FITS[preset.id];
+  const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const left = fit.headX - fit.headWidth / 2;
+  const right = fit.headX + fit.headWidth / 2;
+  const cap = normalized.cap === 'team';
+  const fabric = kit.style === 'solid' ? kit.primary : '#ffffff';
+  const image = <image href={preset.src} width="200" height="300" preserveAspectRatio="none" />;
 
   return (
-    <div
-      className={`player-portrait-preset ${className}`}
-      role="img"
-      aria-label={`${shortSchoolName} 선수 일러스트`}
-      style={{ width: size, aspectRatio: '2 / 3' }}
-    >
+    <div className={`player-portrait-preset ${className}`} role="img"
+      aria-label={`${kit.name} ${kit.label} 유니폼 선수 일러스트`}
+      style={{ width: size, aspectRatio: '2 / 3' }}>
       <div className="portrait-stadium-bg" />
       <svg className="portrait-composite" viewBox="0 0 200 300" aria-hidden="true">
         <defs>
-          <mask id={maskId}>
-            <image href={preset.src} width="200" height="300" preserveAspectRatio="none" />
-            <rect width="200" height="300" fill="black" opacity=".25" />
-            {preset.id === 'female_long' && (
-              <path
-                d="M0 0H200V134L166 143L151 126L153 60L50 40L35 150L57 185L84 201L79 210L52 204L39 188L32 151L0 157Z"
-                fill="black"
-              />
-            )}
+          <linearGradient id={`${id}-cap-shade`} x2="0" y2="1">
+            <stop offset="0" stopColor="#ffffff" stopOpacity=".12" />
+            <stop offset=".45" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="1" stopColor="#07101f" stopOpacity=".4" />
+          </linearGradient>
+          <filter id={`${id}-alpha`} colorInterpolationFilters="sRGB">
+            <feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
+          </filter>
+          <filter id={`${id}-team`} colorInterpolationFilters="sRGB">
+            <feColorMatrix values={fabricColorMatrix(kit.primary)} />
+          </filter>
+          <mask id={`${id}-fabric`} maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="300">
+            <g filter={`url(#${id}-alpha)`}>{image}</g>
+            <path d={`M0 0H200V300H0Z ${fit.jersey}`} fill="black" fillRule="evenodd" />
+            {fit.hairExclusion && <path d={fit.hairExclusion} fill="black" />}
           </mask>
+          <clipPath id={`${id}-hair`}>
+            <path d={`M0 ${fit.forehead + 2} Q${fit.headX} ${fit.forehead - 7} 200 ${fit.forehead + 2} V300H0Z`} />
+          </clipPath>
+          <clipPath id={`${id}-sleeves`}>
+            <path d={`M0 ${fit.shoulderY - 8} H52 L47 ${fit.cuffY + 10} H0Z M150 ${fit.shoulderY - 8} H200 V${fit.cuffY + 12} H155Z`} />
+          </clipPath>
+          <pattern id={`${id}-stripe`} width="9" height="300" patternUnits="userSpaceOnUse">
+            <path d="M4 0V300" stroke={kit.primary} strokeWidth=".65" opacity=".55" />
+          </pattern>
         </defs>
-        <image href={preset.src} width="200" height="300" preserveAspectRatio="none" />
-        <path
-          d={jersey}
-          fill={primary}
-          opacity=".48"
-          mask={`url(#${maskId})`}
-          style={{ mixBlendMode: 'multiply' }}
-        />
-        <text
-          x="137"
-          y={a.neck + 65}
-          textAnchor="middle"
-          fill={secondary}
-          stroke="#ffffff"
-          strokeWidth=".9"
-          paintOrder="stroke"
-          fontSize="9"
-          fontWeight="900"
-          fontFamily="system-ui, sans-serif"
-        >
-          {shortSchoolName}
-        </text>
-        <text
-          x="140"
-          y={a.neck + 88}
-          textAnchor="middle"
-          fill={secondary}
-          stroke="#ffffff"
-          strokeWidth="1"
-          paintOrder="stroke"
-          fontSize="18"
-          fontWeight="900"
-          fontFamily="system-ui, sans-serif"
-        >
-          {number}
-        </text>
+        <g clipPath={cap ? `url(#${id}-hair)` : undefined}>{image}</g>
+        <g mask={`url(#${id}-fabric)`}>
+          {kit.style === 'solid' && <g filter={`url(#${id}-team)`}>{image}</g>}
+          {kit.style === 'raglan' && <g clipPath={`url(#${id}-sleeves)`} filter={`url(#${id}-team)`}>{image}</g>}
+          {kit.style === 'pinstripe' && <rect width="200" height="300" fill={`url(#${id}-stripe)`} style={{ mixBlendMode: 'multiply' }} />}
+          <g fill="none" stroke={kit.style === 'solid' ? kit.secondary : kit.primary} strokeWidth="1.5">
+            <path d={`M${fit.placketX + 8} ${fit.chestY - 27} Q${fit.placketX - 1} ${fit.chestY - 21} ${fit.placketX} ${fit.chestY - 11} L${fit.placketX} ${fit.chestY + 66} Q${fit.placketX + 2} 270 ${fit.placketX} 300`} />
+            <path d={`M0 ${fit.cuffY - 1} L35 ${fit.cuffY + 11} M165 ${fit.cuffY + 11} L200 ${fit.cuffY - 1}`} />
+          </g>
+          <g fill={kit.ink} stroke={fabric} strokeWidth=".6" paintOrder="stroke" fontFamily="system-ui, sans-serif" fontWeight="900" textAnchor="middle">
+            <text x="100" y={fit.chestY} fontSize="12" textLength="86" lengthAdjust="spacingAndGlyphs">{kit.name}</text>
+            <text x={fit.chestX} y={fit.chestY + 24} fontSize="20">{String(number).slice(0, 2)}</text>
+          </g>
+        </g>
+        {cap && (
+          <g stroke="#14202e" strokeWidth="1.8" strokeLinejoin="round">
+            <path d={`M${left} ${fit.forehead} Q${left - 1} ${fit.forehead - 37} ${fit.headX} ${Math.max(2, fit.forehead - 44)} Q${right + 1} ${fit.forehead - 37} ${right} ${fit.forehead} Q${fit.headX} ${fit.forehead - 7} ${left} ${fit.forehead}Z`} fill={kit.primary} />
+            <path d={`M${left} ${fit.forehead} Q${left - 1} ${fit.forehead - 37} ${fit.headX} ${Math.max(2, fit.forehead - 44)} Q${right + 1} ${fit.forehead - 37} ${right} ${fit.forehead} Q${fit.headX} ${fit.forehead - 7} ${left} ${fit.forehead}Z`} fill={`url(#${id}-cap-shade)`} stroke="none" />
+            <path d={`M${fit.headX} ${Math.max(3, fit.forehead - 43)} Q${fit.headX - 8} ${fit.forehead - 24} ${fit.headX - 8} ${fit.forehead - 4} M${left + 12} ${fit.forehead - 27} Q${left + 20} ${fit.forehead - 20} ${left + 20} ${fit.forehead - 2} M${right - 12} ${fit.forehead - 27} Q${right - 20} ${fit.forehead - 20} ${right - 20} ${fit.forehead - 2}`} fill="none" stroke="#ffffff" strokeOpacity=".2" strokeWidth=".9" />
+            <path d={`M${left - 2} ${fit.forehead} Q${fit.headX} ${fit.forehead - 10} ${right + 2} ${fit.forehead} L${right + 6} ${fit.forehead + 6} Q${fit.headX} ${fit.forehead + 13} ${left - 6} ${fit.forehead + 6}Z`} fill={kit.primary} />
+            <path d={`M${left - 3} ${fit.forehead + 4} Q${fit.headX} ${fit.forehead + 10} ${right + 3} ${fit.forehead + 4}`} stroke={kit.secondary} strokeWidth="2" fill="none" />
+            <text x={fit.headX} y={fit.forehead - 13} textAnchor="middle" fontSize="13" fontFamily="system-ui, sans-serif" fontWeight="900" fill={kit.capText} strokeWidth=".4" paintOrder="stroke">{kit.symbol}</text>
+          </g>
+        )}
         {normalized.accessoryId === 'goggles' && (
-          <g fill="#65b8d02b" stroke="#1e293b" strokeWidth="1.8">
-            <rect x={a.eyeX - 12} y={a.eyeY - 6} width="24" height="13" rx="5" />
-            <rect x={a.eyeX + a.eyeWidth - 12} y={a.eyeY - 6} width="24" height="13" rx="5" />
-            <path
-              d={`M${a.eyeX + 12} ${a.eyeY - 1} Q${a.eyeX + a.eyeWidth / 2} ${a.eyeY - 5} ${a.eyeX + a.eyeWidth - 12} ${a.eyeY - 1}`}
-              fill="none"
-            />
+          <g stroke="#172635" strokeWidth="1.5" strokeLinejoin="round">
+            <path d={`M${left + 5} ${fit.eyeY - 3} L${fit.eyeX - 11} ${fit.eyeY - 2} M${fit.eyeX + fit.eyeGap + 11} ${fit.eyeY - 2} L${right - 5} ${fit.eyeY - 3}`} fill="none" />
+            {[fit.eyeX, fit.eyeX + fit.eyeGap].map(x => (
+              <g key={x}>
+                <path d={`M${x - 11} ${fit.eyeY - 5} Q${x} ${fit.eyeY - 8} ${x + 11} ${fit.eyeY - 5} L${x + 10} ${fit.eyeY + 5} Q${x} ${fit.eyeY + 9} ${x - 10} ${fit.eyeY + 5}Z`} fill="#80cce522" />
+                <path d={`M${x - 7} ${fit.eyeY - 3} L${x - 3} ${fit.eyeY - 4}`} stroke="#ffffff" strokeWidth="1" />
+              </g>
+            ))}
+            <path d={`M${fit.eyeX + 11} ${fit.eyeY - 2} Q${fit.eyeX + fit.eyeGap / 2} ${fit.eyeY - 5} ${fit.eyeX + fit.eyeGap - 11} ${fit.eyeY - 2}`} fill="none" />
           </g>
         )}
         {normalized.accessoryId === 'headband' && (
-          <path
-            d={`M${a.eyeX - 19} ${a.eyeY - 24} Q${a.eyeX + a.eyeWidth / 2} ${a.eyeY - 33} ${a.eyeX + a.eyeWidth + 18} ${a.eyeY - 24}`}
-            fill="none"
-            stroke={primary}
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
+          <g stroke="#14202e" strokeWidth="1.1" strokeLinejoin="round">
+            <path d={`M${left + 4} ${fit.forehead + 2} Q${fit.headX} ${fit.forehead - 6} ${right - 4} ${fit.forehead + 2} L${right - 5} ${fit.forehead + 8} Q${fit.headX} ${fit.forehead} ${left + 5} ${fit.forehead + 8}Z`} fill={kit.primary} />
+            <path d={`M${left + 8} ${fit.forehead + 5} Q${fit.headX} ${fit.forehead - 2} ${right - 8} ${fit.forehead + 5}`} stroke={kit.secondary} strokeWidth="1.2" fill="none" />
+          </g>
         )}
       </svg>
     </div>
@@ -160,6 +126,7 @@ export function AppearanceEditor({
 }: AppearanceEditorProps) {
   const normalized = normalizeAppearance(value, gender);
   const presets = getPortraitPresets(gender);
+  const kit = getSchoolKit(schoolName);
   return (
     <div className="appearance-editor">
       <div className="portrait-preview-container">
@@ -172,7 +139,8 @@ export function AppearanceEditor({
         />
       </div>
       <div className="appearance-fields">
-        <strong>일러스트 프리셋</strong>
+        <strong>선수 외형</strong>
+        <div className="school-kit-label"><span style={{ background: kit.primary }} /><span style={{ background: kit.secondary }} /><b>{kit.name}</b> {kit.label}</div>
         <div className="portrait-preset-grid">
           {presets.map((preset) => (
             <button
@@ -181,11 +149,21 @@ export function AppearanceEditor({
               className={`portrait-preset-btn ${normalized.hairStyleId === preset.id ? 'active' : ''}`}
               onClick={() => onChange({ ...normalized, hairStyleId: preset.id })}
             >
-              <img src={preset.src} alt="" />
+              <PlayerPortrait appearance={{ ...normalized, hairStyleId: preset.id }} number={number} gender={gender} schoolName={schoolName} size="100%" />
               <span>{preset.label}</span>
             </button>
           ))}
         </div>
+        <label>
+          <span>모자</span>
+          <select value={normalized.cap} onChange={(e) => onChange({
+            ...normalized, cap: e.target.value as 'team' | 'none',
+            accessoryId: e.target.value === 'team' && normalized.accessoryId === 'headband' ? undefined : normalized.accessoryId,
+          })}>
+            <option value="team">학교 모자</option>
+            <option value="none">벗기</option>
+          </select>
+        </label>
         <label>
           <span>액세서리</span>
           <select
@@ -194,6 +172,7 @@ export function AppearanceEditor({
               onChange({
                 ...normalized,
                 accessoryId: e.target.value === 'none' ? undefined : e.target.value,
+                cap: e.target.value === 'headband' ? 'none' : normalized.cap,
               })
             }
           >
@@ -202,7 +181,7 @@ export function AppearanceEditor({
             <option value="headband">헤어밴드</option>
           </select>
         </label>
-        <small>유니폼 색상과 가슴의 학교명은 선택한 학교에 맞춰 자동 적용됩니다.</small>
+        <small>학교를 바꾸면 모자·유니폼·배색이 함께 바뀝니다. 헤어밴드는 모자를 벗고 착용합니다.</small>
       </div>
     </div>
   );

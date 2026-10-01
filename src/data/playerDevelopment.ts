@@ -24,6 +24,7 @@ export interface PitchRating {
 export interface Appearance {
   hairStyleId: string;
   accessoryId?: string;
+  cap?: 'team' | 'none';
 }
 export const PORTRAIT_PRESETS = {
   male: [
@@ -72,7 +73,7 @@ export function normalizeAppearance(
       : rawAccessory === 'glasses' || rawAccessory === 'goggles'
         ? 'goggles'
         : undefined;
-  return { hairStyleId, accessoryId };
+  return { hairStyleId, accessoryId, cap: accessoryId === 'headband' || record.cap === 'none' ? 'none' : 'team' };
 }
 export const EXTRA_RATINGS = {
   gapPower: ['갭파워', '외야 사이를 가르는 2·3루타 생산 능력'],

@@ -1113,3 +1113,9 @@
     flex-basis: 48px;
   }
 }
+
+/* 선택 타일도 실제 학교 키트와 액세서리를 그대로 미리 보여준다. */
+.portrait-preset-btn .player-portrait-preset { border-radius: 8px; max-height: 126px; }
+.school-kit-label { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 12px; color: #cbd5e1; }
+.school-kit-label > span { width: 14px; height: 14px; border: 1px solid #ffffff55; border-radius: 50%; }
+.school-kit-label > b { color: #f8fafc; }

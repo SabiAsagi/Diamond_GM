@@ -324,3 +324,69 @@ test('이어서 하기는 샘플 선수 제외·날짜와 졸업 기록 보존·
   assert.equal(getCareerRoute(careers[1]), '/development/interview/3');
   assert.equal(players[0].id, 1, '표시를 위해 저장본 순서를 변경하지 않음');
 });
+
+const { getSchoolKit, PORTRAIT_FITS, fabricColorMatrix } = require(path.join(dir, 'data/schoolKits.js'));
+const { normalizeAppearance, getPortraitPresets } = require(path.join(dir, 'data/playerDevelopment.js'));
+const { PlayerPortrait, AppearanceEditor } = require(path.join(dir, 'components/PlayerAppearance.js'));
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+
+test('학교 키트는 주 색·보조 색을 구분하고 모든 학교에 안정적인 디자인을 제공한다', () => {
+  const styles = new Set();
+  for (const school of HIGH_SCHOOLS_DATA) {
+    const kit = getSchoolKit(school.name);
+    assert.equal(kit.primary, school.uniformPrimaryColor);
+    assert.equal(kit.secondary, school.uniformSecondaryColor);
+    assert.deepEqual(kit, getSchoolKit(school.name));
+    styles.add(kit.style);
+  }
+  assert.equal(styles.size, 4);
+  assert.notEqual(getSchoolKit('덕수고').primary, getSchoolKit('덕수고').secondary);
+  assert.notEqual(getSchoolKit('덕수고').style, getSchoolKit('휘문고').style);
+  // 선화의 검정은 검정으로, 흰 원단은 지정 색상으로 변환해야 한다.
+  const matrix = fabricColorMatrix('#2563eb').split(' ').map(Number);
+  assert.equal(matrix.length, 20);
+  for (const [row, channel] of [0x25, 0x63, 0xeb].entries()) {
+    assert.equal(matrix[row * 5 + 4], 0);
+    assert.ok(Math.abs(matrix.slice(row * 5, row * 5 + 3).reduce((a, b) => a + b, 0) - channel / 255) < 1e-12);
+  }
+});
+
+test('이전 외형을 유지하며 모자와 헤어밴드의 겹침을 방지한다', () => {
+  const old = normalizeAppearance({ hairStyle: 'long', accessory: 'glasses' }, 'female');
+  assert.equal(old.hairStyleId, 'female_long');
+  assert.equal(old.accessoryId, 'goggles');
+  assert.equal(old.cap, 'team');
+  assert.equal(normalizeAppearance({ hairStyleId: 'male_buzz', accessoryId: 'headband', cap: 'team' }).cap, 'none');
+  assert.equal(normalizeAppearance({ hairStyleId: 'female_bob', cap: 'none' }, 'female').cap, 'none');
+});
+
+test('8개 외형과 학교·액세서리를 함께 렌더링해도 SVG 마스크 ID가 충돌하지 않는다', () => {
+  const portraits = [];
+  for (const gender of ['male', 'female']) {
+    for (const preset of getPortraitPresets(gender)) {
+      assert.ok(PORTRAIT_FITS[preset.id], preset.id);
+      for (const schoolName of ['덕수고', '충암고', '휘문고', '서울고']) {
+        for (const accessoryId of [undefined, 'goggles', 'headband']) {
+          portraits.push(React.createElement(PlayerPortrait, {
+            key: `${preset.id}-${schoolName}-${accessoryId}`,
+            gender, schoolName, appearance: { hairStyleId: preset.id, accessoryId },
+          }));
+        }
+      }
+    }
+  }
+  const html = renderToStaticMarkup(React.createElement('div', null, portraits));
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(ids.length, new Set(ids).size);
+  const references = [...html.matchAll(/url\(#([^)]+)\)/g)].map(match => match[1]);
+  assert.ok(references.every(id => ids.includes(id)));
+  assert.equal((html.match(/role="img"/g) || []).length, 96);
+  const editor = renderToStaticMarkup(React.createElement(AppearanceEditor, {
+    value: { hairStyleId: 'female_long', accessoryId: 'headband' },
+    onChange() {}, gender: 'female', schoolName: '덕수고',
+  }));
+  assert.ok(editor.includes('학교 모자'));
+  assert.ok(editor.includes('화이트 · 핀스트라이프'));
+  assert.equal((editor.match(/role="img"/g) || []).length, 5);
+});
