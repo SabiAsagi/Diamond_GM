@@ -247,3 +247,25 @@ test('회차별 인물: 활동·이벤트·외출 문구에 기본 인물 이름
   assert.equal(juniorScene.speakerId, 'junior');
   assert.equal(personalizeText(juniorScene.speakerName, { cast }), `후배 ${cast.junior.name}`);
 });
+
+const { trainingFocus, trainingRecommendation, optionMatchesTrainingAdvice } = require(path.join(dir, 'data/teamCompetition.js'));
+test('코치 조언은 컨디션 회복을 우선하고 포지션별 보완 활동만 표시한다', () => {
+  const player = { position: 'P', condition: 70, teamCompetition: { recentForm: 30 } };
+  const option = (category, statChanges, pitchTraining) => ({ category, statChanges, pitchTraining });
+  assert.equal(trainingFocus({ ...player, condition: 44 }), 'recovery');
+  assert.ok(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('rest', { condition: 3 })));
+  assert.equal(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('rest', { condition: -1 })), false);
+  assert.equal(optionMatchesTrainingAdvice({ ...player, condition: 44 }, option('training', { control: 3 })), false);
+  assert.ok(optionMatchesTrainingAdvice(player, option('special', { control: 3 })));
+  assert.equal(optionMatchesTrainingAdvice(player, option('training', { power: 3 })), false);
+  assert.equal(optionMatchesTrainingAdvice(player, option('relationship', { control: 3 })), false);
+  const batter = { ...player, position: 'SS' };
+  assert.ok(optionMatchesTrainingAdvice(batter, option('training', { eye: 1 })));
+  assert.equal(optionMatchesTrainingAdvice(batter, option('training', { defense: 3 })), false);
+  const twoWay = { ...player, position: 'TwoWay' };
+  assert.ok(optionMatchesTrainingAdvice(twoWay, option('training', { contact: 1 })));
+  assert.ok(optionMatchesTrainingAdvice(twoWay, option('training', { control: 1 })));
+  assert.ok(optionMatchesTrainingAdvice(twoWay, option('training', {}, { pitch: 'Slider' })));
+  assert.ok(trainingRecommendation(twoWay).includes('타격·수비와 구종·제구'));
+  assert.equal(trainingFocus({ ...player, condition: 45, teamCompetition: { recentForm: 40 } }), 'technique');
+});

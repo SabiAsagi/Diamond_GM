@@ -1,6 +1,6 @@
 import { isGoalForMonth, optionMatchesMonthlyGoal } from '../../data/monthlyGoals';
 import { MatchSelectionCard } from './TeamCompetitionPanel';
-import { trainingRecommendation } from '../../data/teamCompetition';
+import { trainingRecommendation, optionMatchesTrainingAdvice } from '../../data/teamCompetition';
 import type { BondId } from '../../types/bondScores';
 import { getBondName, personalizeText } from '../../data/cast';
 import { EXTRA_RATINGS } from '../../data/playerDevelopment';
@@ -231,6 +231,7 @@ export function SlotActionPanel({
               </div>
 
               {player.monthlyGoal && isGoalForMonth(player.monthlyGoal, date) && player.monthlyGoal.progress < player.monthlyGoal.target && optionMatchesMonthlyGoal(player.monthlyGoal, opt) && <span className="monthly-goal-badge">이번 달 목표에 포함</span>}
+              {player.teamCompetition?.lastFeedback && optionMatchesTrainingAdvice(player, opt) && <span className="monthly-goal-badge">코치 조언에 맞는 활동</span>}
               <p className="card-desc">{personalizeText(opt.description, player)}</p>
 
               {/* 스탯 및 체력 변동 칩 */}
