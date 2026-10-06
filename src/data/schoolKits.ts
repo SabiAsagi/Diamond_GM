@@ -12,6 +12,47 @@ export const KIT_STYLE_LABELS: Record<KitStyle, string> = {
   solid: '팀 컬러 · 투톤 트림', raglan: '화이트 · 배색 소매',
 };
 
+export interface SchoolKitReference {
+  style: KitStyle;
+  primary: string;
+  secondary: string;
+  capPrimary: string;
+  capSecondary: string;
+  wordmark: string;
+  symbol: string;
+  ink: string;
+  capText: string;
+  placement?: 'split' | 'chest';
+  baseFabric?: string;
+}
+
+// 여러 시기의 홈·원정 사진을 참고한 게임용 배색. 최신 공식 유니폼 복제품은 아니다.
+const reference = (style: KitStyle, primary: string, secondary: string, capPrimary: string,
+  wordmark: string, symbol: string, ink = '#ffffff', extra: Partial<SchoolKitReference> = {}): SchoolKitReference =>
+  ({ style, primary, secondary, capPrimary, capSecondary: secondary, wordmark, symbol, ink, capText: '#ffffff', ...extra });
+export const SCHOOL_KIT_REFERENCES: Record<string, SchoolKitReference> = {
+  덕수고: reference('classic', '#bf1829', '#14253d', '#14253d', 'DUKSOO', 'D', '#14253d'),
+  서울고: reference('pinstripe', '#182844', '#182844', '#182844', '서울고교', 'S', '#182844'),
+  충암고: reference('classic', '#c82535', '#c82535', '#aaaeb4', '忠岩', 'C', '#c82535', { baseFabric: '#d0d1d2', capText: '#c82535' }),
+  휘문고: reference('solid', '#78b7e0', '#162740', '#162740', 'W', 'W', '#b32132', { placement: 'chest', capText: '#c72639' }),
+  경북고: reference('classic', '#182844', '#182844', '#182844', '慶北高校', 'K', '#182844'),
+  광주제일고: reference('classic', '#202429', '#202429', '#202429', '광주일고', 'K', '#202429'),
+  부산고: reference('solid', '#49a5de', '#ba273c', '#49a5de', '부산고교', 'BH', '#ba273c'),
+  북일고: reference('solid', '#ec7c24', '#202429', '#202429', '북일', 'B', '#202429'),
+  경남고: reference('classic', '#172944', '#172944', '#172944', '경남고교', 'K', '#172944'),
+  유신고: reference('solid', '#172d4a', '#ffffff', '#172d4a', '裕信高校', 'YS'),
+  신일고: reference('solid', '#172b47', '#c82a40', '#172b47', 'SHINIL', 'S'),
+  인천고: reference('solid', '#21262d', '#c5273a', '#21262d', 'INKO', 'IH', '#c5273a', { capText: '#c5273a' }),
+  강릉고: reference('solid', '#125ba5', '#ffffff', '#125ba5', '江陵高校', 'G'),
+  마산용마고: reference('solid', '#c22e37', '#23262d', '#23262d', 'YONGMA', 'Y'),
+  대전고: reference('classic', '#c42639', '#c42639', '#c42639', '대전고교', 'D', '#c42639', { baseFabric: '#d5d5d5' }),
+  대구상원고: reference('classic', '#172a46', '#172a46', '#172a46', '대구상원', 'C', '#172a46'),
+  세광고: reference('pinstripe', '#172a46', '#bf2538', '#172a46', '世光高校', 'S', '#bf2538', { capText: '#bf2538' }),
+  전주고: reference('solid', '#c32635', '#172a46', '#172a46', '全州', 'J', '#172a46'),
+  광주동성고: reference('classic', '#22262c', '#22262c', '#22262c', '광주동성', 'D', '#22262c'),
+  동산고: reference('classic', '#182b48', '#b92439', '#182b48', '동산고교', 'D', '#182b48'),
+};
+
 // 게임용 학교 키트. 실제 학교의 공식 유니폼 재현을 뜻하지 않는다.
 // 목록 순서가 바뀌어도 같은 학교는 같은 디자인을 사용한다.
 export function getSchoolKit(schoolName: string) {
@@ -21,13 +62,24 @@ export function getSchoolKit(schoolName: string) {
   const primary = school?.uniformPrimaryColor ?? school?.emblem?.primaryColor ?? '#1e3a8a';
   const secondary = school?.uniformSecondaryColor ?? school?.emblem?.secondaryColor ?? '#f59e0b';
   const style = SCHOOL_STYLES[name] ?? STYLES[seed % STYLES.length];
-  return {
+  const photo = SCHOOL_KIT_REFERENCES[name];
+  const kit = {
+    id: school?.id || 'default',
     primary, secondary, style, label: KIT_STYLE_LABELS[style],
     name: name.replace(/등학교$/, '').slice(0, 6),
     symbol: (school?.emblem?.symbolText || name.slice(0, 2)).slice(0, 2),
     ink: style === 'solid' ? '#ffffff' : primary,
     capText: school?.emblem?.textColor ?? '#ffffff',
+    capPrimary: primary, capSecondary: secondary,
+    wordmark: name.replace(/등학교$/, '').slice(0, 6),
+    placement: 'split' as 'split' | 'chest', baseFabric: '#ffffff',
   };
+  return photo ? { ...kit, ...photo, label: photo.baseFabric ? '그레이 · 배색 파이핑' : KIT_STYLE_LABELS[photo.style] } : kit;
+}
+
+export function getSchoolPortraitSrc(schoolName: string, presetId: string) {
+  const preset = Object.hasOwn(PORTRAIT_FITS, presetId) ? presetId : 'male_spiky';
+  return `assets/school-kits/${getSchoolKit(schoolName).id}-${preset}.webp`;
 }
 
 export interface PortraitFit {

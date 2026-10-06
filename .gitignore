@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Reproducible school portraits; source plates remain tracked.
+public/assets/school-kits/
+.genex/
+.env
+.env.*
+!.env.example

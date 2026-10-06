@@ -325,68 +325,112 @@ test('이어서 하기는 샘플 선수 제외·날짜와 졸업 기록 보존·
   assert.equal(players[0].id, 1, '표시를 위해 저장본 순서를 변경하지 않음');
 });
 
-const { getSchoolKit, PORTRAIT_FITS, fabricColorMatrix } = require(path.join(dir, 'data/schoolKits.js'));
+const { getSchoolKit, getSchoolPortraitSrc, SCHOOL_KIT_REFERENCES } = require(path.join(dir, 'data/schoolKits.js'));
 const { normalizeAppearance, getPortraitPresets } = require(path.join(dir, 'data/playerDevelopment.js'));
 const { PlayerPortrait, AppearanceEditor } = require(path.join(dir, 'components/PlayerAppearance.js'));
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
+const sharp = require('sharp');
 
-test('학교 키트는 주 색·보조 색을 구분하고 모든 학교에 안정적인 디자인을 제공한다', () => {
+const allPresets = [...getPortraitPresets('male'), ...getPortraitPresets('female')];
+
+test('학교별 디자인은 안정적이고 사진 참고 배색과 기본 배색을 구분한다', () => {
   const styles = new Set();
   for (const school of HIGH_SCHOOLS_DATA) {
     const kit = getSchoolKit(school.name);
-    assert.equal(kit.primary, school.uniformPrimaryColor);
-    assert.equal(kit.secondary, school.uniformSecondaryColor);
     assert.deepEqual(kit, getSchoolKit(school.name));
+    assert.equal(kit.id, school.id);
+    assert.match(kit.capPrimary, /^#[a-f0-9]{6}$/i);
+    if (!SCHOOL_KIT_REFERENCES[school.name]) {
+      assert.equal(kit.primary, school.uniformPrimaryColor);
+      assert.equal(kit.secondary, school.uniformSecondaryColor);
+    }
     styles.add(kit.style);
   }
   assert.equal(styles.size, 4);
-  assert.notEqual(getSchoolKit('덕수고').primary, getSchoolKit('덕수고').secondary);
-  assert.notEqual(getSchoolKit('덕수고').style, getSchoolKit('휘문고').style);
-  // 선화의 검정은 검정으로, 흰 원단은 지정 색상으로 변환해야 한다.
-  const matrix = fabricColorMatrix('#2563eb').split(' ').map(Number);
-  assert.equal(matrix.length, 20);
-  for (const [row, channel] of [0x25, 0x63, 0xeb].entries()) {
-    assert.equal(matrix[row * 5 + 4], 0);
-    assert.ok(Math.abs(matrix.slice(row * 5, row * 5 + 3).reduce((a, b) => a + b, 0) - channel / 255) < 1e-12);
-  }
+  assert.equal(Object.keys(SCHOOL_KIT_REFERENCES).length, 20);
+  assert.ok(Object.keys(SCHOOL_KIT_REFERENCES).every(name => HIGH_SCHOOLS_DATA.some(s => s.name === name)));
 });
 
-test('이전 외형을 유지하며 모자와 헤어밴드의 겹침을 방지한다', () => {
-  const old = normalizeAppearance({ hairStyle: 'long', accessory: 'glasses' }, 'female');
-  assert.equal(old.hairStyleId, 'female_long');
-  assert.equal(old.accessoryId, 'goggles');
-  assert.equal(old.cap, 'team');
-  assert.equal(normalizeAppearance({ hairStyleId: 'male_buzz', accessoryId: 'headband', cap: 'team' }).cap, 'none');
-  assert.equal(normalizeAppearance({ hairStyleId: 'female_bob', cap: 'none' }, 'female').cap, 'none');
+test('이전 성별·헤어 외형은 유지하고 액세서리와 모자 토글은 제거한다', () => {
+  assert.deepEqual(normalizeAppearance({ hairStyle: 'long', accessory: 'glasses' }, 'female'), { hairStyleId: 'female_long' });
+  assert.deepEqual(normalizeAppearance({ hairStyleId: 'male_buzz', accessoryId: 'headband', cap: 'none' }), { hairStyleId: 'male_buzz' });
+  assert.equal(normalizeAppearance({ hairStyleId: 'female_bob' }, 'male').hairStyleId, 'male_spiky');
 });
 
-test('8개 외형과 학교·액세서리를 함께 렌더링해도 SVG 마스크 ID가 충돌하지 않는다', () => {
+test('8개 외형은 완성 이미지와 등번호로만 렌더링하고 액세서리 입력이 없다', () => {
   const portraits = [];
-  for (const gender of ['male', 'female']) {
-    for (const preset of getPortraitPresets(gender)) {
-      assert.ok(PORTRAIT_FITS[preset.id], preset.id);
-      for (const schoolName of ['덕수고', '충암고', '휘문고', '서울고']) {
-        for (const accessoryId of [undefined, 'goggles', 'headband']) {
-          portraits.push(React.createElement(PlayerPortrait, {
-            key: `${preset.id}-${schoolName}-${accessoryId}`,
-            gender, schoolName, appearance: { hairStyleId: preset.id, accessoryId },
-          }));
-        }
-      }
+  for (const gender of ['male', 'female']) for (const preset of getPortraitPresets(gender)) {
+    for (const schoolName of ['덕수고', '충암고', '휘문고', '서울고']) for (const accessoryId of [undefined, 'goggles', 'headband']) {
+      portraits.push(React.createElement(PlayerPortrait, { key: portraits.length, gender, schoolName, appearance: { hairStyleId: preset.id, accessoryId } }));
     }
   }
   const html = renderToStaticMarkup(React.createElement('div', null, portraits));
-  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
-  assert.equal(ids.length, new Set(ids).size);
-  const references = [...html.matchAll(/url\(#([^)]+)\)/g)].map(match => match[1]);
-  assert.ok(references.every(id => ids.includes(id)));
   assert.equal((html.match(/role="img"/g) || []).length, 96);
-  const editor = renderToStaticMarkup(React.createElement(AppearanceEditor, {
-    value: { hairStyleId: 'female_long', accessoryId: 'headband' },
-    onChange() {}, gender: 'female', schoolName: '덕수고',
-  }));
-  assert.ok(editor.includes('학교 모자'));
-  assert.ok(editor.includes('화이트 · 핀스트라이프'));
+  assert.equal((html.match(/<img /g) || []).length, 96);
+  assert.ok(!html.includes('<mask') && !html.includes('<filter') && !html.includes('<path'));
+  const editor = renderToStaticMarkup(React.createElement(AppearanceEditor, { value: { hairStyleId: 'female_long', accessoryId: 'headband' }, onChange() {}, gender: 'female', schoolName: '덕수고' }));
+  assert.ok(!editor.includes('<select') && !editor.includes('액세서리'));
+  assert.ok(editor.includes('aria-pressed="true"'));
   assert.equal((editor.match(/role="img"/g) || []).length, 5);
+});
+
+test('원화32장과 학교91×외형8장 및 기본8장이 모두 존재한다', () => {
+  for (const preset of allPresets) {
+    for (const style of ['classic', 'pinstripe', 'solid', 'raglan']) assert.ok(fs.existsSync(`public/assets/kit-sources/${preset.id}-${style}.webp`));
+    for (const school of [...HIGH_SCHOOLS_DATA, { name: '' }]) assert.ok(fs.existsSync('public/' + getSchoolPortraitSrc(school.name, preset.id)));
+  }
+  assert.equal(HIGH_SCHOOLS_DATA.length, 91);
+});
+
+test('알 수 없는 학교와 잘못된 외형은 준비된 기본 원화를 사용한다', () => {
+  assert.equal(getSchoolPortraitSrc('알 수 없는 학교', '../../bad'), 'assets/school-kits/default-male_spiky.webp');
+});
+
+test('작업용 원단 색을 바꿔도 선화·피부·중성 그림자와 알파는 보존한다', async () => {
+  const { recolourFabric } = await import('../scripts/kit-colours.mjs');
+  const pixels = Buffer.from([255, 0, 255, 255, 0, 255, 255, 230, 24, 24, 24, 255, 250, 188, 145, 255, 0, 0, 0, 0]);
+  const out = recolourFabric(pixels, '#183a72', '#ce243d', { width: 5 });
+  assert.deepEqual([...out.subarray(0, 3)], [24, 58, 114]);
+  assert.deepEqual([...out.subarray(4, 7)], [206, 36, 61]);
+  assert.deepEqual(out.subarray(8), pixels.subarray(8));
+  assert.equal(out[7], 230);
+});
+
+test('흰 원단만 그레이로 바꾸고 모자와 유니폼은 독립된 색을 쓴다', async () => {
+  const { recolourFabric } = await import('../scripts/kit-colours.mjs');
+  const pixels = Buffer.alloc(4 * 300);
+  for (let y = 0; y < 300; y++) pixels.set([255, 0, 255, 255], y * 4);
+  pixels.set([255, 255, 255, 255], 200 * 4);
+  const out = recolourFabric(pixels, '#b52239', '#ffffff', { width: 1, capPrimary: '#182b45', baseFabric: '#cccccc', forehead: 50, chestY: 180 });
+  assert.deepEqual([...out.subarray(0, 3)], [24, 43, 69]);
+  assert.deepEqual([...out.subarray(180 * 4, 180 * 4 + 3)], [181, 34, 57]);
+  assert.deepEqual([...out.subarray(200 * 4, 200 * 4 + 3)], [204, 204, 204]);
+});
+
+test('학교명과 모자 글자의 모든 문자가 번들 폰트에 포함된다', () => {
+  const supported = new Set(JSON.parse(fs.readFileSync('scripts/fonts/glyphs.json', 'utf8')));
+  for (const school of [...HIGH_SCHOOLS_DATA, { name: '' }]) {
+    const kit = getSchoolKit(school.name);
+    assert.ok([...kit.wordmark + kit.symbol].every(c => supported.has(c)), school.name);
+  }
+});
+
+test('학교91×외형8의 실제 글자 렌더링에서 단추 여밈선26px은 비어 있다', async () => {
+  const { registerKitFont, getKitLetteringSvg, LETTERING_FITS } = await import('../scripts/kit-lettering.mjs');
+  await registerKitFont();
+  for (const school of HIGH_SCHOOLS_DATA) for (const preset of allPresets) {
+    const fit = LETTERING_FITS[preset.id];
+    const { data, info } = await sharp(Buffer.from(getKitLetteringSvg(getSchoolKit(school.name), preset.id, { cap: false }))).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    for (let y = 0; y < info.height; y++) for (let x = Math.ceil((fit.seam - 12) * info.width / 200); x < Math.floor((fit.seam + 12) * info.width / 200); x++) {
+      assert.equal(data[(y * info.width + x) * 4 + 3], 0, school.name + ' ' + preset.id + ' 단추');
+    }
+  }
+});
+
+test('완성 원화는512×768이며 투명 배경을 유지한다', async () => {
+  for (const preset of allPresets) {
+    const meta = await sharp('public/' + getSchoolPortraitSrc('서울고', preset.id)).metadata();
+    assert.equal(meta.width, 512); assert.equal(meta.height, 768); assert.ok(meta.hasAlpha);
+  }
 });
