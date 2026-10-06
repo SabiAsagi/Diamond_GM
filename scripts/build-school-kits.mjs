@@ -93,8 +93,12 @@ try {
         const plate = plates.get(`${preset}-${kit.style}.webp`);
         const pixels = recolourFabric(plate, kit.primary, kit.secondary, { width: 640, ...LETTERING_FITS[preset], ...kit });
         const letters = await sharp(Buffer.from(getKitLetteringSvg(kit, preset))).png().toBuffer();
-        const buffer = await sharp(pixels, { raw: { width: 640, height: 960, channels: 4 } })
-          .composite([{ input: letters }]).resize(512, 768).webp({ quality: 90, alphaQuality: 100 }).toBuffer();
+        // Sharp applies resize before composite, regardless of call order.
+        // Complete lettering on the original canvas before shrinking it.
+        const composited = await sharp(pixels, { raw: { width: 640, height: 960, channels: 4 } })
+          .composite([{ input: letters }]).raw().toBuffer();
+        const buffer = await sharp(composited, { raw: { width: 640, height: 960, channels: 4 } })
+          .resize(512, 768).webp({ quality: 90, alphaQuality: 100 }).toBuffer();
         const final = path.join(outputDir, name);
         const temp = final + '.' + crypto.randomUUID() + '.tmp';
         await fs.writeFile(temp, buffer); await fs.rename(temp, final);

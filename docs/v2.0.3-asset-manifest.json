@@ -1,0 +1,25 @@
+{
+  "version": "2.0.3",
+  "sourceCount": 32,
+  "kitCount": 736,
+  "sourceSize": [
+    640,
+    960
+  ],
+  "kitSize": [
+    512,
+    768
+  ],
+  "generator": "Genex CLI 1.35.0",
+  "creditsSpent": 70,
+  "notes": "선수별 2×2 유니폼 시트를 생성하고 실제 알파 배경을 확인한 뒤 분리했습니다. 기존 원화는 유지하며 누락 24장만 추가했습니다. 학교별 완성 이미지는 빌드에서 생성하며 외부 이미지 URL을 런타임에서 사용하지 않습니다.",
+  "generations": {
+    "male_parted": "cmuw808gn09qe2pmooah4payn",
+    "male_wavy": "cmuw7ygk409oq2pmoky25lsxm",
+    "female_short": "cmuw7yjhc09ox2pmodw3i4c1y",
+    "female_bob": "cmuw7ymrf09p42pmo4bpb6ona",
+    "female_long": "cmuw7yqc309pa2pmoilip08mg",
+    "female_ponytail": "cmuw7yu2009ht3ap1k3a4zfhx",
+    "male_buzz": "cmuw7z1m509ps2pmogplnwbw1"
+  }
+}

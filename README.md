@@ -11,9 +11,9 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![version](https://img.shields.io/badge/version-2.0.2-3b82f6?style=flat-square)
-![platform](https://img.shields.io/badge/platform-Web%20·%20Mobile-f59e0b?style=flat-square)
-![save](https://img.shields.io/badge/save-브라우저_자동_저장-64748b?style=flat-square)
+![버전](https://img.shields.io/badge/버전-2.0.3-3b82f6?style=flat-square)
+![플랫폼](https://img.shields.io/badge/플랫폼-웹%20·%20모바일-f59e0b?style=flat-square)
+![저장](https://img.shields.io/badge/저장-브라우저_자동_저장-64748b?style=flat-square)
 
 <br>
 
@@ -61,9 +61,9 @@
 - 전국 91개 고교 중 입학할 학교 선택
 - 투수 · 야수 · **투타겸업** 포지션
 - 투구 폼 · 타격 폼 · 우투좌타 등 세부 설정
-- 남녀 8개 선수 외형에 맞는 학교 모자·유니폼·고글·헤어밴드
+- 남녀 8개 선수 외형에 모자와 유니폼이 자연스럽게 그려진 학교별 완성 원화
 - 학교별 주 색·보조 색과 화이트 / 줄무늬 / 단색 / 배색 소매 키트
-- 학교 변경 시 전체 키트 즉시 반영 · 모자 벗기 선택
+- 학교 변경 시 전체 키트 즉시 반영 · 액세서리 선택 제거
 - 첫날 감독 면담에서 육성 방향 설정
 - 저장된 선수 선택으로 **이어서 하기**
 
@@ -176,6 +176,8 @@ npm run lint             # oxlint
 npm run build            # 타입체크 + 프로덕션 빌드
 ```
 
+학교 키트는 빌드 전에 원화 32장을 바탕으로 736장을 생성합니다. 중단한 작업은 체크포인트부터 이어지며, 누락된 출력만 다시 생성합니다. 원화 생성 이력은 [2.0.3 에셋 기록](docs/v2.0.3-asset-manifest.json)을 참고하세요.
+
 `main` 브랜치에 push하면 GitHub Actions가 테스트 · 빌드 후 GitHub Pages로 자동 배포합니다. 작업 규칙은 [AGENTS.md](AGENTS.md)를 참고하세요.
 
 ```
@@ -197,5 +199,5 @@ tests/                 node:test 테스트
 <br>
 
 <div align="center">
-<sub>Made with ⚾ by <a href="https://github.com/SabiAsagi">SabiAsagi</a></sub>
+<sub>⚾ 제작: <a href="https://github.com/SabiAsagi">SabiAsagi</a></sub>
 </div>

@@ -383,6 +383,22 @@ test('원화32장과 학교91×외형8장 및 기본8장이 모두 존재한다'
   assert.equal(HIGH_SCHOOLS_DATA.length, 91);
 });
 
+test('32개 작업 원화는 실제 투명 배경과 인물을 가진640×960WebP다', async () => {
+  for (const preset of allPresets) for (const style of ['classic', 'pinstripe', 'solid', 'raglan']) {
+    const file = `public/assets/kit-sources/${preset.id}-${style}.webp`;
+    const metadata = await sharp(file).metadata();
+    assert.equal(metadata.width, 640, file);
+    assert.equal(metadata.height, 960, file);
+    assert.equal(metadata.format, 'webp', file);
+    assert.ok(metadata.hasAlpha, file);
+    const stats = await sharp(file).ensureAlpha().stats();
+    const alpha = stats.channels[3];
+    assert.equal(alpha.min, 0, file + ' 투명 배경');
+    assert.equal(alpha.max, 255, file + ' 인물');
+    assert.ok(alpha.mean > 255 * .25 && alpha.mean < 255 * .98, file + ' 배경/인물 비율');
+  }
+});
+
 test('알 수 없는 학교와 잘못된 외형은 준비된 기본 원화를 사용한다', () => {
   assert.equal(getSchoolPortraitSrc('알 수 없는 학교', '../../bad'), 'assets/school-kits/default-male_spiky.webp');
 });
