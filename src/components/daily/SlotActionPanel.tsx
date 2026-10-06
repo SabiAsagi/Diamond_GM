@@ -184,7 +184,7 @@ export function SlotActionPanel({
             <Zap size={18} className="text-primary" /> {TIME_SLOT_LABELS[currentSlot]} 계획 선택
           </span>
           <span className="slot-panel-subtitle">
-            1차 카테고리를 고르면 실시간으로 3~4개의 세부 행동이 랜덤 노출됩니다.
+            오늘의 작은 선택을 훈련 수첩에 남겨보세요.
           </span>
         </div>
 
@@ -214,7 +214,7 @@ export function SlotActionPanel({
         })}
       </div>
 
-      {selectedCategory==='training' && currentSlot==='afternoon' && <label className="training-focus">집중 훈련 선택
+      {selectedCategory==='training' && currentSlot==='afternoon' && <label className="training-focus">훈련 수첩 · 집중할 기술
         <select value={selectedSubId.startsWith('pitch_')||selectedSubId.startsWith('skill_')?selectedSubId:''} onChange={e=>{const option=SUB_ACTIVITY_POOL.training.find(o=>o.id===e.target.value);if(option){setSampledSubActivities([option]);setSelectedSubId(option.id);}}}>
           <option value="">원하는 능력치·구종 선택</option>
           {SUB_ACTIVITY_POOL.training.filter(o=>(o.id.startsWith('pitch_')||o.id.startsWith('skill_'))&&(player.position==='TwoWay'||o.targetPosition===(player.position==='P'?'P':'B'))).map(o=><option key={o.id} value={o.id}>{o.label}</option>)}
@@ -312,7 +312,7 @@ export function SlotActionPanel({
           ) : (
             <>
               <Flame size={18} />
-              <span>{TIME_SLOT_LABELS[currentSlot]} 활동 완료 (다음 슬롯으로)</span>
+              <span>{TIME_SLOT_LABELS[currentSlot]} 활동 완료</span>
               <ArrowRight size={18} />
             </>
           )}

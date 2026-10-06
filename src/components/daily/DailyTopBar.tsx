@@ -48,7 +48,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
       <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber} gender={player.gender} schoolName={player.highSchool}/></div>
         {school && <SchoolEmblem school={school} size="sm" />}
         <div className="daily-player-meta">
-          <div className="daily-player-row">
+          <span className="locker-label">PLAYER LOCKER · 나의 선수</span><div className="daily-player-row">
             <span className="player-name-bold">{player.name}</span>
             <span className="player-num-chip">#{player.uniformNumber}</span>
             <span className="player-pos-chip">{POSITION_LABELS[player.position] || player.position}</span>
