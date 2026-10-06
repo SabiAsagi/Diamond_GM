@@ -27,7 +27,18 @@ try {
   const outputDir = path.join(root, 'public/assets/school-kits');
   await fs.mkdir(outputDir, { recursive: true });
   const sourceNames = presets.flatMap(id => styles.map(style => `${id}-${style}.webp`));
-  const sources = await Promise.all(sourceNames.map(name => fs.readFile(path.join(sourceDir, name))));
+  const sourceResults = await Promise.all(sourceNames.map(async name => {
+    try { return { name, buffer: await fs.readFile(path.join(sourceDir, name)) }; }
+    catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      return { name };
+    }
+  }));
+  const missing = sourceResults.filter(source => !source.buffer).map(source => source.name);
+  if (missing.length) throw new Error(
+    `학교 키트 원화 ${sourceNames.length - missing.length}/${sourceNames.length}장 준비됨. 누락 ${missing.length}장:\n${missing.join('\n')}`
+  );
+  const sources = sourceResults.map(source => source.buffer);
   const hash = crypto.createHash('sha256');
   for (const buffer of sources) hash.update(buffer);
   for (const name of ['src/data/highSchools.ts', 'src/data/schoolKits.ts', 'scripts/build-school-kits.mjs',
@@ -45,14 +56,39 @@ try {
     await registerKitFont();
     const plates = new Map();
     for (let i = 0; i < sourceNames.length; i++) {
+      const metadata = await sharp(sources[i]).metadata();
+      if (!metadata.hasAlpha) throw Error(`투명 배경이 없는 원화: ${sourceNames[i]}`);
       const raw = await sharp(sources[i]).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       if (raw.info.width !== 640 || raw.info.height !== 960 || raw.info.channels !== 4) throw Error(`잘못된 원화 크기: ${sourceNames[i]}`);
       plates.set(sourceNames[i], raw.data);
     }
+    const checkpointPath = path.join(outputDir, 'checkpoint.json');
+    const checkpoint = JSON.parse(await fs.readFile(checkpointPath, 'utf8').catch(() => '{}'));
+    const finished = new Set(checkpoint.fingerprint === fingerprint && Array.isArray(checkpoint.completed)
+      ? checkpoint.completed.filter(name => jobs.some(job => job.name === name)) : []);
+    const pending = [];
+    for (const job of jobs) {
+      if (finished.has(job.name) && await fs.access(path.join(outputDir, job.name)).then(() => true, () => false)) continue;
+      finished.delete(job.name);
+      pending.push(job);
+    }
+    console.log(`학교 키트 ${finished.size}/${jobs.length}장 확인, ${pending.length}장 이어서 생성`);
+    // Serialize writes so parallel workers cannot replace newer progress.
+    let checkpointWrites = Promise.resolve();
+    const saveCheckpoint = () => {
+      const content = JSON.stringify({ fingerprint, completed: [...finished].sort() }, null, 2);
+      checkpointWrites = checkpointWrites.then(async () => {
+        const temp = checkpointPath + '.' + crypto.randomUUID() + '.tmp';
+        await fs.writeFile(temp, content);
+        await fs.rename(temp, checkpointPath);
+      });
+      return checkpointWrites;
+    };
+    await saveCheckpoint();
     let index = 0;
-    await Promise.all(Array.from({ length: 4 }, async () => {
+    const workers = await Promise.allSettled(Array.from({ length: 4 }, async () => {
       for (;;) {
-        const job = jobs[index++]; if (!job) return;
+        const job = pending[index++]; if (!job) return;
         const { kit, preset, name } = job;
         const plate = plates.get(`${preset}-${kit.style}.webp`);
         const pixels = recolourFabric(plate, kit.primary, kit.secondary, { width: 640, ...LETTERING_FITS[preset], ...kit });
@@ -62,8 +98,15 @@ try {
         const final = path.join(outputDir, name);
         const temp = final + '.' + crypto.randomUUID() + '.tmp';
         await fs.writeFile(temp, buffer); await fs.rename(temp, final);
+        finished.add(name);
+        await saveCheckpoint();
+        if (finished.size % 32 === 0 || finished.size === jobs.length)
+          console.log(`학교 키트 ${finished.size}/${jobs.length}장 저장`);
       }
     }));
+    await checkpointWrites;
+    const failure = workers.find(worker => worker.status === 'rejected');
+    if (failure) throw failure.reason;
     const temp = manifestPath + '.' + crypto.randomUUID() + '.tmp';
     await fs.writeFile(temp, JSON.stringify({ fingerprint, count: jobs.length, sourceCount: sourceNames.length }, null, 2));
     await fs.rename(temp, manifestPath);
