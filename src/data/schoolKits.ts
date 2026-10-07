@@ -22,6 +22,7 @@ export interface SchoolKitReference {
   symbol: string;
   ink: string;
   capText: string;
+  letteringTrim?: string;
   placement?: 'split' | 'chest';
   baseFabric?: string;
 }
@@ -31,7 +32,7 @@ const reference = (style: KitStyle, primary: string, secondary: string, capPrima
   wordmark: string, symbol: string, ink = '#ffffff', extra: Partial<SchoolKitReference> = {}): SchoolKitReference =>
   ({ style, primary, secondary, capPrimary, capSecondary: secondary, wordmark, symbol, ink, capText: '#ffffff', ...extra });
 export const SCHOOL_KIT_REFERENCES: Record<string, SchoolKitReference> = {
-  덕수고: reference('classic', '#bf1829', '#14253d', '#14253d', 'DUKSOO', 'D', '#14253d'),
+  덕수고: reference('classic', '#bf1829', '#14253d', '#14253d', 'DUKSOO', 'D', '#bf1829', { letteringTrim: '#14253d' }),
   서울고: reference('pinstripe', '#182844', '#182844', '#182844', '서울고교', 'S', '#182844'),
   충암고: reference('classic', '#c82535', '#c82535', '#aaaeb4', '忠岩', 'C', '#c82535', { baseFabric: '#d0d1d2', capText: '#c82535' }),
   휘문고: reference('solid', '#78b7e0', '#162740', '#162740', 'W', 'W', '#b32132', { placement: 'chest', capText: '#c72639' }),
