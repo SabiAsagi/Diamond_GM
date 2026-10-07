@@ -86,6 +86,7 @@ export default function DevelopmentDashboard() {
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    if (window.matchMedia('(min-width: 769px)').matches) window.scrollTo({ top: 0, behavior: 'instant' });
   }, [activeNavTab, clock.currentSlot, clock.date.year, clock.date.month, clock.date.day, player?.id]);
 
   const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
