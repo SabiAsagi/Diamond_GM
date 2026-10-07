@@ -11,7 +11,7 @@
 
 [![지금 플레이](https://img.shields.io/badge/▶_지금_플레이-브라우저에서_바로_시작-10b981?style=for-the-badge)](https://sabiasagi.github.io/Diamond_GM/)
 
-![버전](https://img.shields.io/badge/버전-2.0.8-3b82f6?style=flat-square)
+![버전](https://img.shields.io/badge/버전-2.0.9-3b82f6?style=flat-square)
 ![플랫폼](https://img.shields.io/badge/플랫폼-웹%20·%20모바일-f59e0b?style=flat-square)
 ![저장](https://img.shields.io/badge/저장-브라우저_자동_저장-64748b?style=flat-square)
 
