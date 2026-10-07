@@ -69,12 +69,12 @@ export async function getKitLetteringSvg(kit, preset, { cap = true } = {}) {
     return `<g clip-path="url(#${clip})"><g transform="translate(${x} ${y}) scale(${scaleX} 1)">${shape} fill="${kit.ink}" stroke="#faf7ed" stroke-width="1.7">${escape(word)}</text>${shape} fill="${kit.ink}" stroke="${trim}" stroke-width=".7">${escape(word)}</text></g></g>`;
   };
   let chest;
-  if (kit.placement === 'chest' || preset === 'female_long') {
+  if (kit.placement === 'chest') {
     const mid = Math.ceil(text.length / 2);
     const lines = text.length > 3 ? [text.slice(0, mid).join(''), text.slice(mid).join('')] : [text.join('')];
     const measured = await Promise.all(lines.map(word => wordWidth(word, family)));
     const available = f.chestRight - rightEdge - 6;
-    const size = Math.min(preset === 'female_long' ? 26 : latin ? 34 : 30, available / Math.max(...measured) / .8);
+    const size = Math.min(latin ? 34 : 30, available / Math.max(...measured) / .8);
     const scaleX = Math.min(1, available / Math.max(...measured) / size);
     chest = lines.map((word, i) => textEl(word, (rightEdge + f.chestRight) / 2, f.chestY + 3 + i * (size * 1.15), size, 'right', 'middle', scaleX)).join('');
   } else {
