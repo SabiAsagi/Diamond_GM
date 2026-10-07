@@ -49,6 +49,7 @@ export function shouldTriggerCutscene(
   date: GameDate,
   history: CutsceneTriggerHistory
 ): boolean {
+  if (event.speakerId && player.careerJourney && !player.careerJourney.met.includes(event.speakerId as import('./bondScores').BondId)) return false;
   // 1. 조건 검사
   if (event.conditions && !event.conditions(player, date)) {
     return false;

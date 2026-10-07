@@ -4,6 +4,7 @@ import type { TimeSlot } from './calendar';
 import type { DailyActivityCategory } from './dailySchedule';
 import type { Position } from './index';
 import { isWinterVacation } from './academicCalendar';
+import { canDoSocialActivity } from '../data/careerJourney';
 
 export interface PlayerStatsSubset {
   gapPower?: number; avoidK?: number; movement?: number; holdRunners?: number; stealing?: number; baserunning?: number; fieldingRange?: number; fieldingError?: number; arm?: number; velocity?: number;
@@ -634,10 +635,11 @@ export function sampleSubActivities(
   playerPosition: Position = 'P',
   slot?: TimeSlot,
   grade = 1,
-  date?: { month: number; day: number }
+  date?: { month: number; day: number },
+  player?: import('./index').Player
 ): ActivityOption[] {
   const pool = SUB_ACTIVITY_POOL[category] || [];
-  const filteredPool = pool.filter(opt => isActivityAvailable(opt, playerPosition, slot, grade, date));
+  const filteredPool = pool.filter(opt => isActivityAvailable(opt, playerPosition, slot, grade, date) && (!player || canDoSocialActivity(player, opt)));
 
   if (filteredPool.length <= count) {
     return [...filteredPool];

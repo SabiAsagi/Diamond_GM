@@ -105,7 +105,7 @@ export default function DevelopmentDashboard() {
 
   const gradeReport = player.gradeReports?.find(r => r.id === player.pendingGradeReportId);
   const showGradeReport = !!gradeReport && !activeCutscene && !lastActionResult;
-  const showRivalReport = !gradeReport && !!player.pendingRivalReport && activeNavTab === 'home' && !outingOpen && !drawDue && !activeCutscene && !lastActionResult;
+  const showRivalReport = (!player.careerJourney || player.careerJourney.met.includes('rival')) && !gradeReport && !!player.pendingRivalReport && activeNavTab === 'home' && !outingOpen && !drawDue && !activeCutscene && !lastActionResult;
   const unreadNews = getUnreadNews(player, clock.date);
   const unreadTabs = Object.fromEntries(['records', 'goals', 'info'].map(tab => [tab, unreadNews.some(n => n.tab === tab)]));
   const currentSlotAssignment = dailyPlan.slots[clock.currentSlot];
@@ -282,7 +282,7 @@ export default function DevelopmentDashboard() {
             <Trophy size={28} color="#fbbf24" />
             <div>
               <strong>🎉 고교 야구 생활을 마쳤습니다!</strong>
-              <p>{player.name} 선수는 3년간의 모든 고교 일정과 대회를 완주하였습니다.</p>
+              <p>{player.careerJourney?.ending ? `${player.careerJourney.ending.title} — ${player.careerJourney.ending.text}` : `${player.name} 선수는 3년간의 고교 일정을 완주했습니다.`}</p>
             </div>
           </div>
           <button className="btn btn-primary btn-sm" onClick={() => setActiveNavTab('records')}>

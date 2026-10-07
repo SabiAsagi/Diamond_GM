@@ -1,0 +1,21 @@
+.career-journey-panel {padding:24px;display:grid;gap:22px; color:var(--text-primary,#182844)}
+.career-journey-panel h2,.career-journey-panel h3 {margin:0 0 10px}
+.career-journey-panel p {line-height:1.65;margin:8px 0}
+.career-summary-grid,.career-choice-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.career-summary-grid article,.career-story-list {padding:16px;border:1px solid rgba(24,40,68,.15);border-radius:14px}
+.career-journey-panel progress {display:block;width:100%;margin-top:10px;accent-color:#c56b35}
+.career-journey-panel small,.match-decision-box small {display:block;line-height:1.6;color:#566277}
+.career-choice {display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;min-height:48px;padding:14px;background:#f5f1e8;color:#182844;border:2px solid #cdd2db;border-radius:12px;cursor:pointer;font:inherit}
+.career-choice.selected {border-color:#a74c23;background:#fff0df}
+.career-choice:focus-within,.career-choice:focus-visible {outline:3px solid #2563eb;outline-offset:2px}
+.career-choice span {font-size:14px;line-height:1.5}
+.career-choice:disabled {opacity:.65;cursor:wait}
+.match-decision-box {border:1px solid #cdd2db;border-radius:14px;padding:14px;margin:12px 0}
+.match-decision-box legend {font-weight:700;padding:0 6px}
+.match-decision-box p {line-height:1.5}
+@media(min-width:769px){
+  .onepage-viewport-container:has(.match-decision-box){height:auto;min-height:100dvh;grid-template-rows:auto auto auto}
+  .onepage-viewport-container:has(.match-decision-box) .home-dashboard-layout{height:auto;align-items:start}
+  .onepage-viewport-container:has(.match-decision-box) .onepage-main-stage{height:auto;overflow:visible}
+}
+@media(max-width:600px){.career-journey-panel{padding:16px}.career-summary-grid,.career-choice-grid{grid-template-columns:1fr}}

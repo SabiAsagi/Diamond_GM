@@ -1,5 +1,8 @@
 import { isGoalForMonth, optionMatchesMonthlyGoal } from '../../data/monthlyGoals';
 import { MatchSelectionCard } from './TeamCompetitionPanel';
+import { matchDecisions, matchSituation, type MatchDecisionId } from '../../data/matchDecisions';
+import { useGameClockStore } from '../../store/gameClockStore';
+import { getPlayerMatchForDate } from '../../types/tournament';
 import { trainingRecommendation, optionMatchesTrainingAdvice } from '../../data/teamCompetition';
 import type { BondId } from '../../types/bondScores';
 import { getBondName, personalizeText } from '../../data/cast';
@@ -37,7 +40,7 @@ interface SlotActionPanelProps {
   date: GameDate;
   assignment: SlotAssignment;
   player: Player;
-  onExecuteForced: (slot: TimeSlot) => Promise<void>;
+  onExecuteForced: (slot: TimeSlot, decision?: MatchDecisionId) => Promise<void>;
   onSelectActivity: (
     slot: TimeSlot,
     category: DailyActivityCategory,
@@ -66,20 +69,25 @@ export function SlotActionPanel({
 
   // 2차 세부 행동 후보군 (카테고리 선택 시마다 가중치 기반 3~4개 랜덤 샘플링!)
   const [sampledSubActivities, setSampledSubActivities] = useState<ActivityOption[]>(() =>
-    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date) : []
+    !assignment.forced ? sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date, player) : []
   );
   const [selectedSubId, setSelectedSubId] = useState<string>(() => sampledSubActivities[0]?.id || '');
   const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const matches = useGameClockStore(s => s.seasonMatches);
+  const match = getPlayerMatchForDate(date, matches);
+  const decisions = assignment.category === 'match' ? matchDecisions(player, match ?? undefined) : [];
+  const [matchDecision, setMatchDecision] = useState<MatchDecisionId | undefined>();
 
   // 슬롯 또는 등교일 상태가 변경되었을 때 상태 재설정
   const [prevKey, setPrevKey] = useState(`${player.id}-${player.position}-${date.year}-${date.month}-${date.day}-${currentSlot}-${assignment.forced}-${schoolDay}`);
   const currentKey = `${player.id}-${player.position}-${date.year}-${date.month}-${date.day}-${currentSlot}-${assignment.forced}-${schoolDay}`;
   if (prevKey !== currentKey) {
     setPrevKey(currentKey);
+    setMatchDecision(undefined);
     setSelectedCategory(defaultCat);
     if (!assignment.forced) {
-      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date);
+      const sampled = sampleSubActivities(defaultCat, 4, player.position, currentSlot, player.grade ?? 1, date, player);
       setSampledSubActivities(sampled);
       setSelectedSubId(sampled[0]?.id || '');
     }
@@ -87,7 +95,7 @@ export function SlotActionPanel({
 
   const handleCategorySelect = (cat: DailyActivityCategory) => {
     setSelectedCategory(cat);
-    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot, player.grade ?? 1, date);
+    const sampled = sampleSubActivities(cat, 4, player.position, currentSlot, player.grade ?? 1, date, player);
     setSampledSubActivities(sampled);
     setSelectedSubId(sampled[0]?.id || '');
   };
@@ -97,7 +105,7 @@ export function SlotActionPanel({
     setError('');
     setIsProcessing(true);
     try {
-      await onExecuteForced(currentSlot);
+      await onExecuteForced(currentSlot, matchDecision);
     } catch {
       setError('진행 내용을 저장하지 못했습니다. 현재 슬롯에서 다시 시도해주세요.');
     } finally {
@@ -154,6 +162,15 @@ export function SlotActionPanel({
         </div>
 
         {isMatch && assignment.sourceEventId && <MatchSelectionCard player={player} matchId={assignment.sourceEventId} />}
+        {isMatch && match && decisions.length > 0 && <fieldset className="match-decision-box">
+          <legend>승부처 접근 선택</legend>
+          <p>{matchSituation(match, player)}</p>
+          <div className="career-choice-grid">{decisions.map(d => <label key={d.id} className={`career-choice ${matchDecision === d.id ? 'selected' : ''}`}>
+            <input type="radio" name="match-decision" value={d.id} checked={matchDecision === d.id} onChange={() => setMatchDecision(d.id)} disabled={isProcessing} />
+            <strong>{d.label}</strong><span>{d.description}</span>
+          </label>)}</div>
+          <small>경기 중 한 번의 접근을 결과 계산에 반영합니다. 선택하지 않으면 감독의 기본 접근으로 진행합니다.</small>
+        </fieldset>}
         {error && <p role="alert">{error}</p>}
         <div className="forced-action-footer">
           <div className="forced-notice-text">

@@ -36,7 +36,7 @@ export function getBondScores(p: Player): BondScores {
   for (const id of Object.keys(scores) as BondId[]) scores[id] = clamp(p.relationships?.[id] ?? scores[id]);
   return scores;
 }
-export const getRelScore = (p: Player, id: BondId) => clamp(p.relationships?.[id] ?? 10);
+export const getRelScore = (p: Player, id: BondId) => p.careerJourney && !p.careerJourney.met.includes(id) ? 0 : clamp(p.relationships?.[id] ?? 10);
 export const getBondScore = getRelScore;
 export function getHighestBondScore(p: Player, ids: BondId[]): number {
   return Math.max(0, ...ids.map(id => getRelScore(p,id)));
@@ -60,7 +60,8 @@ export function applyBondChanges(p: Player, targets: RelationshipTargets = {}): 
 export function actualBondChanges(before: Player, after: Player): RelationshipTargets {
   const changes: RelationshipTargets = {};
   for (const id of Object.keys(BOND_NAMES) as BondId[]) {
-    const delta = getRelScore(after,id) - getRelScore(before,id);
+    const introduced = before.careerJourney && !before.careerJourney.met.includes(id) && after.careerJourney?.met.includes(id);
+    const delta = introduced ? getBondScores(after)[id] - getBondScores(before)[id] : getRelScore(after,id) - getRelScore(before,id);
     if(delta) changes[id] = delta;
   }
   return changes;

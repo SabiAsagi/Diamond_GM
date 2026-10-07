@@ -17,6 +17,7 @@ import { isSchoolDay } from '../../../types/academicCalendar';
 import { getHighSchoolDataByName } from '../../../data/highSchools';
 import { useGameClockStore } from '../../../store/gameClockStore';
 import { MapPin, ShoppingBag, Wallet, Info } from 'lucide-react';
+import { canDoSocialActivity } from '../../../data/careerJourney';
 
 interface Props {
   player: Player;
@@ -35,7 +36,7 @@ export function TownView({ player, onPurchase, onEquip, onVisit }: Props) {
   const isLoading = useGameClockStore(s => s.isLoading);
   const isCareerEnded = useGameClockStore(s => s.isCareerEnded);
   const region = getHighSchoolDataByName(player.highSchool)?.region || '서울';
-  const locations = getOutdoorLocations(region);
+  const locations = getOutdoorLocations(region).filter(location => canDoSocialActivity(player, location.effects));
   const todayDateStr = `${clock.date.year}-${clock.date.month}-${clock.date.day}`;
   const isVisitedToday = player.lastOutdoorVisitDate === todayDateStr;
   const outingAllowedNow = !isSchoolDay(clock.date) || clock.currentSlot === 'night';

@@ -265,7 +265,6 @@ test('개별 점수·5단계 효과·성별 무관 로맨스와 졸업 인연이
     ],
   );
   for (const id of [
-    'coach2',
     'teacher',
     'pe',
     'senior',
@@ -283,6 +282,7 @@ test('개별 점수·5단계 효과·성별 무관 로맨스와 졸업 인연이
         .stageEffects.every((e) => !e.hasEffect && e.description === '효과 없음'),
     );
   assert.equal(getTrainingEfficiencyMultiplier(p), 1.18);
+  assert.ok(profiles.find(b => b.id === 'coach2').stageEffects.filter(e => e.stage >= 3).every(e => e.hasEffect));
   p.relationships.rival = 100;
   p.relationships.senior = 100;
   assert.equal(getTrainingEfficiencyMultiplier(p), 1.18);
@@ -1262,4 +1262,26 @@ test('경기 날 감독 면담으로 강제 경기를 건너뛸 수 없고 활�
   assert.equal(day.morningLog, '오전 수업');
   assert.equal(day.afternoonLog, gameLog);
   assert.equal(day.nightLog, '야간 휴식');
+});
+
+test('승부처 접근은 실제 안타·홈런·경기 결과와 저장에 반영되고 중복 출전을 막는다', async () => {
+  const school=HIGH_SCHOOLS_DATA.find(s=>s.name==='덕수고');
+  const m=fixtureMatch();
+  const p=teamPlayer({contact:80,power:80,eye:80,defense:80,speed:80,condition:100,relationships:{coach:90,peer:70,coach2:70}});
+  for(const key of Object.keys(require(path.join(dir,'data/playerDevelopment.js')).EXTRA_RATINGS)) p[key]=95;
+  p.teamCompetition.training=90; p.teamCompetition.recentForm=90;
+  const selected=competition.prepareTeamContext(p,school,p.gameDate,'afternoon',[m]);
+  assert.equal(selected.teamCompetition.selection.role,'starter');
+  const contact=withRandom(.18,()=>resolveMatchPlaceholder(m,selected,school,'contact'));
+  const attack=withRandom(.18,()=>resolveMatchPlaceholder(m,selected,school,'attack'));
+  assert.ok(attack.matchPerformance.homeRuns>contact.matchPerformance.homeRuns,'장타 접근이 홈런 확률을 바꾸어야 한다');
+  assert.match(attack.logMessage,/승부처 접근: 장타 노리기/);
+  assert.match(attack.logMessage,/동기와의 호흡/);
+  await useGameClockStore.getState().initClock({...p,savedMatches:[m],savedSeasonYear:2026});
+  await useGameClockStore.getState().executeForcedSlot('afternoon','attack');
+  const stored=structuredClone(saved);
+  assert.match(stored.matchRecords.at(-1).log,/승부처 접근: 장타 노리기/);
+  await useGameClockStore.getState().initClock(stored);
+  await useGameClockStore.getState().executeForcedSlot('afternoon','attack');
+  assert.equal(saved.matchRecords.length,stored.matchRecords.length);
 });

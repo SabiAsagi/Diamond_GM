@@ -140,6 +140,7 @@ export default function PlayerCreation() {
       condition: 100,
       academics: 50,
       relationships: {...INITIAL_RELATIONSHIPS},
+      careerJourney: { met: ['mother','father'], completedScenes: [], trainingGrowth: {}, offers: [] },
       money: 50000,
       inventory: [],
       equippedItems: {},

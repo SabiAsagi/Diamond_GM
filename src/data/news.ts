@@ -4,6 +4,7 @@ import { buildAchievements, buildTournamentTrophies } from './achievements';
 import { PITCH_NAMES } from './playerDevelopment';
 import { EQUIPMENT_CATALOG } from '../types/equipment';
 import { getBondName } from './cast';
+import { hasMet, ROUTE_LABELS, GRADE_STORY_SCENES } from './careerJourney';
 import { scoreToStage, STAGE_LABELS } from '../types/relationship';
 import type { BondId } from '../types/bondScores';
 
@@ -16,9 +17,12 @@ export function collectPlayerNews(player: Player, date: GameDate): PlayerNews[] 
   for (const pitch of player.pitches ?? []) if (pitch.rating > 0) news.push({ id: `pitch:${pitch.type}:${Math.floor(pitch.rating / 10)}`, tab: 'info', section: 'pitches', title: `${PITCH_NAMES[pitch.type]} 숙련도 ${pitch.rating}` });
   for (const id of player.inventory ?? []) news.push({ id: `item:${id}`, tab: 'info', section: 'equipment', title: `새 장비 · ${EQUIPMENT_CATALOG.find(e => e.id === id)?.name ?? id}` });
   for (const trait of player.traits ?? []) news.push({ id: `trait:${trait}`, tab: 'info', section: 'relationships', title: `새 특성 · ${trait}` });
+  for (const id of player.careerJourney?.met ?? []) if (!['mother','father'].includes(id)) news.push({id:`met:${id}`,tab:'info',section:'relationships',title:`새 인연 · ${getBondName(player,id)}`});
+  for (const route of player.careerJourney?.offers ?? []) news.push({id:`offer:${route}`,tab:'info',section:'journey',title:`새 진로 제안 · ${ROUTE_LABELS[route]}`});
+  for (const scene of GRADE_STORY_SCENES) if (player.careerJourney?.completedScenes.includes(scene.id)) news.push({id:`story:${scene.id}`,tab:'info',section:'journey',title:`육성 이야기 · ${scene.title}`});
   for (const [id, score] of Object.entries(player.relationships)) {
     const stage = scoreToStage(score ?? 0);
-    if (stage > 1) news.push({ id: `bond:${id}:${stage}`, tab: 'info', section: 'relationships', title: `${getBondName(player, id as BondId)} · ${STAGE_LABELS[stage]}` });
+    if (stage > 1 && hasMet(player, id)) news.push({ id: `bond:${id}:${stage}`, tab: 'info', section: 'relationships', title: `${getBondName(player, id as BondId)} · ${STAGE_LABELS[stage]}` });
   }
   for (const r of player.matchRecords ?? []) news.push({ id: `match:${r.year}:${r.matchId}`, tab: 'records', section: 'matches', title: `${r.year}년 경기 기록이 추가되었습니다.` });
   for (const r of player.gradeReports ?? []) news.push({ id: `grade:${r.id}`, tab: 'records', section: 'years', title: `${r.grade}학년 일지가 도착했습니다.` });
