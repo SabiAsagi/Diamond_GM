@@ -432,16 +432,24 @@ test('학교명과 모자 글자의 모든 문자가 번들 폰트에 포함된�
   }
 });
 
-test('학교91×외형8의 실제 글자 렌더링에서 단추 여밈선26px은 비어 있다', async () => {
+test('학교91×외형8의 실제 글자 렌더링에서 단추 여밈선20px은 비어 있다', async () => {
   const { registerKitFont, getKitLetteringSvg, LETTERING_FITS } = await import('../scripts/kit-lettering.mjs');
   await registerKitFont();
   for (const school of HIGH_SCHOOLS_DATA) for (const preset of allPresets) {
     const fit = LETTERING_FITS[preset.id];
-    const { data, info } = await sharp(Buffer.from(getKitLetteringSvg(getSchoolKit(school.name), preset.id, { cap: false }))).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-    for (let y = 0; y < info.height; y++) for (let x = Math.ceil((fit.seam - 12) * info.width / 200); x < Math.floor((fit.seam + 12) * info.width / 200); x++) {
+    const { data, info } = await sharp(Buffer.from(await getKitLetteringSvg(getSchoolKit(school.name), preset.id, { cap: false }))).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    for (let y = 0; y < info.height; y++) for (let x = Math.ceil((fit.seam - 9) * info.width / 200); x < Math.floor((fit.seam + 9) * info.width / 200); x++) {
       assert.equal(data[(y * info.width + x) * 4 + 3], 0, school.name + ' ' + preset.id + ' 단추');
     }
   }
+});
+
+test('유니폼 글씨는 머리·피부·투명 배경을 덮지 않고 원단 가장자리 알파를 보존한다', async () => {
+  const { maskLetteringToFabric } = await import('../scripts/kit-lettering.mjs');
+  const plate = Buffer.from([255,255,255,128, 30,25,20,255, 230,165,130,255, 255,0,255,255, 255,255,255,0]);
+  const ink = Buffer.from(Array.from({length:5}, () => [200,0,0,255]).flat());
+  const out = maskLetteringToFabric(ink, plate, {width:1,chestY:0});
+  assert.deepEqual([out[3],out[7],out[11],out[15],out[19]], [128,0,0,255,0]);
 });
 
 test('완성 원화는512×768이며 투명 배경을 유지한다', async () => {
