@@ -6,7 +6,7 @@ import type { Player } from '../../types';
 import { POSITION_LABELS } from '../../types';
 import type { HighSchoolData } from '../../types/highSchool';
 import { SchoolEmblem } from '../SchoolEmblem';
-import { Calendar, Trophy, Wallet } from 'lucide-react';
+import { Calendar, Trophy, Wallet, Sunrise, Sun, Moon } from 'lucide-react';
 
 interface DailyTopBarProps {
   player: Player;
@@ -20,16 +20,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
   const weekdayStr = WEEKDAY_NAMES[date.weekday];
   const slotLabel = TIME_SLOT_LABELS[currentSlot];
 
-  const getSlotIcon = (slot: TimeSlot) => {
-    switch (slot) {
-      case 'morning':
-        return '🌅';
-      case 'afternoon':
-        return '☀️';
-      case 'night':
-        return '🌙';
-    }
-  };
+  const SlotIcon = currentSlot === 'morning' ? Sunrise : currentSlot === 'afternoon' ? Sun : Moon;
 
   const getSlotClass = (slot: TimeSlot) => {
     switch (slot) {
@@ -48,7 +39,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
       <div className="daily-profile-cluster"><div className="profile-portrait"><PlayerPortrait appearance={player.appearance} number={player.uniformNumber} gender={player.gender} schoolName={player.highSchool}/></div>
         {school && <SchoolEmblem school={school} size="sm" />}
         <div className="daily-player-meta">
-          <span className="locker-label">PLAYER LOCKER · 나의 선수</span><div className="daily-player-row">
+          <span className="locker-label">{school?.name || player.highSchool} · 선수 등록 카드</span><div className="daily-player-row">
             <span className="player-name-bold">{player.name}</span>
             <span className="player-num-chip">#{player.uniformNumber}</span>
             <span className="player-pos-chip">{POSITION_LABELS[player.position] || player.position}</span>
@@ -70,7 +61,7 @@ export function DailyTopBar({ player, school, date, currentSlot }: DailyTopBarPr
         </div>
 
         <div className={`daily-slot-pill ${getSlotClass(currentSlot)}`}>
-          <span className="slot-emoji">{getSlotIcon(currentSlot)}</span>
+          <SlotIcon size={16} aria-hidden="true" />
           <span className="slot-text">{slotLabel}</span>
         </div>
 

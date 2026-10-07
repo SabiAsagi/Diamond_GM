@@ -24,7 +24,13 @@ import {
   Flame,
   CheckCircle2,
   CalendarCheck,
+  Dumbbell, BookOpen, Moon, MessagesSquare, Sparkles, School, CircleDot,
 } from 'lucide-react';
+
+function ActivityIcon({ category, size = 20 }: { category: DailyActivityCategory; size?: number }) {
+  const Icon = category === 'training' ? Dumbbell : category === 'study' || category === 'exam' ? BookOpen : category === 'rest' ? Moon : category === 'relationship' ? MessagesSquare : category === 'match' ? CircleDot : category === 'event' ? School : Sparkles;
+  return <Icon size={size} aria-hidden="true" />;
+}
 
 interface SlotActionPanelProps {
   currentSlot: TimeSlot;
@@ -130,19 +136,19 @@ export function SlotActionPanel({
       <div className="slot-action-panel glass-panel forced-slot-panel animate-fade-in">
         <div className="forced-badge-row">
           <span className={`forced-status-pill ${isMatch ? 'match-pill' : 'academic-pill'}`}>
-            {isMatch ? '⚾ 야구부 경기 일정' : isExam ? '📝 정규 지필 평가' : '🌸 학교 공식 행사'}
+            <ActivityIcon category={assignment.category} size={16} />{isMatch ? '야구부 경기 일정' : isExam ? '정규 지필 평가' : '학교 공식 행사'}
           </span>
           <span className="slot-badge-indicator">
-            {TIME_SLOT_LABELS[currentSlot]} 슬롯 강제 지정
+            {TIME_SLOT_LABELS[currentSlot]} · 필수 일정
           </span>
         </div>
 
         <div className="forced-content-box">
           <div className="forced-icon-large">
-            {isMatch ? '⚾' : isExam ? '✍️' : '🏫'}
+            <ActivityIcon category={assignment.category} size={36} />
           </div>
           <div className="forced-details">
-            <h3 className="forced-title">{assignment.label}</h3>
+            <h2 className="forced-title">{assignment.label}</h2>
             <p className="forced-desc">{assignment.description}</p>
           </div>
         </div>
@@ -180,9 +186,9 @@ export function SlotActionPanel({
     <div className="slot-action-panel glass-panel free-slot-panel animate-fade-in">
       <div className="slot-panel-header">
         <div className="header-left">
-          <span className="slot-turn-title">
-            <Zap size={18} className="text-primary" /> {TIME_SLOT_LABELS[currentSlot]} 계획 선택
-          </span>
+          <h2 className="slot-turn-title">
+            <Zap size={20} className="text-primary" aria-hidden="true" /> {TIME_SLOT_LABELS[currentSlot]}에 무엇을 할까요?
+          </h2>
           <span className="slot-panel-subtitle">
             오늘의 작은 선택을 훈련 수첩에 남겨보세요.
           </span>
@@ -206,8 +212,9 @@ export function SlotActionPanel({
               key={cat.id}
               className={`category-chip-btn ${isSelected ? 'selected' : ''}`}
               onClick={() => handleCategorySelect(cat.category)}
+              aria-pressed={isSelected}
             >
-              <span className="cat-icon">{cat.icon}</span>
+              <span className="cat-icon"><ActivityIcon category={cat.category} /></span>
               <span className="cat-label">{categoryLabels[cat.category] ?? cat.label}</span>
             </button>
           );
@@ -235,9 +242,9 @@ export function SlotActionPanel({
               onClick={() => setSelectedSubId(opt.id)}
             >
               <div className="card-top">
-                <span className="card-icon">{opt.icon}</span>
+                <span className="card-icon"><ActivityIcon category={opt.category} /></span>
                 <strong className="card-title">{personalizeText(opt.label, player)}</strong>
-                {isSelected && <CheckCircle2 size={18} className="check-icon" />}
+                {isSelected && <CheckCircle2 size={20} className="check-icon" aria-hidden="true" />}
               </div>
 
               {player.monthlyGoal && isGoalForMonth(player.monthlyGoal, date) && player.monthlyGoal.progress < player.monthlyGoal.target && optionMatchesMonthlyGoal(player.monthlyGoal, opt) && <span className="monthly-goal-badge">이번 달 목표에 포함</span>}
@@ -275,12 +282,12 @@ export function SlotActionPanel({
               {/* 상태 게이팅 특수 배지 */}
               {isLowStamina && isTrainingOpt && (
                 <div className="gate-notice-chip penalty">
-                  ⚠️ 체력 20 이하: 효과 50% & 부상 위험
+                  <AlertTriangle size={16} aria-hidden="true" /> 체력 20 이하: 효과 50% & 부상 위험
                 </div>
               )}
               {isLowMental && isRestOpt && (
                 <div className="gate-notice-chip bonus">
-                  ✨ 멘탈 케어: 회복량 +30% 증폭
+                  <Sparkles size={16} aria-hidden="true" /> 멘탈 케어: 회복량 +30% 증폭
                 </div>
               )}
             </button>
@@ -311,7 +318,7 @@ export function SlotActionPanel({
             <span>활동 처리 중...</span>
           ) : (
             <>
-              <Flame size={18} />
+              <Flame size={20} aria-hidden="true" />
               <span>{TIME_SLOT_LABELS[currentSlot]} 활동 완료</span>
               <ArrowRight size={18} />
             </>

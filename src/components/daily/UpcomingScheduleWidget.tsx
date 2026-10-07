@@ -98,7 +98,7 @@ export function UpcomingScheduleWidget({
     return items.slice(0, 4);
   }, [currentDate, matches, academicEvents]);
 
-  if (compact) return <div className="home-next-event glass-panel"><span>다음 일정</span><strong>{upcomingItems[0] ? `${upcomingItems[0].icon} ${upcomingItems[0].title}` : '자율 훈련 기간'}</strong><b>{upcomingItems[0]?.dDayStr}</b></div>;
+  if (compact) return <div className="home-next-event glass-panel"><span><CalendarDays size={16} aria-hidden="true" /> 다가오는 일정</span><strong>{upcomingItems[0]?.title ?? '자율 훈련 기간'}</strong><b>{upcomingItems[0]?.dDayStr}</b>{upcomingItems[0] && <small>{upcomingItems[0].subtitle}</small>}</div>;
 
   return (
     <div className="upcoming-schedule-card glass-panel animate-fade-in">
