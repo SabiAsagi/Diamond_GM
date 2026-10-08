@@ -7,10 +7,19 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import sharp from 'sharp';
 import { recolourFabric } from './kit-colours.mjs';
-import { LETTERING_FITS, registerKitFont, getKitLetteringSvg } from './kit-lettering.mjs';
+import { LETTERING_FITS, registerKitFont, getKitLetteringSvg, maskLetteringToFabric } from './kit-lettering.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'diamond-kit-data-'));
+async function renameGeneratedFile(from, to) {
+  for (let attempt = 0; ; attempt++) {
+    try { await fs.rename(from, to); return; }
+    catch (error) {
+      if (!['EPERM', 'EBUSY'].includes(error.code) || attempt >= 8) throw error;
+      await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)));
+    }
+  }
+}
 try {
   for (const name of ['highSchools', 'schoolKits']) {
     const text = await fs.readFile(path.join(root, 'src/data', name + '.ts'), 'utf8');
@@ -42,7 +51,7 @@ try {
   const hash = crypto.createHash('sha256');
   for (const buffer of sources) hash.update(buffer);
   for (const name of ['src/data/highSchools.ts', 'src/data/schoolKits.ts', 'scripts/build-school-kits.mjs',
-    'scripts/kit-colours.mjs', 'scripts/kit-lettering.mjs', 'scripts/fonts/NotoSansKR-kit-subset.ttf', 'scripts/fonts/Bevan-Regular.ttf']) {
+    'scripts/kit-colours.mjs', 'scripts/kit-lettering.mjs', 'scripts/fonts/NotoSansKR-kit-subset.ttf', 'scripts/fonts/Bevan-Regular.ttf', 'scripts/fonts/Anton-Regular.ttf']) {
     hash.update(await fs.readFile(path.join(root, name)));
   }
   const fingerprint = hash.digest('hex');
@@ -80,7 +89,7 @@ try {
       checkpointWrites = checkpointWrites.then(async () => {
         const temp = checkpointPath + '.' + crypto.randomUUID() + '.tmp';
         await fs.writeFile(temp, content);
-        await fs.rename(temp, checkpointPath);
+        await renameGeneratedFile(temp, checkpointPath);
       });
       return checkpointWrites;
     };
@@ -92,16 +101,19 @@ try {
         const { kit, preset, name } = job;
         const plate = plates.get(`${preset}-${kit.style}.webp`);
         const pixels = recolourFabric(plate, kit.primary, kit.secondary, { width: 640, ...LETTERING_FITS[preset], ...kit });
-        const letters = await sharp(Buffer.from(getKitLetteringSvg(kit, preset))).png().toBuffer();
+        const letterPixels = await sharp(Buffer.from(await getKitLetteringSvg(kit, preset))).ensureAlpha().raw().toBuffer();
+        const letters = await sharp(maskLetteringToFabric(letterPixels, plate, { width: 640, ...LETTERING_FITS[preset] }),
+          { raw: { width: 640, height: 960, channels: 4 } }).png().toBuffer();
         // Sharp applies resize before composite, regardless of call order.
         // Complete lettering on the original canvas before shrinking it.
         const composited = await sharp(pixels, { raw: { width: 640, height: 960, channels: 4 } })
           .composite([{ input: letters }]).raw().toBuffer();
+        for (let i = 3; i < composited.length; i += 4) composited[i] = plate[i];
         const buffer = await sharp(composited, { raw: { width: 640, height: 960, channels: 4 } })
           .resize(512, 768).webp({ quality: 90, alphaQuality: 100 }).toBuffer();
         const final = path.join(outputDir, name);
         const temp = final + '.' + crypto.randomUUID() + '.tmp';
-        await fs.writeFile(temp, buffer); await fs.rename(temp, final);
+        await fs.writeFile(temp, buffer); await renameGeneratedFile(temp, final);
         finished.add(name);
         await saveCheckpoint();
         if (finished.size % 32 === 0 || finished.size === jobs.length)
@@ -113,7 +125,7 @@ try {
     if (failure) throw failure.reason;
     const temp = manifestPath + '.' + crypto.randomUUID() + '.tmp';
     await fs.writeFile(temp, JSON.stringify({ fingerprint, count: jobs.length, sourceCount: sourceNames.length }, null, 2));
-    await fs.rename(temp, manifestPath);
+    await renameGeneratedFile(temp, manifestPath);
     console.log(`학교 키트 ${jobs.length}장 생성 완료 (원화 ${sourceNames.length}장)`);
   }
 } finally {
