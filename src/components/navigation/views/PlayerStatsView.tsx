@@ -6,7 +6,7 @@ import type { Player } from '../../../types';
 import { EXTRA_RATINGS, normalizePlayer, PITCH_NAMES } from '../../../data/playerDevelopment';
 import { useGameClockStore } from '../../../store/gameClockStore';
 import { EQUIPMENT_CATALOG, EQUIPMENT_SLOT_LABELS, EQUIPMENT_STAT_LABELS, getRelevantSlots, isEquipmentRelevant, type EquipmentStat } from '../../../types/equipment';
-import { Sparkles, ShoppingBag, X } from 'lucide-react';
+import { Sparkles, ShoppingBag, X, Award } from 'lucide-react';
 
 const BAT = [
   ['contact', '컨택', '안타로 연결하는 타격 정확도'],
@@ -95,7 +95,7 @@ export function PlayerStatsView({ player: raw, section }: { player: Player; onCl
         <div>
           <h3>내 선수 · {p.name}</h3>
           <p>능력치 0–100 · 종합 {p.overall} · 잠재력 {p.potential}</p>
-          {tab === 'ratings' && <><span className="rel-score-badge" style={{color:nationalRank.percentile <= 10 ? '#fbbf24' : nationalRank.percentile <= 30 ? '#cbd5e1' : '#93c5fd'}}>🏅 {nationalRank.label} (동학년 기준)</span><p className="menu-view-sub">학년별 가정 분포로 계산한 추정치 · 실제 선수 순위 아님</p></>}
+          {tab === 'ratings' && <><span className="rel-score-badge national-rank-badge"><Award size={16} aria-hidden="true" /> {nationalRank.label} (동학년 기준)</span><p className="menu-view-sub">학년별 가정 분포로 계산한 추정치 · 실제 선수 순위 아님</p></>}
         </div>
         {!section && <div className="menu-view-tabs">
           {[

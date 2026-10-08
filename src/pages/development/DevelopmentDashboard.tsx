@@ -1,5 +1,6 @@
 import { getUnreadNews } from '../../data/news';
 import { GAME_VERSION } from '../../version';
+import { DayProgress } from '../../components/daily/DayProgress';
 import { SeasonJourneyPanel } from '../../components/daily/SeasonJourneyPanel';
 import { MonthlyGoalsPanel } from '../../components/daily/MonthlyGoalsPanel';
 import { GradeReportModal } from '../../components/daily/GradeReportModal';
@@ -7,7 +8,7 @@ import { TeamCompetitionPanel } from '../../components/daily/TeamCompetitionPane
 import { TEAM_ROLE_LABELS, getStanding } from '../../data/teamCompetition';
 import { RivalReportModal } from '../../components/daily/RivalReportModal';
 import { getBondName, getRivalSchool } from '../../data/cast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../db';
 import { useGameClockStore } from '../../store/gameClockStore';
@@ -26,12 +27,13 @@ import { SettingsView } from '../../components/navigation/views/SettingsView';
 import { TownView } from '../../components/navigation/views/TownView';
 
 import { TournamentBracket } from '../../components/navigation/views/TournamentBracket';
-import { Heart, Star, Trophy } from 'lucide-react';
+import { Heart, Star, Trophy, Diamond, ShoppingBag, Users, ArrowUpRight } from 'lucide-react';
 import '../../index.css';
 
 export default function DevelopmentDashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const mainRef = useRef<HTMLElement>(null);
 
   const [loadError, setLoadError] = useState('');
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -82,6 +84,10 @@ export default function DevelopmentDashboard() {
     loadData();
   }, [id, navigate, initClock, loadAttempt]);
 
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeNavTab, clock.currentSlot, clock.date.year, clock.date.month, clock.date.day, player?.id]);
+
   const drawDue=seasonMatches.find(m=>m.isPlayerTeamMatch && m.drawn===false && m.date.month===clock.date.month && m.date.day===clock.date.day);
   // 추첨마다 키가 달라서, 새 추첨이 오면 이전에 확인한 키와 자동으로 불일치한다.
   const drawKey = drawDue ? `${clock.date.year}:${drawDue.tournamentId}` : null;
@@ -108,7 +114,9 @@ export default function DevelopmentDashboard() {
   return (
     <div className="onepage-viewport-container">
       {/* 1. 상단바 (고정) */}
-      <header className="clubhouse-masthead"><div className="clubhouse-brand"><span className="diamond-mark" aria-hidden="true">◆</span><span>DIAMOND GM <small>선수의 하루</small></span></div><span className="clubhouse-edition">클럽하우스 × 선수 일지 · {GAME_VERSION}</span></header>
+      <button className="club-skip-link" type="button" onClick={() => mainRef.current?.focus()}>본문으로 건너뛰기</button>
+      <header className="clubhouse-masthead"><h1 className="clubhouse-brand"><Diamond className="diamond-mark" size={26} aria-hidden="true" /><span>DIAMOND GM <small>나의 고교야구 일지</small></span></h1><span className="clubhouse-edition">SEASON {clock.date.year}<span>v{GAME_VERSION}</span></span></header>
+      <div className="club-navigation-shell" inert={showGradeReport || !!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} unreadTabs={unreadTabs} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
       <DailyTopBar
         player={player}
         school={school}
@@ -118,15 +126,15 @@ export default function DevelopmentDashboard() {
 
       {/* 2. 메인 중앙 콘텐츠 영역 */}
       {drawDue && confirmedDraw !== drawKey && !activeCutscene && !lastActionResult && <div className="cutscene-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draw-intro-title"><div className="cutscene-modal-card glass-panel"><span className="cutscene-top-tag">📢 대회 개막</span><h2 id="draw-intro-title">{drawDue.tournamentName} 조 추첨일</h2><p>전국 각지의 학교들이 대진 조 추첨을 위해 모였습니다. 우리 학교는 어떤 상대를 만나게 될까요?</p><button autoFocus className="btn btn-primary" onClick={() => setConfirmedDraw(drawKey)}>조 추첨 현장으로 이동</button></div></div>}
-      <main className="onepage-main-stage" inert={showGradeReport || showRivalReport || (!!drawDue && confirmedDraw !== drawKey)}>
+      <main ref={mainRef} id="club-main" tabIndex={-1} className="onepage-main-stage" inert={showGradeReport || showRivalReport || (!!drawDue && confirmedDraw !== drawKey)}>
         {drawDue && confirmedDraw === drawKey && <div className="menu-view-container glass-panel"><h3>대회 개막 · 조 추첨</h3><div className="menu-view-body"><TournamentBracket key={drawKey} matches={seasonMatches.filter(m => m.tournamentId === drawDue.tournamentId)} /></div></div>}
         {activeNavTab === 'home' && teamOpen && !drawDue && <TeamCompetitionPanel player={player} onClose={() => setTeamOpen(false)} />}
         {activeNavTab === 'home' && !teamOpen && !outingOpen && !drawDue && (
           <div className="home-dashboard-layout animate-fade-in">
             {/* 좌측 패널 (데스크톱) 또는 상단 요약 (모바일) */}
             <section className="home-left-rail">
-              <button className="btn btn-secondary" onClick={() => setOutingOpen(true)}>외출 · 상점</button>
-              <button className="btn btn-secondary team-home-button" onClick={() => setTeamOpen(true)}><span>주전 경쟁 · 감독 면담</span><strong>{TEAM_ROLE_LABELS[player.teamCompetition?.role ?? 'bench']} · 포지션 {getStanding(player).rank}위</strong>{player.teamCompetition?.entries.at(-1) && <small>최근 엔트리: {player.teamCompetition.entries.at(-1)!.included ? '합류' : '제외'} · 명단 확인</small>}</button>
+              <div className="club-quick-actions"><button className="btn btn-secondary" onClick={() => setOutingOpen(true)}><ShoppingBag size={20} aria-hidden="true" /><span>외출 · 상점</span><ArrowUpRight size={16} aria-hidden="true" /></button>
+              <button className="btn btn-secondary team-home-button" onClick={() => setTeamOpen(true)}><Users size={20} aria-hidden="true" /><span>주전 경쟁 · 감독 면담<strong>{TEAM_ROLE_LABELS[player.teamCompetition?.role ?? 'bench']} · 포지션 {getStanding(player).rank}위</strong></span><ArrowUpRight size={16} aria-hidden="true" /></button></div>
               {!isCareerEnded && <SeasonJourneyPanel date={clock.date} />}
               <MonthlyGoalsPanel compact player={player} date={clock.date} onOpen={() => setActiveNavTab('goals')} />
               {/* 3대 핵심 게이지 요약 바 */}
@@ -149,13 +157,13 @@ export default function DevelopmentDashboard() {
                 {/* 체력 / 컨디션 */}
                 <div className="compact-gauge-box">
                   <div className="cg-header-line">
-                    <Heart size={13} color="#ef4444" />
-                    <span className="cg-label">체력/컨디션</span>
+                    <Heart size={16} aria-hidden="true" />
+                    <span className="cg-label">컨디션</span>
                   </div>
                   <div className="cg-num-row">
                     <span
                       className="cg-big-num"
-                      style={{ color: player.condition > 70 ? '#10b981' : player.condition > 35 ? '#fbbf24' : '#ef4444' }}
+                      style={{ color: player.condition > 70 ? 'var(--club-positive)' : player.condition > 35 ? 'var(--club-warning)' : 'var(--club-red)' }}
                     >
                       {player.condition}
                     </span>
@@ -166,7 +174,7 @@ export default function DevelopmentDashboard() {
                       className="cg-fill"
                       style={{
                         width: `${player.condition}%`,
-                        backgroundColor: player.condition > 70 ? '#10b981' : player.condition > 35 ? '#fbbf24' : '#ef4444',
+                        backgroundColor: player.condition > 70 ? 'var(--club-positive)' : player.condition > 35 ? 'var(--club-warning)' : 'var(--club-red)',
                       }}
                     ></div>
                   </div>
@@ -175,12 +183,12 @@ export default function DevelopmentDashboard() {
                 {/* 스카우트 인지도 */}
                 <div className="compact-gauge-box">
                   <div className="cg-header-line">
-                    <Star size={13} color="#fbbf24" />
-                    <span className="cg-label">스카우트 인지도</span>
+                    <Star size={16} aria-hidden="true" />
+                    <span className="cg-label">인지도</span>
                   </div>
                   <div className="cg-num-row">
-                    <span className="cg-big-num" style={{ color: '#fbbf24' }}>
-                      {player.fame || 10}
+                    <span className="cg-big-num" style={{ color: 'var(--club-warning)' }}>
+                      {player.fame ?? 10}
                     </span>
                     <span className="cg-sub">pt</span>
                   </div>
@@ -188,8 +196,8 @@ export default function DevelopmentDashboard() {
                     <div
                       className="cg-fill"
                       style={{
-                        width: `${Math.min(100, (player.fame || 10))}%`,
-                        backgroundColor: '#fbbf24',
+                        width: `${Math.min(100, (player.fame ?? 10))}%`,
+                        backgroundColor: 'var(--club-warning)',
                       }}
                     ></div>
                   </div>
@@ -207,6 +215,7 @@ export default function DevelopmentDashboard() {
 
             {/* 우측 패널: 오늘 슬롯 행동 선택 패널 */}
             <section className="home-center-stage">
+              <DayProgress currentSlot={clock.currentSlot} ended={isCareerEnded} />
               <SlotActionPanel
                 currentSlot={clock.currentSlot}
                 date={clock.date}
@@ -251,7 +260,6 @@ export default function DevelopmentDashboard() {
       </main>
 
       {/* 3. 앱 메인 네비게이션 (데스크톱 사이드 / 모바일 하단 탭바) */}
-      <div inert={showGradeReport || !!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} unreadTabs={unreadTabs} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
       {lastActionResult && (
