@@ -1,4 +1,4 @@
-name: Validate career progression
+name: 선수 육성 진행 검증
 on:
   pull_request:
   workflow_dispatch:
@@ -6,6 +6,7 @@ permissions:
   contents: read
 jobs:
   validate:
+    name: 완주 검사와 빌드
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -14,6 +15,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+      - name: 개발 패키지 설치
+        run: npm ci
+      - name: 전체 자동 검사
+        run: npm test
+      - name: 배포용 빌드
+        run: npm run build

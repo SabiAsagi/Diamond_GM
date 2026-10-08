@@ -66,14 +66,7 @@ export function normalizeAppearance(
   const hairStyleId = PORTRAIT_PRESETS[gender].some((p) => p.id === requested)
     ? requested
     : fallback;
-  const rawAccessory = record.accessoryId ?? record.accessory;
-  const accessoryId =
-    rawAccessory === 'headband'
-      ? 'headband'
-      : rawAccessory === 'glasses' || rawAccessory === 'goggles'
-        ? 'goggles'
-        : undefined;
-  return { hairStyleId, accessoryId, cap: accessoryId === 'headband' || record.cap === 'none' ? 'none' : 'team' };
+  return { hairStyleId };
 }
 export const EXTRA_RATINGS = {
   gapPower: ['갭파워', '외야 사이를 가르는 2·3루타 생산 능력'],

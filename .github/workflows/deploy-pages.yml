@@ -1,4 +1,4 @@
-name: Deploy playable site
+name: 게임 사이트 배포
 on:
   push:
     branches: [main]
@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
+    name: 게임 검사와 빌드
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,9 +20,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+      - name: 개발 패키지 설치
+        run: npm ci
+      - name: 전체 자동 검사
+        run: npm test
+      - name: 배포용 빌드
+        run: npm run build
       - uses: actions/configure-pages@v5
         with:
           enablement: true
@@ -29,12 +33,13 @@ jobs:
         with:
           path: dist
   deploy:
+    name: GitHub Pages 배포
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy
+      - name: 사이트 게시
         id: deployment
         uses: actions/deploy-pages@v4
