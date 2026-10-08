@@ -21,7 +21,7 @@ export const isCastId = (id: string): id is CastId => (CAST_IDS as readonly stri
 
 /** 캐스트가 없는 이전 저장본의 인물. 기존 이름과 전용 일러스트를 그대로 쓴다. */
 const DEFAULT_GENDERS: Record<CastId, Gender> = {
-  senior: 'male', peer: 'male', rival: 'male', junior: 'male', childhood: 'female', neighbor: 'male', deskmate: 'female',
+  senior: 'male', peer: 'male', rival: 'male', junior: 'male', childhood: 'female', neighbor: 'male', deskmate: 'female', classLeader: 'female',
 };
 export const DEFAULT_CAST: Cast = Object.fromEntries(CAST_IDS.map(id => [id, {
   name: BOND_NAMES[id], gender: DEFAULT_GENDERS[id], portrait: { kind: 'image', src: CHARACTER_PORTRAITS[id] },
@@ -65,7 +65,7 @@ const hasBatchim = (word: string) => {
  * {peer|과}처럼 조사를 붙이면 이름 받침에 맞춰 과/와, 이/가, 은/는, 을/를 등을 고른다.
  */
 export function personalizeText(text: string, player: Pick<Player, 'cast'> | null | undefined): string {
-  return text.replace(/\{(senior|peer|rival|junior|childhood|neighbor|deskmate)(?:\|([^}]+))?\}/g, (_, id: CastId, josa?: string) => {
+  return text.replace(/\{(senior|peer|rival|junior|childhood|neighbor|deskmate|classLeader)(?:\|([^}]+))?\}/g, (_, id: CastId, josa?: string) => {
     const name = getBondName(player, id);
     const forms = josa ? JOSA[josa] : undefined;
     return name + (forms ? forms[hasBatchim(name) ? 0 : 1] : josa ?? '');
@@ -115,5 +115,9 @@ export function generateCast(
       portrait: { kind: 'imagePair', schoolSrc: profile.schoolPortrait!, casualSrc: profile.casualPortrait! },
     };
   });
+  // 이미 사용한 친구의 얼굴은 제외하여 반장과 동네 친구가 같은 인물이 되지 않게 한다.
+  const usedPortraits = new Set(Object.values(cast).map(member => member.portrait.kind === 'imagePair' ? member.portrait.schoolSrc : ''));
+  const leader = pick(RANDOM_RELATIONSHIP_PROFILES.neighbor.filter(profile => !usedPortraits.has(profile.schoolPortrait!)));
+  cast.classLeader = { name: nameFor(leader.gender), gender: leader.gender, portrait: { kind: 'imagePair', schoolSrc: leader.schoolPortrait!, casualSrc: leader.casualPortrait! } };
   return cast as Cast;
 }

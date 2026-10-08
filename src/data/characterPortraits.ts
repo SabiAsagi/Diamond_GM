@@ -13,6 +13,7 @@ export const CHARACTER_PORTRAITS = {
   childhood: 'assets/characters/childhood-v18.webp',
   neighbor: 'assets/characters/neighbor-v18.webp',
   deskmate: 'assets/characters/deskmate-v18.webp',
+  classLeader: 'assets/characters/random/neighbor/neighbor-01-school.webp',
   mother: 'assets/characters/mother-v18.webp',
   father: 'assets/characters/father-v18.webp',
   scout: 'assets/characters/scout-v18.webp',

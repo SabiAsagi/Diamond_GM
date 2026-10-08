@@ -40,11 +40,12 @@ export default function CoachInterview() {
       if (!id) return;
       const p = await db.players.get(Number(id));
       if (p) {
+        if (p.interviewCompleted || ['school','team'].includes(p.careerJourney?.onboarding ?? '')) { navigate(`/development/dashboard/${p.id}`, { replace: true }); return; }
         setPlayer(p);
       }
     }
     loadPlayer();
-  }, [id]);
+  }, [id, navigate]);
 
   if (!player) {
     return (
@@ -140,7 +141,7 @@ export default function CoachInterview() {
       fame: newFame,
       traits: newTraits,
       interviewCompleted: true,
-      careerJourney: player.careerJourney ? { ...player.careerJourney, met: [...new Set([...player.careerJourney.met, 'coach' as const])] } : undefined,
+      careerJourney: player.careerJourney ? { ...player.careerJourney, onboarding: 'complete', met: [...new Set([...player.careerJourney.met, 'coach' as const])] } : undefined,
       chosenPathTitle: pathTitle,
       familyBackground: allAnswers.some(a=>a.id==='q4_grandma') ? 'grandmother' : 'parents',
       siblings,
@@ -155,7 +156,7 @@ export default function CoachInterview() {
         weekday: 1,
         grade: 1,
       },
-      currentSlot: 'morning',
+      currentSlot: player.careerJourney?.onboarding === 'interview' ? 'night' : 'morning',
     };
 
     // Overall 계산
@@ -193,7 +194,7 @@ export default function CoachInterview() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {schoolData && <SchoolEmblem school={schoolData} size="md" />}
             <div>
-              <span className="interview-location-tag">{player.highSchool} 야구부 감독실</span>
+              <span className="interview-location-tag">{player.highSchool} · 야구부 첫 미팅 후 감독 면담</span>
               <h2 className="interview-title">신입 부원 1:1 진로 & 플레이 성향 심층 면담</h2>
             </div>
           </div>

@@ -72,7 +72,7 @@ export default function DevelopmentDashboard() {
       const p = await db.players.get(Number(id));
       if (!p) { setLoadError('선수 저장본을 찾지 못했습니다.'); return; }
       if (p) {
-        if (!p.interviewCompleted) {
+        if (!p.interviewCompleted && !['school','team'].includes(p.careerJourney?.onboarding ?? '')) {
           navigate(`/development/interview/${p.id}`);
           return;
         }
@@ -83,6 +83,10 @@ export default function DevelopmentDashboard() {
     }
     loadData();
   }, [id, navigate, initClock, loadAttempt]);
+
+  useEffect(() => {
+    if (player?.id === Number(id) && !player.interviewCompleted && player.careerJourney?.onboarding === 'interview' && !activeCutscene) navigate(`/development/interview/${player.id}`);
+  }, [player, id, activeCutscene, navigate]);
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });

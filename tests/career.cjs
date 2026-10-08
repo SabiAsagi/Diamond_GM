@@ -246,7 +246,7 @@ test('개별 점수·5단계 효과·성별 무관 로맨스와 졸업 인연이
   p.grade = 2;
   p.relationships = { ...p.relationships, coach: 90, peer: 90, rival: 12 };
   const profiles = buildBondProfiles(p);
-  assert.equal(profiles.length, 13);
+  assert.equal(profiles.length, 14);
   for (const b of profiles) {
     assert.deepEqual(
       b.stageEffects.map((e) => e.stage),
@@ -451,7 +451,7 @@ test('모든 인물별 활동은 그 인물만 변경하고 밤 저장·상한·
       option.id,
     );
   const talks = all.filter((o) => o.id.startsWith('bond_talk_'));
-  assert.equal(talks.length, 13);
+  assert.equal(talks.length, 14);
   for (const option of talks) {
     const p = { ...player(), grade: 2 };
     const before = structuredClone(p.relationships);
@@ -688,7 +688,7 @@ test('인연 전원과 대화 화자는 존재하는 전용 초상화를 사용�
   const { CHARACTER_PORTRAITS } = require(path.join(dir, 'data/characterPortraits.js'));
   const { CUTSCENE_EVENTS_POOL } = require(path.join(dir, 'data/cutsceneEvents.js'));
   const portraits = Object.keys(BOND_NAMES).map((id) => CHARACTER_PORTRAITS[id]);
-  assert.equal(new Set(portraits).size, 13, '인연끼리 초상화를 돌려쓰지 않는다');
+  assert.equal(new Set(portraits).size, 14, '인연끼리 초상화를 돌려쓰지 않는다');
   for (const src of Object.values(CHARACTER_PORTRAITS))
     assert.ok(fs.existsSync(path.join('public', src)), src);
   for (const event of CUTSCENE_EVENTS_POOL)

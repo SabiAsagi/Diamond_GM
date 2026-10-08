@@ -3,7 +3,7 @@ import type { EventCutscene } from '../../types/randomEvent';
 import type { Player } from '../../types';
 import { PlayerPortrait } from '../PlayerAppearance';
 import { formatBondChanges, actualBondChanges, applyBondChanges } from '../../types/bondScores';
-import { personalizeText } from '../../data/cast';
+import { personalizeText, getBondName } from '../../data/cast';
 import { CharacterPortrait } from '../CharacterPortrait';
 
 function rewardText(event: EventCutscene, player: Player, choiceId: string) {
@@ -50,7 +50,10 @@ export function EventCutsceneModal({
 }) {
   const [step, setStep] = useState(-1);
   // 대사 속 {peer} 같은 인물 자리를 이번 회차 이름으로 바꾼다.
-  const t = (text: string) => personalizeText(text, player);
+  // 소개 장면 안에서만 이름을 공개하고, 저장된 인연 목록은 완료 전까지 유지한다.
+  const introducing = cutscene.id.startsWith('meet_') ? Object.keys(cutscene.effect(player).relationshipTargets ?? {}) : [];
+  const dialoguePlayer = player.careerJourney ? { ...player, careerJourney: { ...player.careerJourney, met: [...new Set([...player.careerJourney.met, ...introducing])] as typeof player.careerJourney.met } } : player;
+  const t = (text: string) => personalizeText(text, dialoguePlayer);
   const [chosen, setChosen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -62,6 +65,7 @@ export function EventCutsceneModal({
   }, []);
   const lines = cutscene.dialogueLines ?? [{ speaker: 'npc' as const, text: cutscene.dialogue }];
   const line = lines[Math.max(0, Math.min(step, lines.length - 1))];
+  const speakerId = line.speakerId ?? cutscene.speakerId;
   const choice = cutscene.choices?.find((c) => c.id === chosen);
   const isPlayer = step >= 0 && !chosen && line.speaker === 'player';
   const atEnd = step === lines.length - 1;
@@ -98,12 +102,12 @@ export function EventCutsceneModal({
           />
         </div>
         <div className={!isPlayer ? 'cast-person speaking' : 'cast-person'}>
-          {cutscene.speakerId ? <CharacterPortrait player={player} id={cutscene.speakerId} variant={cutscene.portraitVariant} /> : <img src={cutscene.portrait} alt="" />}
+          {speakerId ? <CharacterPortrait player={player} id={speakerId} variant={cutscene.portraitVariant} /> : <img src={cutscene.portrait} alt="" />}
         </div>
       </div>
       <section className="story-dialogue">
         <strong className="story-speaker">
-          {step < 0 ? '잠깐, 누군가 다가옵니다' : isPlayer ? player.name : t(cutscene.speakerName)}
+          {step < 0 ? '새로운 사람들과 인사를 나눕니다' : isPlayer ? player.name : line.speakerId ? getBondName(dialoguePlayer, line.speakerId) : t(cutscene.speakerName)}
         </strong>
         <p key={`${step}-${chosen}`} className="story-line" aria-live="polite">
           {t(step < 0 ? cutscene.subtitle : choice ? choice.response : line.text)}
