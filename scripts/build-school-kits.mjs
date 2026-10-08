@@ -42,7 +42,7 @@ try {
   const hash = crypto.createHash('sha256');
   for (const buffer of sources) hash.update(buffer);
   for (const name of ['src/data/highSchools.ts', 'src/data/schoolKits.ts', 'scripts/build-school-kits.mjs',
-    'scripts/kit-colours.mjs', 'scripts/kit-lettering.mjs', 'scripts/fonts/NotoSansKR-kit-subset.ttf']) {
+    'scripts/kit-colours.mjs', 'scripts/kit-lettering.mjs', 'scripts/fonts/NotoSansKR-kit-subset.ttf', 'scripts/fonts/Bevan-Regular.ttf']) {
     hash.update(await fs.readFile(path.join(root, name)));
   }
   const fingerprint = hash.digest('hex');
