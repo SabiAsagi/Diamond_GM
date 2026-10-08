@@ -76,15 +76,15 @@ export async function getKitLetteringSvg(kit, preset, { cap = true } = {}) {
     const available = f.chestRight - rightEdge - 6;
     const size = Math.min(preset === 'female_long' ? 26 : latin ? 34 : 30, available / Math.max(...measured) / .8);
     const scaleX = Math.min(1, available / Math.max(...measured) / size);
-    chest = lines.map((word, i) => textEl(word, (rightEdge + f.chestRight) / 2, f.chestY + 1 + i * (size * 1.15), size, 'right', 'middle', scaleX)).join('');
+    chest = lines.map((word, i) => textEl(word, (rightEdge + f.chestRight) / 2, f.chestY + 3 + i * (size * 1.15), size, 'right', 'middle', scaleX)).join('');
   } else {
     const mid = Math.ceil(text.length / 2);
     const left = text.slice(0, mid).join(''), right = text.slice(mid).join('');
     const [lw, rw] = await Promise.all([wordWidth(left, family), right ? wordWidth(right, family) : Promise.resolve(0)]);
     const widthRatio = Math.min((leftEdge - f.chestLeft - 5) / lw, rw ? (f.chestRight - rightEdge - 5) / rw : Infinity);
     const size = Math.min(latin ? 34 : 30, widthRatio / .8), scaleX = Math.min(1, widthRatio / size);
-    chest = textEl(left, leftEdge - 2, f.chestY + 5, size, 'left', 'end', scaleX)
-      + (right ? textEl(right, rightEdge + 2, f.chestY + 5, size, 'right', 'start', scaleX) : '');
+    chest = textEl(left, leftEdge - 2, f.chestY + 7, size, 'left', 'end', scaleX)
+      + (right ? textEl(right, rightEdge + 2, f.chestY + 7, size, 'right', 'start', scaleX) : '');
   }
   const capLatin = /^[A-Z0-9]+$/.test(kit.symbol);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="960" viewBox="0 0 200 300"><defs><clipPath id="left"><rect x="${f.chestLeft}" y="${f.chestY - 32}" width="${leftEdge - f.chestLeft}" height="76"/></clipPath><clipPath id="right"><rect x="${rightEdge}" y="${f.chestY - 32}" width="${f.chestRight - rightEdge}" height="76"/></clipPath></defs><g font-family="Noto Sans KR" font-weight="900">${cap ? `<text x="${f.capX}" y="${f.forehead - 17}" font-family="${capLatin ? 'Bevan' : 'Noto Sans KR'}" font-weight="${capLatin ? 400 : 900}" text-anchor="middle" font-size="15" fill="${kit.capText}" stroke="${kit.capPrimary}" stroke-width=".5" paint-order="stroke">${escape(kit.symbol)}</text>` : ''}${chest}</g></svg>`;
