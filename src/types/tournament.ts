@@ -1,8 +1,9 @@
+import { generateWeekendMatches } from '../data/weekendLeague';
 import type { HighSchoolData, SchoolTier } from './highSchool';
 import type { GameDate } from './calendar';
 
 export type TournamentType =
-  | 'weekend_league'     // 주말리그 (정규시즌, 매주 토요일 반복)
+  | 'weekend_league'     // 전·후반기 권역별 단일 순환 리그
   | 'spring_national'    // 이마트배 등 전국대회
   | 'summer_national'    // 황금사자기 / 청룡기 등
   | 'autumn_national'    // 봉황대기 등
@@ -29,6 +30,8 @@ export function getMatchKind(match: ScheduledMatch): MatchKind {
   return match.kind ?? (match.tournamentId === 'weekend_league' ? 'weekend' : match.tournamentId.startsWith('scrimmage_') ? 'scrimmage' : match.tournamentId.startsWith('practice_') ? 'practice' : 'national');
 }
 export interface ScheduledMatch {
+  scheduleVersion?: number;
+  leagueHalf?: 1 | 2;
   kind?: MatchKind;
   year?: number;
   group?: string;
@@ -56,7 +59,7 @@ export const MAJOR_TOURNAMENT_TEMPLATES: TournamentSchedule[] = [
     id: 'emart_spring',
     type: 'spring_national',
     name: '신세계 이마트배 전국고교야구대회',
-    startDate: { month: 4, day: 11 },
+    startDate: { month: 4, day: 15 },
     roundIntervalDays: 3,
     participatingTiers: ['S', 'A', 'B', 'C', 'D'],
     description: '대한야구소프트볼협회 주관 전국 규모 최대 등록 고교 참가 대회.',
@@ -64,26 +67,35 @@ export const MAJOR_TOURNAMENT_TEMPLATES: TournamentSchedule[] = [
   {
     id: 'golden_lion',
     type: 'summer_national',
-    name: '제79회 황금사자기 전국고교야구대회',
-    startDate: { month: 5, day: 16 },
+    name: '황금사자기 전국고교야구대회',
+    startDate: { month: 5, day: 2 },
     roundIntervalDays: 3,
-    participatingTiers: ['S', 'A', 'B', 'C'],
+    participatingTiers: ['S', 'A', 'B', 'C', 'D'],
     description: '동아일보사 주최 역사와 전통을 자랑하는 메이저 전국대회.',
   },
   {
     id: 'blue_dragon',
     type: 'summer_national',
-    name: '제80회 청룡기 전국고교야구선수권',
-    startDate: { month: 7, day: 11 },
+    name: '청룡기 전국고교야구선수권',
+    startDate: { month: 7, day: 1 },
     roundIntervalDays: 3,
-    participatingTiers: ['S', 'A', 'B', 'C'],
+    participatingTiers: ['S', 'A', 'B', 'C', 'D'],
     description: '조선일보사 주최 고교야구 최고의 권위를 지닌 하계 선수권.',
+  },
+  {
+    id: 'president_cup',
+    type: 'summer_national',
+    name: '대통령배 전국고교야구대회',
+    startDate: { month: 7, day: 22 },
+    roundIntervalDays: 3,
+    participatingTiers: ['S', 'A', 'B', 'C', 'D'],
+    description: '주말리그 이후 여름 전국 무대를 잇는 대통령배. 게임에서는 등록 학교 공개 추첨으로 편성합니다.',
   },
   {
     id: 'phoenix_autumn',
     type: 'autumn_national',
-    name: '제54회 봉황대기 전국고교야구대회',
-    startDate: { month: 8, day: 22 },
+    name: '봉황대기 전국고교야구대회',
+    startDate: { month: 8, day: 15 },
     roundIntervalDays: 3,
     participatingTiers: ['S', 'A', 'B', 'C', 'D'],
     description: '초록 봉황을 향한 전국 모든 고교가 조건 없이 출전하는 토너먼트.',
@@ -121,7 +133,8 @@ const FESTIVAL_ROUNDS: { round: string; games: [month: number, day: number, time
 export function getTournamentRuleText(tournamentId: string): string {
   if (tournamentId === FESTIVAL_QUALIFIER_ID) return '대회 규칙: 같은 시·도 학교끼리 단판 토너먼트(참가 학교 수에 따라 1회전 부전승) → 우승 학교가 전국체전 시·도 대표로 출전';
   if (tournamentId === NATIONAL_FESTIVAL_ID) return '대회 규칙: 16개 시·도 대표 단판 토너먼트 1회전 → 8강 → 4강 → 결승 (경기마다 정해진 날짜에 진행)';
-  return '게임 대회 규칙: 4팀씩 조별 토너먼트 예선 → 조 우승팀 본선 16강 → 8강 → 4강 → 결승';
+  if (tournamentId === 'weekend_league') return '게임 리그 규칙: 전·후반기 각각 최대 7팀 권역 조 · 같은 조 상대와 한 번씩(최대 6경기) · 토요일 진행 · 실제 편성·날짜는 재현하지 않음';
+  return '게임 대회 규칙: 등록 학교 공개 추첨 · 4팀씩 조별 토너먼트 예선 → 조 우승팀 본선 16강 → 8강 → 4강 → 결승 (실제 출전 자격·일정은 단순화)';
 }
 
 const TIER_ORDER: SchoolTier[] = ['S', 'A', 'B', 'C', 'D'];
@@ -270,54 +283,7 @@ export function generateSeasonMatches(
   playerSchool: HighSchoolData,
   allSchools: HighSchoolData[]
 ): ScheduledMatch[] {
-  const matches: ScheduledMatch[] = [];
-  const otherSchools = allSchools.filter(s => s.id !== playerSchool.id && s.name !== playerSchool.name);
-
-  // 같은 권역 학교 우선 선택, 부족하면 전체 풀에서 선택
-  const sameRegionSchools = otherSchools.filter(s => s.region === playerSchool.region);
-  const candidateOpponents = sameRegionSchools.length >= 5 ? sameRegionSchools : otherSchools;
-
-  let opponentIdx = 0;
-  const getNextOpponent = () => {
-    if (candidateOpponents.length === 0) {
-      return { id: 'rival_high', name: '라이벌고', region: playerSchool.region, tier: 'B' as SchoolTier };
-    }
-    const opp = candidateOpponents[opponentIdx % candidateOpponents.length];
-    opponentIdx++;
-    return opp;
-  };
-
-  // 1. 고교야구 주말리그 (4월 1일 ~ 9월 20일 사이의 모든 토요일)
-  let weekendWeek = 1;
-  for (let m = 4; m <= 9; m++) {
-    // 8월 후반 봉황대기 시즌 일부 휴식 제외, 토요일마다 주말리그 배치
-    const daysInM = m === 4 || m === 6 || m === 9 ? 30 : 31;
-    for (let d = 1; d <= daysInM; d++) {
-      const dObj = new Date(year, m - 1, d);
-      if (dObj.getDay() === 6) { // 6: 토요일
-        // 여름방학 집중 휴식(7/25~8/8) 제외
-        if (m === 7 && d >= 25) continue;
-        if (m === 8 && d <= 8) continue;
-
-        const opp = getNextOpponent();
-        const stageName = m <= 6 ? '전반기' : '후반기';
-        matches.push({
-          id: `weekend_${m}_${d}`,
-          date: { month: m, day: d },
-          tournamentId: 'weekend_league',
-          tournamentName: '고교야구 주말리그',
-          round: `${stageName} ${weekendWeek}주차`,
-          homeSchoolId: playerSchool.id,
-          homeSchoolName: playerSchool.name,
-          awaySchoolId: opp.id,
-          awaySchoolName: opp.name,
-          isPlayerTeamMatch: true,
-          description: `주말리그 ${stageName} 조별리그 ${weekendWeek}차전 (${opp.name}전)`,
-        });
-        weekendWeek++;
-      }
-    }
-  }
+  const matches: ScheduledMatch[] = generateWeekendMatches(year, playerSchool, allSchools);
 
   for (const tour of MAJOR_TOURNAMENT_TEMPLATES) matches.push(...buildTournamentOpening(tour, year, playerSchool, allSchools));
   // 일자 순서로 정렬
@@ -398,7 +364,7 @@ export function settleScheduleConflicts(matches: ScheduledMatch[], from?: GameDa
   const candidates=updated.filter(m=>m.isPlayerTeamMatch).sort((a,b)=>Number(!a.result)-Number(!b.result)||Number(getMatchKind(a)!=='national')-Number(getMatchKind(b)!=='national')||a.date.month-b.date.month||a.date.day-b.date.day);
   for(const m of candidates){
     if(from&&m.date.month*32+m.date.day<from.month*32+from.day)continue;
-    while(used.has(`${m.date.month}-${m.date.day}`)&&!m.result){const d=new Date(m.year??from?.year??2026,m.date.month-1,m.date.day+1);m.date={month:d.getMonth()+1,day:d.getDate()};}
+    while(used.has(`${m.date.month}-${m.date.day}`)&&!m.result){const d=new Date(m.year??from?.year??2026,m.date.month-1,m.date.day+(getMatchKind(m)==='weekend'?7:1));m.date={month:d.getMonth()+1,day:d.getDate()};}
     used.add(`${m.date.month}-${m.date.day}`);
   }
   return updated.sort((a,b)=>a.date.month-b.date.month||a.date.day-b.date.day);

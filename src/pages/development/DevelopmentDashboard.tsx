@@ -1,3 +1,5 @@
+import { getUnreadNews } from '../../data/news';
+import { GAME_VERSION } from '../../version';
 import { SeasonJourneyPanel } from '../../components/daily/SeasonJourneyPanel';
 import { MonthlyGoalsPanel } from '../../components/daily/MonthlyGoalsPanel';
 import { GradeReportModal } from '../../components/daily/GradeReportModal';
@@ -97,6 +99,8 @@ export default function DevelopmentDashboard() {
   const gradeReport = player.gradeReports?.find(r => r.id === player.pendingGradeReportId);
   const showGradeReport = !!gradeReport && !activeCutscene && !lastActionResult;
   const showRivalReport = !gradeReport && !!player.pendingRivalReport && activeNavTab === 'home' && !outingOpen && !drawDue && !activeCutscene && !lastActionResult;
+  const unreadNews = getUnreadNews(player, clock.date);
+  const unreadTabs = Object.fromEntries(['records', 'goals', 'info'].map(tab => [tab, unreadNews.some(n => n.tab === tab)]));
   const currentSlotAssignment = dailyPlan.slots[clock.currentSlot];
 
 
@@ -104,6 +108,7 @@ export default function DevelopmentDashboard() {
   return (
     <div className="onepage-viewport-container">
       {/* 1. 상단바 (고정) */}
+      <header className="clubhouse-masthead"><div className="clubhouse-brand"><span className="diamond-mark" aria-hidden="true">◆</span><span>DIAMOND GM <small>선수의 하루</small></span></div><span className="clubhouse-edition">클럽하우스 × 선수 일지 · {GAME_VERSION}</span></header>
       <DailyTopBar
         player={player}
         school={school}
@@ -246,7 +251,7 @@ export default function DevelopmentDashboard() {
       </main>
 
       {/* 3. 앱 메인 네비게이션 (데스크톱 사이드 / 모바일 하단 탭바) */}
-      <div inert={showGradeReport || !!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
+      <div inert={showGradeReport || !!drawDue || showRivalReport}><AppNavigation activeTab={activeNavTab} unreadTabs={unreadTabs} onTabChange={tab => { setActiveNavTab(tab); setOutingOpen(false); setTeamOpen(false); }} /></div>
 
       {/* 4. 활동 완료 즉시 스탯 변화 팝업 모달 */}
       {lastActionResult && (

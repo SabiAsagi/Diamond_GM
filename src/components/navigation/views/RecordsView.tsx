@@ -1,3 +1,7 @@
+import { getUnreadNews } from '../../../data/news';
+import { NewsNotice } from '../NewsNotice';
+import { useGameClockStore } from '../../../store/gameClockStore';
+import { getTournamentRuleText } from '../../../types/tournament';
 import { GradeReportContent } from '../../daily/GradeReportModal';
 import { useState } from 'react';
 import type { Player } from '../../../types';
@@ -22,6 +26,8 @@ export function RecordsView({
   onClose,
   defaultSubTab = 'matches',
 }: RecordsViewProps) {
+  const date = useGameClockStore(s => s.clock.date);
+  const news = getUnreadNews(player, date).filter(n => n.tab === 'records');
   const [subTab, setSubTab] = useState<'matches' | 'tournaments' | 'years'>(defaultSubTab);
 
   return (
@@ -34,7 +40,7 @@ export function RecordsView({
           className={`tab-btn ${subTab === 'matches' ? 'active' : ''}`}
           onClick={() => setSubTab('matches')}
         >
-          <Trophy size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 경기
+          <Trophy size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 경기{news.some(n => n.section === 'matches') && <span className="news-dot" aria-label="새 소식" />}
         </button>
         <button
           className={`tab-btn ${subTab === 'tournaments' ? 'active' : ''}`}
@@ -42,18 +48,19 @@ export function RecordsView({
         >
           <Award size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> 대회·리그
         </button>
-        <button className={`tab-btn ${subTab === 'years' ? 'active' : ''}`} onClick={() => setSubTab('years')}>학년 일지</button>
+        <button className={`tab-btn ${subTab === 'years' ? 'active' : ''}`} onClick={() => setSubTab('years')}>학년 일지{news.some(n => n.section === 'years') && <span className="news-dot" aria-label="새 소식" />}</button>
       </div>
 
+      <NewsNotice news={news.filter(n => n.section === subTab)} />
       {subTab === 'matches' ? (
         <MatchesView showBracket={false} player={player} matches={matches} historyLogs={historyLogs} onClose={onClose} />
       ) : subTab === 'years' ? (
         <div className="menu-view-container glass-panel"><div className="menu-view-body">{player.gradeReports?.length ? player.gradeReports.map(report => <details key={report.id}><summary>{report.grade}학년 · {report.start.date.year}학년도</summary><GradeReportContent report={report} player={player} /></details>) : <p>학년을 마치면 한 해의 기록이 이곳에 남습니다.</p>}</div></div>
       ) : (
         <div className="menu-view-container glass-panel"><div className="menu-view-body"><TournamentBracket matches={matches} />
-          <section aria-label="주말리그"><h4>주말리그 일정·결과</h4>
+          <section aria-label="주말리그"><h4>주말리그 일정·결과</h4><p className="league-format-note">{getTournamentRuleText('weekend_league')}</p>
             {matches.filter(m => m.tournamentId === 'weekend_league' && m.isPlayerTeamMatch).map(m => <div className="bracket-game" key={m.id}>
-              <small>{m.date.month}/{m.date.day} · {m.round}</small>
+              <small>{m.date.month}/{m.date.day} · {m.round} · {m.group}</small>
               <p>{m.homeSchoolName} vs {m.awaySchoolName}</p>
               <strong>{m.result ? `${m.result === 'home' ? m.homeSchoolName : m.awaySchoolName} 승리` : '경기 예정'}</strong>
             </div>)}

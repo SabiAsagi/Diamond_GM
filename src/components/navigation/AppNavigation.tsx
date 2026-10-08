@@ -1,10 +1,11 @@
-import { Home, ClipboardList, Target, LineChart, Settings } from 'lucide-react';
+import { Diamond, NotebookPen, Flag, ContactRound, Settings } from 'lucide-react';
 
 export type MainNavTab = 'records' | 'goals' | 'home' | 'info' | 'settings';
 
 interface AppNavigationProps {
   activeTab: MainNavTab;
   onTabChange: (tab: MainNavTab) => void;
+  unreadTabs?: Partial<Record<MainNavTab, boolean>>;
 }
 
 interface NavItem {
@@ -13,17 +14,17 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
+export function AppNavigation({ activeTab, onTabChange, unreadTabs = {} }: AppNavigationProps) {
   const navItems: NavItem[] = [
-    { id: 'records', label: '기록', icon: <ClipboardList size={18} /> },
-    { id: 'goals', label: '목표', icon: <Target size={18} /> },
-    { id: 'home', label: '홈', icon: <Home size={18} /> },
-    { id: 'info', label: '정보', icon: <LineChart size={18} /> },
+    { id: 'records', label: '기록실', icon: <NotebookPen size={20} /> },
+    { id: 'goals', label: '월간 목표', icon: <Flag size={20} /> },
+    { id: 'home', label: '클럽하우스', icon: <Diamond size={22} /> },
+    { id: 'info', label: '선수 수첩', icon: <ContactRound size={20} /> },
     { id: 'settings', label: '설정', icon: <Settings size={18} /> },
   ];
 
   return (
-    <nav className="app-main-nav">
+    <nav className="app-main-nav" aria-label="주 메뉴">
       {navItems.map(item => {
         const isActive = activeTab === item.id;
         return (
@@ -31,9 +32,10 @@ export function AppNavigation({ activeTab, onTabChange }: AppNavigationProps) {
             key={item.id}
             className={`nav-tab-button ${isActive ? 'active' : ''}`}
             onClick={() => onTabChange(item.id)}
-            aria-label={item.label}
+            aria-label={`${item.label}${unreadTabs[item.id] ? ' · 새 소식 있음' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
           >
-            <span className="nav-tab-icon">{item.icon}</span>
+            <span className="nav-tab-icon">{item.icon}{unreadTabs[item.id] && <span className="nav-notification-dot" aria-hidden="true" />}</span>
             <span className="nav-tab-label">{item.label}</span>
           </button>
         );

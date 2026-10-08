@@ -35,7 +35,9 @@ const { INITIAL_RELATIONSHIPS } = require(path.join(dir, 'types/bondScores.js'))
 const { SUB_ACTIVITY_POOL, getActivityCategories, isActivityAvailable, sampleSubActivities } = require(path.join(dir, 'types/activity.js'));
 const { isSchoolDay, isVacationPeriod, isWinterVacation } = require(path.join(dir, 'types/academicCalendar.js'));
 const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals, getPlayerMatchForDate, progressTournament, advanceOtherTournamentMatches } = require(path.join(dir, 'types/tournament.js'));
-const openNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'phoenix_autumn'];
+const openNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'president_cup', 'phoenix_autumn'];
+const { generateWeekendMatches, migrateWeekendMatches, getWeekendGroup } = require(path.join(dir, 'data/weekendLeague.js'));
+const { collectPlayerNews, getUnreadNews } = require(path.join(dir, 'data/news.js'));
 function seededRandom(seed) {
   let n = seed >>> 0;
   return () => { n = (Math.imul(n, 1664525) + 1013904223) >>> 0; return n / 4294967296; };
@@ -650,4 +652,107 @@ test('3개년 연결: 1학년부터 윤년을 거쳐 졸업·재접속까지 실
     assert.deepEqual(saved.gradeReports.map(r => r.monthlyGoals.declared), [12, 12, 12]);
     t.diagnostic(JSON.stringify({ ...stats, gradeReports: saved.gradeReports.length, monthlyReports: saved.monthlyGoalReports.length, matches: records.length }));
   } finally { Math.random = random; }
+});
+
+
+test('91개 학교의 전후반기는 같은 조 상대와 한 번씩 최대 6경기, 토요일에 진행한다', () => {
+  for (const year of [2026, 2027, 2028]) for (const school of HIGH_SCHOOLS_DATA) {
+    const matches = generateSeasonMatches(year, school, HIGH_SCHOOLS_DATA);
+    const own = matches.filter(m => m.isPlayerTeamMatch);
+    assert.equal(new Set(own.map(m => `${m.date.month}-${m.date.day}`)).size, own.length, '하루 두 경기 금지');
+    for (const half of [1, 2]) {
+      const games = matches.filter(m => m.leagueHalf === half);
+      const group = getWeekendGroup(school, HIGH_SCHOOLS_DATA, half);
+      assert.equal(games.length, group.teams.length - 1);
+      assert.ok(games.length >= 4 && games.length <= 6, `${school.name} 반기 ${games.length}경기`);
+      const opponents = games.map(m => m.homeSchoolId === school.id ? m.awaySchoolId : m.homeSchoolId);
+      assert.equal(new Set(opponents).size, games.length);
+      for (const m of games) {
+        assert.equal(new Date(year, m.date.month - 1, m.date.day).getDay(), 6);
+        assert.ok(group.teams.some(s => s.id === m.awaySchoolId));
+        assert.equal(m.year, year);
+        assert.ok(m.round.startsWith(half === 1 ? '전반기' : '후반기'));
+      }
+    }
+    for (const id of openNationals) assert.ok(own.some(m => m.tournamentId === id), `${school.name} ${id} 누락`);
+  }
+});
+
+test('후반기 조는 재편성되며 전국대회 시즌은 이마트→황금→청룡→대통령→봉황 순서다', () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  assert.notDeepEqual(getWeekendGroup(school, HIGH_SCHOOLS_DATA, 1).teams.map(s => s.id), getWeekendGroup(school, HIGH_SCHOOLS_DATA, 2).teams.map(s => s.id));
+  const dates = openNationals.map(id => MAJOR_TOURNAMENT_TEMPLATES.find(t => t.id === id).startDate);
+  assert.ok(dates.every((d, i) => !i || d.month * 32 + d.day > dates[i - 1].month * 32 + dates[i - 1].day));
+});
+
+test('기존 저장본은 경기 결과·지난 일정을 보존하고 남은 주말리그만 한 번 바꾼다', () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const planned = generateWeekendMatches(2026, school, HIGH_SCHOOLS_DATA);
+  const past = { ...planned[0], id: 'weekend_3_7', scheduleVersion: undefined, result: 'home' };
+  const unplayedPast = { ...planned[1], id: 'weekend_3_14', scheduleVersion: undefined };
+  const future = { ...planned[2], id: 'weekend_9_12', scheduleVersion: undefined, date: { month: 9, day: 12 } };
+  const from = { year: 2026, month: 3, day: 21, grade: 1, weekday: 6 };
+  const input = [past, unplayedPast, future];
+  const snapshot = structuredClone(input);
+  const migrated = migrateWeekendMatches(input, 2026, school, HIGH_SCHOOLS_DATA, from);
+  assert.deepEqual(input, snapshot, '원본 저장본 변경 금지');
+  assert.equal(migrated.find(m => m.id === past.id).result, 'home');
+  assert.deepEqual(migrated.find(m => m.id === past.id).date, past.date);
+  assert.ok(migrated.some(m => m.id === unplayedPast.id));
+  assert.ok(!migrated.some(m => m.id === future.id));
+  assert.ok(migrated.filter(m => m.id !== past.id).every(m => !(m.homeSchoolId === (past.homeSchoolId === school.id ? past.awaySchoolId : past.homeSchoolId) && m.leagueHalf === 1)));
+  assert.deepEqual(migrateWeekendMatches(migrated, 2026, school, HIGH_SCHOOLS_DATA, from), migrated);
+});
+
+test('여섯 경기 이상 이미 끝난 반기는 새 경기를 추가하지 않는다', () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const base = generateWeekendMatches(2026, school, HIGH_SCHOOLS_DATA)[0];
+  const played = Array.from({ length: 7 }, (_, i) => ({ ...base, id: `weekend_3_${i + 1}`, scheduleVersion: undefined, result: 'home' }));
+  const migrated = migrateWeekendMatches(played, 2026, school, HIGH_SCHOOLS_DATA, { year: 2026, month: 3, day: 8, grade: 1, weekday: 0 });
+  assert.equal(migrated.filter(m => m.leagueHalf === 1).length, 7);
+  assert.ok(migrated.filter(m => m.leagueHalf === 1).every(m => m.result));
+});
+
+test('새 소식은 선수·세부 메뉴별이고 읽지 않은 다른 메뉴와 새 달의 알림은 유지한다', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'P', 'male');
+  p.inventory = ['notebook-test'];
+  p.traits = ['테스트 특성'];
+  await store.getState().initClock(p);
+  const state = store.getState();
+  const news = getUnreadNews(state.player, state.clock.date);
+  const ratingIds = news.filter(n => n.tab === 'info' && n.section === 'ratings').map(n => n.id);
+  assert.ok(ratingIds.length);
+  await store.getState().readNews(ratingIds);
+  const snapshot = structuredClone(saved);
+  await store.getState().initClock(snapshot);
+  const reloaded = store.getState();
+  assert.ok(!getUnreadNews(reloaded.player, reloaded.clock.date).some(n => ratingIds.includes(n.id)));
+  assert.ok(getUnreadNews(reloaded.player, reloaded.clock.date).some(n => n.section === 'equipment'));
+  assert.ok(getUnreadNews(reloaded.player, reloaded.clock.date).some(n => n.tab === 'goals'));
+  assert.ok(getUnreadNews({ ...reloaded.player, overall: reloaded.player.overall + 1 }, reloaded.clock.date).some(n => n.section === 'ratings'));
+  const plan = collectPlayerNews(reloaded.player, reloaded.clock.date).find(n => n.section === 'monthly');
+  await store.getState().readNews([plan.id]);
+  assert.ok(getUnreadNews(saved, { ...reloaded.clock.date, month: 4 }).some(n => n.id === 'plan:2026:4'));
+  assert.ok(getUnreadNews(starter(HIGH_SCHOOLS_DATA[0], 'P', 'male'), reloaded.clock.date).some(n => ratingIds.includes(n.id)));
+});
+
+test('알림 읽음 저장 실패는 알림을 없애거나 선수 데이터를 바꾸지 않는다', async () => {
+  await store.getState().initClock(starter(HIGH_SCHOOLS_DATA[0], 'SS', 'female'));
+  const snapshot = structuredClone(store.getState().player);
+  const news = getUnreadNews(snapshot, store.getState().clock.date);
+  failNextSave = true;
+  await assert.rejects(store.getState().readNews(news.map(n => n.id)), /save failed/);
+  assert.deepEqual(store.getState().player, snapshot);
+  assert.equal(store.getState().isLoading, false);
+  assert.equal(getUnreadNews(store.getState().player, store.getState().clock.date).length, news.length);
+});
+
+
+test('일부 새 주말리그와 과거 일정이 함께 있는 저장본도 경기 ID를 중복 생성하지 않는다', () => {
+  const school = HIGH_SCHOOLS_DATA[0];
+  const current = generateWeekendMatches(2026, school, HIGH_SCHOOLS_DATA);
+  const legacy = { ...current[0], id: 'weekend_3_7', scheduleVersion: undefined, result: 'home' };
+  const migrated = migrateWeekendMatches([legacy, ...current.slice(1)], 2026, school, HIGH_SCHOOLS_DATA, { year: 2026, month: 3, day: 8, weekday: 0, grade: 1 });
+  assert.equal(new Set(migrated.map(m => m.id)).size, migrated.length);
+  assert.equal(migrated.length, current.length);
 });

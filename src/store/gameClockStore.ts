@@ -1,3 +1,5 @@
+import { collectPlayerNews } from '../data/news';
+import { migrateWeekendMatches } from '../data/weekendLeague';
 import { getMonthlyGoalOptions, isGoalForMonth, progressMonthlyGoal, settleMonthlyGoal, type MonthlyGoalKind } from '../data/monthlyGoals';
 import { createGradeSnapshot, preserveGradeTournaments, finishGradeReport } from '../data/gradeReport';
 import { prepareTeamContext, updateCompetitionAfterAction, TEAM_ROLE_LABELS, dateNumber, refreshTeamEvaluation } from '../data/teamCompetition';
@@ -55,6 +57,7 @@ export interface GameClockState {
   lastActionResult: ActivityResult | null;
   clearLastActionResult: () => void;
   dismissRivalReport: () => Promise<void>;
+  readNews: (ids: string[]) => Promise<void>;
   dismissGradeReport: () => Promise<void>;
   declareMonthlyGoal: (kind: MonthlyGoalKind) => Promise<void>;
   activeCutscene: EventCutscene | null;
@@ -100,6 +103,20 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
   lastActionResult: null,
   clearLastActionResult: () => set({ lastActionResult: null }),
+  readNews: async ids => {
+    const { player, clock, isLoading } = get();
+    if (!player || isLoading) return;
+    const valid = new Set(collectPlayerNews(player, clock.date).map(n => n.id));
+    const read = new Set(player.readNewsIds ?? []);
+    const incoming = ids.filter(id => valid.has(id) && !read.has(id));
+    if (!incoming.length) return;
+    set({ isLoading: true });
+    try {
+      const updated = { ...player, readNewsIds: [...read, ...incoming] };
+      await db.players.put(updated);
+      set({ player: updated });
+    } finally { set({ isLoading: false }); }
+  },
   dismissRivalReport: async () => {
     const {player,isLoading}=get(); if(!player || isLoading || !player.pendingRivalReport)return;
     set({isLoading:true});
@@ -148,7 +165,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const initialSlot: TimeSlot = player.currentSlot || 'morning';
 
     // 시즌 대회 대진표 생성
-    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(addMissingNationals(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate), initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
+    const seasonMatches = player.savedSeasonYear === initialDate.year && player.savedMatches ? addClubMatches(addMissingNationals(migrateWeekendMatches(player.savedMatches, initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate), initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate), initialDate.year, school, HIGH_SCHOOLS_DATA, initialDate) : generateSeasonMatches(initialDate.year, school, HIGH_SCHOOLS_DATA);
     player=prepareTeamContext(player,school,initialDate,initialSlot,seasonMatches);
     captureAchievements(player);
     if (!player.gradeStartSnapshot) player.gradeStartSnapshot = createGradeSnapshot(player, initialDate);
