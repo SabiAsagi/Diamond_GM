@@ -140,6 +140,7 @@ export default function CoachInterview() {
       fame: newFame,
       traits: newTraits,
       interviewCompleted: true,
+      careerJourney: player.careerJourney ? { ...player.careerJourney, met: [...new Set([...player.careerJourney.met, 'coach' as const])] } : undefined,
       chosenPathTitle: pathTitle,
       familyBackground: allAnswers.some(a=>a.id==='q4_grandma') ? 'grandmother' : 'parents',
       siblings,

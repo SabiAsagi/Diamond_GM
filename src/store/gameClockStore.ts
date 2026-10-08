@@ -1,4 +1,6 @@
 import { collectPlayerNews } from '../data/news';
+import { INTRODUCTION_SCENES, GRADE_STORY_SCENES, nextJourneyScene, migrateCareerJourney, canDoSocialActivity, recordCareerAction, updateCareerProgress, schoolTrainingCulture, type CareerRoute } from '../data/careerJourney';
+import type { MatchDecisionId } from '../data/matchDecisions';
 import { migrateWeekendMatches } from '../data/weekendLeague';
 import { getMonthlyGoalOptions, isGoalForMonth, progressMonthlyGoal, settleMonthlyGoal, type MonthlyGoalKind } from '../data/monthlyGoals';
 import { createGradeSnapshot, preserveGradeTournaments, finishGradeReport } from '../data/gradeReport';
@@ -33,6 +35,8 @@ import type { EquipmentSlot } from '../types/equipment';
 import { EQUIPMENT_CATALOG, isEquipmentRelevant } from '../types/equipment';
 import type { OutdoorLocation } from '../types/outdoorMap';
 import { getTrainingEfficiencyMultiplier } from '../types/relationship';
+
+const ALL_CUTSCENES = [...INTRODUCTION_SCENES, ...GRADE_STORY_SCENES, ...CUTSCENE_EVENTS_POOL];
 
 export interface DayLogRecord {
   date: GameDate;
@@ -71,7 +75,8 @@ export interface GameClockState {
   initClock: (player: Player) => Promise<void>;
   advanceSlot: (result: ActivityResult) => Promise<void>;
   selectActivity: (slot: TimeSlot, category: DailyActivityCategory, subActivityId: string) => Promise<void>;
-  executeForcedSlot: (slot: TimeSlot) => Promise<void>;
+  executeForcedSlot: (slot: TimeSlot, decision?: MatchDecisionId) => Promise<void>;
+  chooseCareerRoute: (route: CareerRoute) => Promise<void>;
   regenerateDailyPlan: () => void;
   purchaseEquipment: (itemId: string) => Promise<boolean>;
   equipItem: (itemId: string, slot: EquipmentSlot) => Promise<void>;
@@ -147,7 +152,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
   initClock: async (player: Player) => {
     if (get().isLoading) throw new Error('다른 저장이 진행 중입니다. 저장 완료 후 다시 불러오세요.');
-    player = normalizePlayer(player);
+    player = updateCareerProgress(normalizePlayer(player), !!player.careerEndedAt || !!player.gradeReports?.some(r => r.grade === 3));
     set({ isLoading: true });
     try {
 
@@ -171,6 +176,10 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (!player.gradeStartSnapshot) player.gradeStartSnapshot = createGradeSnapshot(player, initialDate);
     player.savedMatches=seasonMatches;
     player.savedSeasonYear=initialDate.year;
+    if (!player.pendingEventId && !player.careerEndedAt && !player.pendingGradeReportId) {
+      const scene = nextJourneyScene(player, initialDate);
+      if (scene?.id.startsWith('meet_')) player.pendingEventId = scene.id;
+    }
     captureAchievements(player); await db.players.put(player);
     const academicEvents = [...ACADEMIC_CALENDAR_TEMPLATE];
 
@@ -197,7 +206,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       isCareerEnded: !!player.careerEndedAt || !!player.gradeReports?.some(r => r.grade === 3),
       isLoading: false,
       lastActionResult: null,
-      activeCutscene: CUTSCENE_EVENTS_POOL.find(e=>e.id===player.pendingEventId) ?? null,
+      activeCutscene: ALL_CUTSCENES.find(e=>e.id===player.pendingEventId) ?? null,
       cutsceneHistory: player.eventHistory ?? {},
     });
     } finally { set({ isLoading: false }); }
@@ -363,9 +372,11 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if(advanceRes.isMonthChanged && !isCareerEnded) updatedPlayer=updateMonthlyRival(updatedPlayer,nextDate);
 
       // 3. 확률적 컷신 이벤트 체크
-      let triggeredCutscene: EventCutscene | null = null;
+      updatedPlayer = recordCareerAction(player, updatedPlayer, result);
+      let triggeredCutscene: EventCutscene | null = isCareerEnded ? null : nextJourneyScene(updatedPlayer, nextDate);
       const nextHistory = { ...cutsceneHistory };
       for (const evt of CUTSCENE_EVENTS_POOL.map(evt=>({evt,rank:Math.random()})).sort((a,b)=>a.rank-b.rank).map(x=>x.evt)) {
+        if (triggeredCutscene) break;
         if (!result.activityCategory || !['training','relationship','study','special'].includes(result.activityCategory)) continue;
         if (evt.categories && !evt.categories.includes(result.activityCategory)) continue;
         if (isCareerEnded) continue;
@@ -423,9 +434,11 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     updatedPlayer=finalizeTeam(updatedPlayer,clock.date,nextSlot,seasonMatches);
     // 중간 슬롯에서도 확률적 컷신 체크
-    let triggeredCutscene: EventCutscene | null = null;
+    updatedPlayer = recordCareerAction(player, updatedPlayer, result);
+    let triggeredCutscene: EventCutscene | null = nextJourneyScene(updatedPlayer, clock.date);
     const nextHistory = { ...cutsceneHistory };
     for (const evt of CUTSCENE_EVENTS_POOL.map(evt=>({evt,rank:Math.random()})).sort((a,b)=>a.rank-b.rank).map(x=>x.evt)) {
+      if (triggeredCutscene) break;
         if (!result.activityCategory || !['training','relationship','study','special'].includes(result.activityCategory)) continue;
         if (evt.categories && !evt.categories.includes(result.activityCategory)) continue;
       if (shouldTriggerCutscene(evt, updatedPlayer, clock.date, nextHistory)) {
@@ -459,6 +472,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
   coachMeeting: async (choice, position) => {
     const {player,clock,dailyPlan,isLoading,activeCutscene,isCareerEnded}=get();
+    if (player?.careerJourney && !player.careerJourney.met.includes('coach')) return;
     if(!player||isLoading||activeCutscene||isCareerEnded||clock.currentSlot!=='afternoon'||dailyPlan.slots.afternoon.forced)return;
     if(dateNumber(clock.date)-(player.teamCompetition?.lastInterviewDay??-Infinity)<7)return;
     if(!['chance','position','accept'].includes(choice))return;
@@ -471,7 +485,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
 
     const pool = SUB_ACTIVITY_POOL[category] || [];
     const option = pool.find(o => o.id === subActivityId);
-    if (!option || !isActivityAvailable(option, player.position, _slot, player.grade ?? 1, get().clock.date)) return;
+    if (!option || !isActivityAvailable(option, player.position, _slot, player.grade ?? 1, get().clock.date) || !canDoSocialActivity(player, option)) return;
 
     // 체력 및 멘탈 게이팅 평가 (체력 20 이하 효율 반감 및 부상 롤)
     const result = evaluateActivityWithGating(
@@ -483,7 +497,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (option.category === 'training') {
       const multiplier = getTrainingEfficiencyMultiplier(player);
       for (const [key, value] of Object.entries(result.statChanges)) {
-        if (typeof value === 'number' && value > 0) (result.statChanges as Record<string, number>)[key] = Math.round(value * multiplier);
+        if (typeof value === 'number' && value > 0) (result.statChanges as Record<string, number>)[key] = Math.round(Math.round(value * multiplier) * (schoolTrainingCulture(player).keys.includes(key) ? 1.05 : 1) * 100) / 100;
       }
       if (multiplier > 1) result.logMessage += ` · 인연 훈련 보정 x${multiplier.toFixed(2)}`;
     }
@@ -492,7 +506,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     await get().advanceSlot(result);
   },
 
-  executeForcedSlot: async (slot: TimeSlot) => {
+  executeForcedSlot: async (slot: TimeSlot, decision?: MatchDecisionId) => {
     const { player, school, clock, dailyPlan, seasonMatches, academicEvents } = get();
     if (!player || !school || get().isLoading || get().activeCutscene || slot!==clock.currentSlot) return;
 
@@ -504,7 +518,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     if (assignment.category === 'match') {
       const match = getPlayerMatchForDate(clock.date, seasonMatches);
       if (match) {
-        result = resolveMatchPlaceholder(match, player, school);
+        result = resolveMatchPlaceholder(match, player, school, decision);
 
       } else {
         result = {
@@ -539,6 +553,9 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       if (!activeCutscene.choices?.length && choice !== 'learn') throw new Error('대화를 끝까지 진행해 주세요');
       const effect = (selected?.effect ?? activeCutscene.effect)(player);
       let updated=applyBondChanges({...player,...effect.statChanges,pendingEventId:undefined},effect.relationshipTargets);
+      const journey = migrateCareerJourney(updated);
+      if (ALL_CUTSCENES.some(e => e.id === activeCutscene.id && (e.id.startsWith('meet_') || e.id.startsWith('year')))) updated.careerJourney = { ...journey, completedScenes: [...new Set([...journey.completedScenes, activeCutscene.id])] };
+      updated = updateCareerProgress(updated);
       const relationshipTargets = actualBondChanges(player,updated);
       if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
       effect.logMessage = personalizeText(effect.logMessage, player);
@@ -551,6 +568,18 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       const changes = Object.fromEntries(Object.keys(effect.statChanges).filter(key=>typeof player[key as keyof Player]==='number' && typeof updated[key as keyof Player]==='number').map(key=>[key,Number(updated[key as keyof Player])-Number(player[key as keyof Player])]));
       set({player:updated,activeCutscene:null,lastActionResult:{statChanges:changes,relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
     }finally{set({isLoading:false});}
+  },
+  chooseCareerRoute: async (route) => {
+    const { player, isLoading, isCareerEnded, activeCutscene } = get();
+    if (!player || isLoading || isCareerEnded || activeCutscene || player.pendingGradeReportId) return;
+    const updated = updateCareerProgress(player);
+    if (!updated.careerJourney?.offers.includes(route)) return;
+    set({ isLoading: true });
+    try {
+      updated.careerJourney = { ...updated.careerJourney, chosenRoute: route };
+      await db.players.put(updated);
+      set({ player: updated });
+    } finally { set({ isLoading: false }); }
   },
   saveAppearance: async (appearance) => {
     const {player}=get(); if(!player || get().isLoading)return;
@@ -610,6 +639,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
   visitOutdoorLocation: async (location) => {
     const { player, clock } = get();
     if (get().isLoading || get().activeCutscene || get().isCareerEnded || player?.pendingGradeReportId || !player || (player.money || 0) < location.cost) return false;
+    if (!canDoSocialActivity(player, location.effects)) return false;
     const game = getBallparkVisit(location.id,clock.date,clock.currentSlot);
     if (game && !game.available) return false;
     if (isSchoolDay(clock.date) && clock.currentSlot !== 'night') return false;

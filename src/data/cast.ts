@@ -45,10 +45,13 @@ export function getCastMember(player: Pick<Player, 'cast'>, id: CastId): CastMem
 
 /** 인연 인물의 이름. 학생 인물은 회차별 이름, 나머지는 고정 호칭. */
 export function getBondName(player: Pick<Player, 'cast'> | null | undefined, id: BondId): string {
+  const journey = (player as Player | undefined)?.careerJourney;
+  if (journey && !journey.met.includes(id)) return '아직 만나지 않은 인물';
   return isCastId(id) && player ? getCastMember(player, id).name : BOND_NAMES[id];
 }
 
 const JOSA: Record<string, [withBatchim: string, withoutBatchim: string]> = {
+  이야: ['이야','야'], 이에요: ['이에요','예요'],
   이: ['이', '가'], 가: ['이', '가'], 은: ['은', '는'], 는: ['은', '는'], 을: ['을', '를'], 를: ['을', '를'],
   과: ['과', '와'], 와: ['과', '와'], 이랑: ['이랑', '랑'], 랑: ['이랑', '랑'], 아: ['아', '야'], 야: ['아', '야'],
 };

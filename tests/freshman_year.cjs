@@ -38,6 +38,8 @@ const { MAJOR_TOURNAMENT_TEMPLATES, generateSeasonMatches, addMissingNationals, 
 const openNationals = ['emart_spring', 'golden_lion', 'blue_dragon', 'president_cup', 'phoenix_autumn'];
 const { generateWeekendMatches, migrateWeekendMatches, getWeekendGroup } = require(path.join(dir, 'data/weekendLeague.js'));
 const { collectPlayerNews, getUnreadNews } = require(path.join(dir, 'data/news.js'));
+const { createCareerJourney, canDoSocialActivity, hasMet, eligibleRoutes, updateCareerProgress, schoolTrainingCulture, chemistry } = require(path.join(dir, 'data/careerJourney.js'));
+const { matchDecisions } = require(path.join(dir, 'data/matchDecisions.js'));
 function seededRandom(seed) {
   let n = seed >>> 0;
   return () => { n = (Math.imul(n, 1664525) + 1013904223) >>> 0; return n / 4294967296; };
@@ -117,6 +119,7 @@ for (const scenario of [
       const school = HIGH_SCHOOLS_DATA.find(s => scenario.region ? s.region === scenario.region : s.tier === scenario.tier);
       assert.ok(school, `시나리오 학교 누락: ${scenario.region ?? scenario.tier}`);
       const initialPlayer = starter(school, scenario.position, scenario.gender);
+      if (scenario.seed === 19) initialPlayer.careerJourney = { ...createCareerJourney(), met: ['mother','father','coach'] };
       if (scenario.rating) {
         for (const key of ['contact','power','eye','speed','defense','stuff','control','stamina',...Object.keys(require(path.join(dir, 'data/playerDevelopment.js')).EXTRA_RATINGS)]) initialPlayer[key] = scenario.rating;
         initialPlayer.pitches = initialPlayer.pitches?.map(p => ({ ...p, rating: scenario.rating }));
@@ -154,7 +157,7 @@ for (const scenario of [
         } else {
           const categories = getActivityCategories(clock.currentSlot, isSchoolDay(clock.date)).map(c => c.category);
           const preferred = before.player.condition < 65 ? 'rest' : categories[stats.slots % categories.length];
-          const candidates = SUB_ACTIVITY_POOL[preferred].filter(o => isActivityAvailable(o, before.player.position, clock.currentSlot, 1, clock.date));
+          const candidates = SUB_ACTIVITY_POOL[preferred].filter(o => isActivityAvailable(o, before.player.position, clock.currentSlot, 1, clock.date) && canDoSocialActivity(before.player,o));
           assert.ok(candidates.length, `선택 가능한 활동 없음: ${slotKey}/${preferred}`);
           const option = candidates[stats.slots % candidates.length];
           await before.selectActivity(clock.currentSlot, preferred, option.id);
@@ -616,7 +619,9 @@ test('3개년 연결: 1학년부터 윤년을 거쳐 졸업·재접속까지 실
   Math.random = seededRandom(31415);
   const stats = { events: 0, reports: 0, draws: 0, slots: 0, reloads: 0 };
   try {
-    await store.getState().initClock(starter(HIGH_SCHOOLS_DATA.find(s => s.region === '제주'), 'TwoWay', 'female'));
+    const initial = starter(HIGH_SCHOOLS_DATA.find(s => s.region === '제주'), 'TwoWay', 'female');
+    initial.careerJourney = { ...createCareerJourney(), met: ['mother','father','coach'] };
+    await store.getState().initClock(initial);
     while (!store.getState().isCareerEnded && stats.slots < 3300) {
       await dismissInterruptions(stats);
       const state = store.getState();
@@ -628,7 +633,7 @@ test('3개년 연결: 1학년부터 윤년을 거쳐 졸업·재접속까지 실
       else {
         const categories = getActivityCategories(currentSlot, isSchoolDay(date)).map(c => c.category);
         const category = state.player.condition < 65 ? 'rest' : categories[stats.slots % categories.length];
-        const options = SUB_ACTIVITY_POOL[category].filter(o => isActivityAvailable(o, state.player.position, currentSlot, date.grade, date));
+        const options = SUB_ACTIVITY_POOL[category].filter(o => isActivityAvailable(o, state.player.position, currentSlot, date.grade, date) && canDoSocialActivity(state.player,o));
         assert.ok(options.length);
         await state.selectActivity(currentSlot, category, options[stats.slots % options.length].id);
       }
@@ -638,6 +643,9 @@ test('3개년 연결: 1학년부터 윤년을 거쳐 졸업·재접속까지 실
     }
     assert.equal(stats.slots, 1095 * 3, '364일 + 윤년 366일 + 365일');
     assert.equal(store.getState().isCareerEnded, true);
+    assert.equal(saved.careerJourney.ending.route, 'club');
+    for (const id of ['deskmate','teacher','coach2','peer','rival','junior']) assert.ok(hasMet(saved,id), id + ' 첫 만남 누락');
+    for (const id of ['year1_first_goal','year2_leadership','year2_competition','year3_responsibility','year3_last_summer','year3_future']) assert.ok(saved.careerJourney.completedScenes.includes(id), id + ' 학년 이야기 누락');
     assert.deepEqual(saved.gradeReports.map(r => r.grade), [1, 2, 3]);
     assert.equal(new Set(saved.gradeReports.map(r => r.id)).size, 3);
     assert.equal(saved.monthlyGoalReports.length, 36);
@@ -755,4 +763,100 @@ test('일부 새 주말리그와 과거 일정이 함께 있는 저장본도 경
   const migrated = migrateWeekendMatches([legacy, ...current.slice(1)], 2026, school, HIGH_SCHOOLS_DATA, { year: 2026, month: 3, day: 8, weekday: 0, grade: 1 });
   assert.equal(new Set(migrated.map(m => m.id)).size, migrated.length);
   assert.equal(migrated.length, current.length);
+});
+
+test('첫 만남: 대화 완료 후 등록, 미지 인물 활동 차단, 저장 실패와 재접속 보존', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.careerJourney = { ...createCareerJourney(), met: ['mother','father','coach'] };
+  p.relationships.deskmate=76;
+  await store.getState().initClock(p);
+  assert.equal(store.getState().activeCutscene.id, 'meet_teacher');
+  assert.equal(hasMet(saved,'teacher'), false);
+  assert.ok(!collectPlayerNews(saved,saved.gameDate).some(n=>n.id.startsWith('bond:deskmate:') || n.id==='met:deskmate'));
+  const clock = structuredClone(store.getState().clock);
+  failNextSave = true;
+  await assert.rejects(store.getState().resolveCutscene('learn'), /save failed/);
+  assert.equal(hasMet(store.getState().player,'teacher'), false);
+  assert.equal(store.getState().activeCutscene.id, 'meet_teacher');
+  await store.getState().initClock(structuredClone(saved));
+  await store.getState().resolveCutscene('learn');
+  assert.equal(hasMet(saved,'teacher'), true);
+  assert.equal(store.getState().lastActionResult.relationshipTargets.teacher,2);
+  assert.ok(collectPlayerNews(saved,saved.gameDate).some(n=>n.id==='met:teacher'));
+  assert.deepEqual(store.getState().clock, clock, '소개는 시간을 추가 소비하지 않는다');
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(store.getState().activeCutscene, null);
+  assert.equal(saved.careerJourney.completedScenes.filter(id => id === 'meet_teacher').length, 1);
+  const unknown = SUB_ACTIVITY_POOL.relationship.find(o => Object.keys(o.relationshipTargets ?? {}).includes('deskmate'));
+  assert.ok(unknown);
+  assert.equal(canDoSocialActivity(saved,unknown), false);
+  const snapshot = structuredClone(saved);
+  await store.getState().selectActivity('morning','relationship',unknown.id);
+  assert.deepEqual(saved, snapshot);
+  const offered = sampleSubActivities('relationship', 100, 'SS', 'morning', 1, saved.gameDate, saved);
+  assert.ok(offered.every(o => canDoSocialActivity(saved,o)));
+});
+
+test('기존 저장: 이미 아는 인물·점수·캐스트를 유지하고 첫 만남을 강요하지 않는다', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'female');
+  p.relationships.deskmate = 76;
+  await store.getState().initClock(p);
+  assert.equal(hasMet(saved,'deskmate'), true);
+  assert.equal(saved.relationships.deskmate, 76);
+  assert.equal(store.getState().activeCutscene, null);
+});
+
+test('진로: 미출전·연습경기는 제안 요건에서 제외하고 선택·졸업·저장 실패를 보존한다', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.gameDate = {year:2028,month:9,day:2,weekday:6,grade:3}; p.grade=3;
+  for (const key of ['contact','power','eye','speed','defense']) p[key]=75;
+  for (const key of Object.keys(require(path.join(dir,'data/playerDevelopment.js')).EXTRA_RATINGS)) p[key]=75;
+  p.fame=60; p.academics=60;
+  p.matchRecords = Array.from({length:12},(_,i)=>({matchId:'official-'+i,year:2028,kind:'weekend',performance:{role:'starter'},log:'출전'}));
+  assert.deepEqual(eligibleRoutes(p), ['club','university','professional','overseas']);
+  assert.deepEqual(eligibleRoutes({...p,matchRecords:p.matchRecords.map(r=>({...r,kind:'practice'}))}), ['club']);
+  assert.deepEqual(eligibleRoutes({...p,matchRecords:p.matchRecords.map(r=>({...r,performance:{role:'bench'}}))}), ['club']);
+  await store.getState().initClock(p);
+  failNextSave=true;
+  await assert.rejects(store.getState().chooseCareerRoute('professional'), /save failed/);
+  assert.equal(store.getState().player.careerJourney.chosenRoute, undefined);
+  await store.getState().chooseCareerRoute('professional');
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(saved.careerJourney.chosenRoute, 'professional');
+  const ending=updateCareerProgress({...saved,careerEndedAt:{year:2029,month:3,day:1,weekday:4,grade:3}},true);
+  assert.equal(ending.careerJourney.ending.route, 'professional');
+  assert.deepEqual(updateCareerProgress(ending,true).careerJourney.ending,ending.careerJourney.ending);
+  await store.getState().initClock(ending);
+  await store.getState().chooseCareerRoute('club');
+  assert.equal(saved.careerJourney.ending.route, 'professional');
+});
+
+test('경기 선택: 출전 역할과 능력·피로에 따른 접근, 미출전의 수동 개입 차단', () => {
+  const p=starter(HIGH_SCHOOLS_DATA[0],'SS','male');
+  const match={id:'decision-match',year:2026,tournamentId:'practice',date:{month:3,day:2},isPlayerTeamMatch:true};
+  p.teamCompetition={selection:{matchId:match.id,year:2026,role:'starter'}};
+  p.contact=70;p.power=35;p.eye=55;
+  const choices=matchDecisions(p,match);
+  assert.equal(choices.length,3);
+  assert.ok(choices.find(d=>d.id==='contact').bonus>choices.find(d=>d.id==='attack').bonus);
+  assert.ok(choices.find(d=>d.id==='attack').homerBonus>0);
+  assert.ok(choices.find(d=>d.id==='attack').hitBonus<0);
+  assert.ok(matchDecisions({...p,condition:20},match)[0].bonus<choices[0].bonus);
+  assert.deepEqual(matchDecisions({...p,teamCompetition:{selection:{matchId:match.id,year:2026,role:'outside'}}},match),[]);
+  assert.deepEqual(matchDecisions({...p,position:'P'},match).map(d=>d.id),['challenge','corners','mix']);
+});
+
+test('학교 성향·동료 호흡: 학교와 인연에 따라 효과가 달라지고 실제 성장만 기록한다', async () => {
+  const p=starter(HIGH_SCHOOLS_DATA[0],'SS','male');
+  p.relationships.peer=70;p.relationships.coach2=70;
+  assert.equal(chemistry(p).bonus,.05);
+  assert.equal(chemistry({...p,careerJourney:createCareerJourney()}).bonus,0);
+  assert.ok(new Set(HIGH_SCHOOLS_DATA.map(s=>schoolTrainingCulture({...p,highSchool:s.name}).label)).size===3);
+  p.currentSlot='night';
+  await store.getState().initClock(p);
+  await store.getState().selectActivity('night','training',SUB_ACTIVITY_POOL.training.find(o=>o.id==='night_shadow')?.id ?? SUB_ACTIVITY_POOL.training.find(o=>isActivityAvailable(o,'SS','night',1,p.gameDate)).id);
+  assert.ok(Object.values(saved.careerJourney.trainingGrowth).some(v=>v>0));
+  const growth=structuredClone(saved.careerJourney.trainingGrowth);
+  await store.getState().initClock(structuredClone(saved));
+  assert.deepEqual(saved.careerJourney.trainingGrowth,growth);
 });

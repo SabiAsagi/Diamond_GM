@@ -97,7 +97,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       name: '기술 코치',
       role: '코치',
       icon: '📋',
-      note: '포지션별 특별 훈련이 열립니다.',
+      note: '포지션별 특별 훈련과 코칭 이야기가 이어집니다. 인연 55부터 출전 경기에서 기술 지도 효과로 승리 확률 +2.5%p.',
       stageLabels: ['기초 역량 평가 중', '가능성을 본 원석', '맞춤 지도 대상', '특훈의 동반자', '스승과 애제자'],
     },
     {
@@ -105,7 +105,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       name: '담임 선생님',
       role: '담임',
       icon: '👩‍🏫',
-      note: '학업과 진로 상담을 도와줍니다.',
+      note: '학업과 진로 상담을 도와줍니다. 대학 진학 제안에는 학업 성적도 필요합니다.',
       stageLabels: ['운동부 전입생', '성실한 학생', '진로 고민 상담자', '자랑스러운 제자', '학교의 명예'],
     },
     {
@@ -130,7 +130,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
       name: `입학 동기 ${getBondName(player, 'peer')}`,
       role: player.teamCompetition?.roster.some(n => n.bondId === 'peer' && n.position === (player.position === 'TwoWay' ? 'P' : player.position)) ? '동기 · 포지션 경쟁자' : '동기',
       icon: '🤝',
-      note: '인물별 인연과 이벤트 조건에 따라 가까워집니다.',
+      note: '인연 55부터 출전 경기에서 동료 호흡으로 승리 확률 +2.5%p. 같은 포지션의 경쟁과 학년별 이야기도 이어집니다.',
       romanceable: true,
       stageLabels: ['서먹한 배터리/라이벌', '신경 쓰이는 동기', '믿음을 주는 파트너', '특별한 감정의 싹', '마음을 확인한 연인'],
     },
@@ -202,7 +202,9 @@ export function buildBondProfiles(player: Player): BondProfile[] {
     return {
       ...profile,
       score: getRelScore(player, profile.id),
-      stageEffects: buildStageEffects(group),
+      stageEffects: buildStageEffects(group).map(effect => (profile.id === 'peer' || profile.id === 'coach2') && effect.stage >= 3
+        ? { ...effect, hasEffect: true, description: `${effect.hasEffect ? effect.description + ' · ' : ''}출전 경기 승리 확률 +2.5%p (${profile.id === 'peer' ? '동료 호흡' : '기술 지도'})` }
+        : effect),
     };
   });
 }

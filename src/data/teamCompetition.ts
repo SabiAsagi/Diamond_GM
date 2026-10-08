@@ -118,6 +118,8 @@ export function prepareTeamContext(player:Player,school:HighSchoolData,date:Game
 export function refreshTeamEvaluation(player:Player):Player {
   if(!player.teamCompetition)return player;
   const t={...player.teamCompetition};const updated={...player,teamCompetition:t};
+  t.roster = t.roster.map(n => n.bondId ? { ...n, name: getBondName(player,n.bondId) } : n);
+  if (t.selection) t.selection = { ...t.selection, lineup: t.selection.lineup.map(n => ['peer','senior','junior'].includes(n.id) ? { ...n, name: getBondName(player,n.id as 'peer' | 'senior' | 'junior') } : n) };
   t.technicalEvaluation=technicalScore(updated);t.coachEvaluation=coachScore(updated);
   const standing=getStanding(updated);
   const protectedRole=(t.role==='starter'||t.role==='core')&&getRelScore(updated,'coach')>=75&&t.poorStarts>0&&t.poorStarts<=2&&standing.rank<=2;

@@ -4,9 +4,10 @@ import { buildBondProfiles, scoreToStage, type BondProfile } from '../../../type
 import { Users, Heart, X } from 'lucide-react';
 import { CharacterPortrait } from '../../CharacterPortrait';
 import { personalizeText } from '../../../data/cast';
+import { hasMet } from '../../../data/careerJourney';
 
 export function RelationshipsView({ player }: { player: Player; onClose: () => void }) {
-  const profiles = buildBondProfiles(player);
+  const profiles = buildBondProfiles(player).filter(p => hasMet(player, p.id));
   const [selectedId, setSelectedId] = useState<BondProfile['id'] | null>(null);
   const selected = profiles.find(p => p.id === selectedId);
 
@@ -18,7 +19,7 @@ export function RelationshipsView({ player }: { player: Player; onClose: () => v
           <div>
             <h3 className="menu-view-title">선수 인연 & 인간관계도</h3>
             <p className="menu-view-sub">
-              인물을 눌러 단계별 실제 효과를 확인하세요. 인연은 인물마다 따로 쌓입니다.
+              첫 만남을 마친 인물만 표시됩니다. 학교생활과 컷씬을 통해 새로운 인연을 만나세요.
             </p>
           </div>
         </div>
