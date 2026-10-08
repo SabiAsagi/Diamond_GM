@@ -8,6 +8,7 @@ import { overallRating, EXTRA_RATINGS } from './playerDevelopment';
 
 export type CareerRoute = 'university' | 'professional' | 'overseas' | 'club';
 export interface CareerJourney {
+  onboarding?: 'school' | 'team' | 'interview' | 'complete';
   met: BondId[];
   completedScenes: string[];
   trainingGrowth: Record<string, number>;
@@ -17,11 +18,11 @@ export interface CareerJourney {
   ending?: { route: CareerRoute; title: string; text: string; overall: number; appearances: number };
 }
 export function createCareerJourney(): CareerJourney {
-  return { met: ['mother', 'father'], completedScenes: [], trainingGrowth: {}, offers: [] };
+  return { onboarding: 'school', met: ['mother', 'father'], completedScenes: [], trainingGrowth: {}, offers: [] };
 }
 /** Old careers keep their existing acquaintances and all accumulated scores. */
 export function migrateCareerJourney(p: Player): CareerJourney {
-  return p.careerJourney ?? { ...createCareerJourney(), met: Object.keys(BOND_NAMES) as BondId[] };
+  return p.careerJourney ?? { ...createCareerJourney(), onboarding: undefined, met: Object.keys(BOND_NAMES) as BondId[] };
 }
 export const hasMet = (p: Player, id: string) => !p.careerJourney || p.careerJourney.met.includes(id as BondId);
 export function canDoSocialActivity(p: Player, option: Pick<ActivityOption, 'relationshipTargets'>): boolean {
@@ -36,7 +37,33 @@ const meet = (id: BondId, day: number, title: string, dialogue: string, grade = 
   conditions: (p, date) => !hasMet(p, id) && date.grade >= grade && (date.grade > grade || date.month !== 3 || date.day >= day),
   effect: p => ({ statChanges: { careerJourney: { ...migrateCareerJourney(p), met: [...new Set([...migrateCareerJourney(p).met, id])] } }, relationshipTargets: { [id]: 2 }, logMessage: `${['coach','coach2','teacher','pe'].includes(id) ? BOND_NAMES[id] : `{${id}}`} 인연이 시작되었습니다.` }),
 });
+const orientation = (stage: 'school' | 'team', title: string, members: BondId[], lines: NonNullable<EventCutscene['dialogueLines']>): EventCutscene => ({
+  id: `meet_orientation_${stage}`, title, subtitle: stage === 'school' ? '입학식 · 교실에서 처음 만나는 사람들' : '입학식 후 · 야구부 첫 미팅',
+  speakerId: members[0], speakerName: BOND_NAMES[members[0]], speakerRole: '첫날 소개', icon: '🤝',
+  dialogue: lines[0].text, dialogueLines: lines, baseChance: 1, cooldownDays: 9999,
+  conditions: p => !p.interviewCompleted && p.careerJourney?.onboarding === stage,
+  effect: p => ({ statChanges: { careerJourney: { ...migrateCareerJourney(p), onboarding: stage === 'school' ? 'team' : 'interview', met: [...new Set([...migrateCareerJourney(p).met, ...members])] } }, relationshipTargets: Object.fromEntries(members.map(id => [id,2])), logMessage: `${title} — ${stage === 'school' ? '담임·반장·짝꿍' : '감독·기술 코치·주장·동기'}와 인사를 나눴습니다.` }),
+});
+export const ORIENTATION_SCENES = [
+  orientation('school', '입학식, 우리 반의 첫 만남', ['teacher','classLeader','deskmate'], [
+    { speaker: 'npc', speakerId: 'teacher', text: '입학을 축하해요. 입학식을 마쳤으니 이제 우리 반 친구들과 인사를 나눠 볼까요? 선생님은 여러분의 담임이에요.' },
+    { speaker: 'npc', speakerId: 'classLeader', text: '안녕, 반장을 맡은 {classLeader|이야}. 학급 공지와 수업 자료를 챙길게. 원정으로 자리를 비우면 필요한 내용을 같이 정리하자.' },
+    { speaker: 'npc', speakerId: 'deskmate', text: '나는 {deskmate|이야}. 네 옆자리에 앉게 됐어. 반 친구들과 점심도 같이 먹자!' },
+    { speaker: 'player', text: '잘 부탁해! 야구도 학교생활도 열심히 해 볼게. 반 친구들의 자기소개를 들으니 교실이 조금 편해졌다.' },
+    { speaker: 'npc', speakerId: 'teacher', text: '야구부 신입생은 이제 야구부 첫 미팅에 가면 돼요. 학교생활에서 어려운 일이 생기면 언제든 이야기해요.' },
+  ]),
+  orientation('team', '야구부, 첫 번째 미팅', ['coach','coach2','senior','peer'], [
+    { speaker: 'npc', speakerId: 'coach', text: '교실에서 인사는 잘 나눴니? 이제 야구부에 온 걸 환영한다. 먼저 함께 훈련할 사람들을 소개하마.' },
+    { speaker: 'npc', speakerId: 'coach2', text: '기술 코치다. 첫날부터 무리하지 말고, 네 자세와 회복 습관부터 함께 살펴보자.' },
+    { speaker: 'npc', speakerId: 'senior', text: '주장 {senior|이야}. 운동장과 장비실은 내가 안내할게. 궁금한 건 편하게 물어봐.' },
+    { speaker: 'npc', speakerId: 'peer', text: '나도 오늘 들어온 {peer|이야}. 같은 신입생끼리 잘해 보자!' },
+    { speaker: 'player', text: '잘 부탁드립니다. 이제 팀 동료들과 함께 첫 시즌을 준비하고 싶어요.' },
+    { speaker: 'npc', speakerId: 'coach', text: '팀 소개는 여기까지다. 이제 각자 어떤 선수가 되고 싶은지 면담해 보자.' },
+  ]),
+];
 export const INTRODUCTION_SCENES: EventCutscene[] = [
+  ...ORIENTATION_SCENES,
+  meet('classLeader', 3, '우리 반 반장과의 인사', '반장 {classLeader|이야}. 학급 공지나 놓친 수업이 있으면 함께 정리하자.'),
   meet('coach', 2, '야구부 첫 인사', '우리 팀에 온 걸 환영한다. 결과보다 네가 준비하는 태도부터 보겠다.'),
   meet('teacher', 2, '처음 들어선 교실', '담임 선생님이야. 원정과 수업이 겹칠 때는 함께 계획을 세워 보자.'),
   meet('deskmate', 3, '옆자리의 첫 인사', '안녕, 나는 {deskmate|이야}. 같은 책상을 쓰게 됐네. 야구부라고 들었어!'),

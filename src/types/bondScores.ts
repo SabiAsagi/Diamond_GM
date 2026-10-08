@@ -3,19 +3,19 @@ import type { Player } from './index';
 export const BOND_NAMES = {
   coach: '야구부 감독', coach2: '기술 코치', teacher: '담임 선생님', pe: '체육 선생님',
   senior: '강민준', peer: '이도현', rival: '박태성', junior: '이준서',
-  childhood: '한서윤', neighbor: '최민재', deskmate: '윤하린', mother: '어머니', father: '아버지',
+  childhood: '한서윤', neighbor: '최민재', deskmate: '윤하린', classLeader: '김서진', mother: '어머니', father: '아버지',
 } as const;
 export type BondId = keyof typeof BOND_NAMES;
 /** 회차마다 이름·성별·외모가 새로 정해지는 학생 인물 (data/cast.ts) */
-export const CAST_BOND_IDS = ['senior', 'peer', 'rival', 'junior', 'childhood', 'neighbor', 'deskmate'] as const;
+export const CAST_BOND_IDS = ['senior', 'peer', 'rival', 'junior', 'childhood', 'neighbor', 'deskmate', 'classLeader'] as const;
 export type RelationshipCharacterId = BondId;
 export type BondScores = Record<BondId, number>;
 export type RelationshipTargets = Partial<BondScores>;
 export const TEAM_BOND_IDS: BondId[] = ['pe', 'senior', 'peer', 'rival', 'junior'];
-export const FRIEND_BOND_IDS: BondId[] = ['teacher', 'childhood', 'neighbor', 'deskmate'];
+export const FRIEND_BOND_IDS: BondId[] = ['teacher', 'childhood', 'neighbor', 'deskmate', 'classLeader'];
 export const INITIAL_RELATIONSHIPS: BondScores = {
   coach:10, coach2:10, teacher:15, pe:15, senior:10, peer:15, rival:10, junior:10,
-  childhood:15, neighbor:15, deskmate:15, mother:20, father:20,
+  childhood:15, neighbor:15, deskmate:15, classLeader:15, mother:20, father:20,
 };
 const clamp = (n: number) => Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
 
@@ -30,7 +30,7 @@ export function getBondScores(p: Player): BondScores {
   const f = clamp(old.relationshipFriends ?? 15), family = clamp(old.relationshipFamily ?? 20);
   const scores: BondScores = {
     coach:c, coach2:c, teacher:f, pe:t, senior:t, peer:t, rival:t, junior:t,
-    childhood:f, neighbor:f, deskmate:f, mother:family, father:family,
+    childhood:f, neighbor:f, deskmate:f, classLeader:f, mother:family, father:family,
   };
   // 0점도 유지하며 부분 저장에서 누락된 인물만 채운다. 반복 변환으로 점수를 덮어쓰지 않는다.
   for (const id of Object.keys(scores) as BondId[]) scores[id] = clamp(p.relationships?.[id] ?? scores[id]);

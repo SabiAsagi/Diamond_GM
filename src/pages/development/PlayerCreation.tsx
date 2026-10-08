@@ -1,4 +1,5 @@
 import { initializeRival } from '../../data/rival';
+import { createCareerJourney } from '../../data/careerJourney';
 import { generateCast } from '../../data/cast';
 import { INITIAL_RELATIONSHIPS } from '../../types/bondScores';
 import { AppearanceEditor } from '../../components/PlayerAppearance';
@@ -140,7 +141,7 @@ export default function PlayerCreation() {
       condition: 100,
       academics: 50,
       relationships: {...INITIAL_RELATIONSHIPS},
-      careerJourney: { met: ['mother','father'], completedScenes: [], trainingGrowth: {}, offers: [] },
+      careerJourney: createCareerJourney(),
       money: 50000,
       inventory: [],
       equippedItems: {},
@@ -157,7 +158,7 @@ export default function PlayerCreation() {
     // 회차마다 주장·동기·라이벌·후배·친구들의 이름·성별·외모를 새로 정한다.
     normalized.cast = generateCast(normalized, HIGH_SCHOOLS_DATA);
     const id = await db.players.add(normalized);
-    navigate(`/development/interview/${id}`);
+    navigate(`/development/dashboard/${id}`);
     } catch { setSaveError('선수 저장에 실패했습니다. 입력한 내용으로 다시 시도해주세요.'); }
     finally { creating.current = false; setIsCreating(false); }
   };
@@ -583,7 +584,7 @@ export default function PlayerCreation() {
                   onClick={handleCreate}
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '1rem', fontWeight: 700 }}
                 >
-                  <Save size={18} /> 선수 생성 완료 및 감독 면담 입장
+                  <Save size={18} /> 선수 생성 완료 및 입학식 입장
                 </button>
               </div>
             </div>

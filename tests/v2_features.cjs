@@ -143,7 +143,7 @@ test('초기 인연은 1단계이고 네 로맨스 대상은 선수 성별과 �
     assert.deepEqual(bonds.filter(b => b.romanceable).map(b => b.id).sort(), expectedRomance);
     assert.ok(!bonds.some(b => b.id === 'junior'), '1학년에게는 후배가 노출되지 않는다');
     const laterBonds = buildBondProfiles({ gender, grade: 2, relationships: { ...INITIAL_RELATIONSHIPS } });
-    assert.equal(laterBonds.length, 13);
+    assert.equal(laterBonds.length, 14);
     assert.ok(laterBonds.some(b => b.id === 'junior'));
   }
 });
@@ -179,8 +179,8 @@ test('회차별 인물: 이름·성별·외모가 무작위로 정해지고 서�
     const cast = generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(seed));
     assert.deepEqual(Object.keys(cast).sort(), [...CAST_IDS].sort());
     const names = CAST_IDS.map(id => cast[id].name);
-    assert.equal(new Set(names).size, 7, `이름 중복 (seed ${seed})`);
-    assert.equal(new Set(names.map(n => n.slice(1))).size, 7, `성을 뺀 이름 중복 (seed ${seed})`);
+    assert.equal(new Set(names).size, 8, `이름 중복 (seed ${seed})`);
+    assert.equal(new Set(names.map(n => n.slice(1))).size, 8, `성을 뺀 이름 중복 (seed ${seed})`);
     assert.ok(!names.includes(castPlayer.name), '선수 이름과 중복');
     const team = ['senior', 'peer', 'rival', 'junior'].map(id => cast[id]);
     assert.ok(team.every(member => member.portrait.kind === 'image'));
@@ -188,9 +188,9 @@ test('회차별 인물: 이름·성별·외모가 무작위로 정해지고 서�
     assert.equal(cast.senior.portrait.schoolName, castPlayer.highSchool);
     assert.notEqual(cast.rival.portrait.schoolName, castPlayer.highSchool, '라이벌은 다른 학교 유니폼');
     assert.equal(HIGH_SCHOOLS_DATA.find(s => s.name === cast.rival.portrait.schoolName)?.region, HIGH_SCHOOLS_DATA[0].region, '라이벌은 같은 시·도 학교·팀 소속');
-    const friends = ['childhood', 'neighbor', 'deskmate'].map(id => cast[id]);
+    const friends = ['childhood', 'neighbor', 'deskmate', 'classLeader'].map(id => cast[id]);
     assert.ok(friends.every(m => m.portrait.kind === 'imagePair'));
-    assert.equal(new Set(friends.map(m => m.portrait.schoolSrc)).size, 3, '친구 교복 일러스트 중복');
+    assert.equal(new Set(friends.map(m => m.portrait.schoolSrc)).size, 4, '친구 교복 일러스트 중복');
     assert.ok(friends.every(m => m.portrait.schoolSrc !== m.portrait.casualSrc), '교복·사복 파일이 같음');
   }
   const casts = Array.from({ length: 40 }, (_, index) => generateCast(castPlayer, HIGH_SCHOOLS_DATA, seeded(index + 1)));

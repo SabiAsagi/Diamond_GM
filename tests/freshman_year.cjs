@@ -765,6 +765,41 @@ test('일부 새 주말리그와 과거 일정이 함께 있는 저장본도 경
   assert.equal(migrated.length, current.length);
 });
 
+test('입학식 → 야구부 미팅 순서, 그룹 소개의 저장 실패·재접속과 중복 방지', async () => {
+  const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
+  p.interviewCompleted = false;
+  p.careerJourney = createCareerJourney();
+  await store.getState().initClock(p);
+  assert.equal(store.getState().activeCutscene.id, 'meet_orientation_school');
+  assert.equal(hasMet(saved,'coach'), false);
+  assert.equal(hasMet(saved,'classLeader'), false);
+  failNextSave = true;
+  await assert.rejects(store.getState().resolveCutscene('learn'), /save failed/);
+  assert.equal(hasMet(saved,'teacher'),false);
+  await store.getState().initClock(structuredClone(saved));
+  await store.getState().resolveCutscene('learn');
+  for (const id of ['teacher','classLeader','deskmate']) assert.equal(hasMet(saved,id),true);
+  for (const id of ['coach','coach2','senior','peer']) assert.equal(hasMet(saved,id),false);
+  assert.equal(saved.careerJourney.onboarding,'team');
+  assert.equal(store.getState().activeCutscene.id,'meet_orientation_team');
+  const classScore = saved.relationships.classLeader;
+  await store.getState().initClock(structuredClone(saved));
+  assert.equal(store.getState().activeCutscene.id,'meet_orientation_team');
+  failNextSave = true;
+  await assert.rejects(store.getState().resolveCutscene('learn'), /save failed/);
+  assert.equal(hasMet(saved,'coach'),false);
+  await store.getState().resolveCutscene('learn');
+  assert.equal(saved.careerJourney.onboarding,'interview');
+  for (const id of ['coach','coach2','senior','peer']) assert.equal(hasMet(saved,id),true);
+  assert.equal(saved.relationships.classLeader,classScore);
+  assert.equal(saved.careerJourney.completedScenes.filter(id=>id==='meet_orientation_school').length,1);
+  await store.getState().resolveCutscene('learn');
+  assert.equal(saved.relationships.classLeader,classScore);
+  const option=SUB_ACTIVITY_POOL.relationship.find(o=>o.id==='rel_class_leader_notes');
+  assert.equal(canDoSocialActivity(saved,option),true);
+  assert.equal(option.statChanges.academics,2);
+});
+
 test('첫 만남: 대화 완료 후 등록, 미지 인물 활동 차단, 저장 실패와 재접속 보존', async () => {
   const p = starter(HIGH_SCHOOLS_DATA[0], 'SS', 'male');
   p.careerJourney = { ...createCareerJourney(), met: ['mother','father','coach'] };

@@ -423,6 +423,7 @@ export const SUB_ACTIVITY_POOL: Record<DailyActivityCategory, ActivityOption[]> 
   ],
 
   relationship: [
+    { id: 'rel_class_leader_notes', label: '{classLeader|와} 수업 자료 정리', description: '반장과 학급 공지를 살펴보고 원정 중 놓친 수업을 정리합니다.', category: 'relationship', weight: 2, icon: '📋', targetPosition: 'ALL', allowedSlots: ['morning','night'], staminaDelta: -3, mentalDelta: 5, relationshipTargets: { classLeader: 4 }, statChanges: { academics: 2 } },
     {id:'rel_tech_coach_video',label:'기술 코치와 영상 분석',category:'relationship',icon:'🎥',description:'기술 코치와 스윙·투구 영상을 돌려보며 조언을 듣습니다.',staminaDelta:-4,mentalDelta:2,statChanges:{eye:1},relationshipTargets:{coach2:4},targetPosition:'ALL',allowedSlots:['afternoon']},
     {id:'rel_rival_training_match',label:'라이벌과 자체 미니게임',category:'relationship',icon:'🔥',description:'{rival|과} 가벼운 내기를 걸고 훈련 대결을 펼칩니다.',staminaDelta:-6,mentalDelta:3,statChanges:{condition:2},relationshipTargets:{rival:4},targetPosition:'ALL',allowedSlots:['afternoon']},
     {id:'rel_junior_catch',label:'후배와 캐치볼',category:'relationship',icon:'⚾',description:'{junior|와} 캐치볼을 하며 이야기를 나눕니다.',staminaDelta:-3,mentalDelta:4,statChanges:{},relationshipTargets:{junior:4},minGrade:2,targetPosition:'ALL',allowedSlots:['afternoon','night']},

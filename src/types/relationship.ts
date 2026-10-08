@@ -84,6 +84,7 @@ export function buildBondProfiles(player: Player): BondProfile[] {
 
   // note는 기존 참조와의 호환을 위해 보존한다. 실제 효과 표시는 stageEffects를 사용한다.
   const profiles: Omit<BondProfile, 'stageEffects' | 'score'>[] = [
+    { id: 'classLeader', name: `우리 반 반장 ${getBondName(player, 'classLeader')}`, role: '반장', icon: '📋', note: '학급 일정과 원정 중 놓친 수업을 함께 정리하는 친구입니다. 대화 활동으로 학업과 인연을 키울 수 있습니다.', stageLabels: ['아는 반장', '편한 반장', '든든한 반장', '믿음직한 친구', '특별한 학급 친구'] },
     {
       id: 'coach',
       name: '야구부 감독',

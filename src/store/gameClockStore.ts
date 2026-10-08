@@ -216,6 +216,7 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
     const state = get();
     const { player, clock, school, seasonMatches: originalMatches, academicEvents, todayLogs, cutsceneHistory } = state;
     if (!player || state.isLoading || state.activeCutscene || state.isCareerEnded || player.pendingGradeReportId) return;
+    if (!player.interviewCompleted && player.careerJourney?.onboarding) return;
     if(result.matchOutcome && player.matchRecords?.some(r=>r.matchId===result.matchOutcome!.matchId&&r.year===clock.date.year))return;
     const seasonMatches=result.matchOutcome&&school?progressTournament(originalMatches,result.matchOutcome,school,HIGH_SCHOOLS_DATA):originalMatches;
     const actionDate=`${clock.date.year}-${clock.date.month}-${clock.date.day}`;
@@ -558,15 +559,17 @@ export const useGameClockStore = create<GameClockState>((set, get) => ({
       updated = updateCareerProgress(updated);
       const relationshipTargets = actualBondChanges(player,updated);
       if(Object.keys(relationshipTargets).length) effect.logMessage += ` · ${formatBondChanges(relationshipTargets)}`;
-      effect.logMessage = personalizeText(effect.logMessage, player);
+      effect.logMessage = personalizeText(effect.logMessage, updated);
       for(const key of ['stuff','control','stamina','contact','power','eye','speed','defense','condition','fame','academics',...Object.keys(EXTRA_RATINGS)]){
         const record=updated as unknown as Record<string,unknown>; if(typeof record[key]==='number')record[key]=Math.max(0,Math.min(100,record[key] as number));
       }
       updated=refreshTeamEvaluation(updated);
       updated.overall=overallRating(updated);
+      const following = activeCutscene.id === 'meet_orientation_school' ? nextJourneyScene(updated, get().clock.date) : null;
+      if (following) updated.pendingEventId = following.id;
       captureAchievements(updated); await db.players.put(updated);
       const changes = Object.fromEntries(Object.keys(effect.statChanges).filter(key=>typeof player[key as keyof Player]==='number' && typeof updated[key as keyof Player]==='number').map(key=>[key,Number(updated[key as keyof Player])-Number(player[key as keyof Player])]));
-      set({player:updated,activeCutscene:null,lastActionResult:{statChanges:changes,relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
+      set({player:updated,activeCutscene:following,lastActionResult:following ? null : {statChanges:changes,relationshipTargets,staminaDelta:0,logMessage:effect.logMessage},todayLogs:[...get().todayLogs,effect.logMessage]});
     }finally{set({isLoading:false});}
   },
   chooseCareerRoute: async (route) => {
