@@ -432,6 +432,22 @@ test('학교명과 모자 글자의 모든 문자가 번들 폰트에 포함된�
   }
 });
 
+test('같은 학교는 모든 외형에서 학교명 배치·서체·배색·모자 문양을 유지한다', async () => {
+  const { getKitLetteringSvg } = await import('../scripts/kit-lettering.mjs');
+  for (const school of [...HIGH_SCHOOLS_DATA, { name: '' }]) {
+    const kit = getSchoolKit(school.name);
+    let expected;
+    for (const preset of allPresets) {
+      const svg = await getKitLetteringSvg(kit, preset.id);
+      // Body fitting can resize and translate words, but cannot redesign them.
+      const design = [...svg.matchAll(/<text\b[^>]*>[^<]*<\/text>/g)]
+        .map(([text]) => text.replace(/\s(?:x|y|font-size)="[^"]*"/g, ''));
+      expected ??= design;
+      assert.deepEqual(design, expected, school.name + ' ' + preset.id);
+    }
+  }
+});
+
 test('학교91×외형8의 실제 글자 렌더링에서 단추 여밈선20px은 비어 있다', async () => {
   const { registerKitFont, getKitLetteringSvg, LETTERING_FITS } = await import('../scripts/kit-lettering.mjs');
   await registerKitFont();
